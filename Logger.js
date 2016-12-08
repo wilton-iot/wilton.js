@@ -43,7 +43,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
                     if ("string" === typeof (message)) {
                         msg = message;
                     } else if (message instanceof Error) {
-                        msg = message.toString() + "\n" + message.stack;
+                        msg = message + "\n" + message.stack;
                     } else {
                         try {
                             msg = JSON.stringify(message);

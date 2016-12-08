@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./nativeLib", "./utils"], function(nativeLib, utils) {
+define(["./nativeLib", "./utils", "./Logger"], function(nativeLib, utils, Logger) {
     "use strict";
 
     // Response

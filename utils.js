@@ -66,7 +66,7 @@ define(function() {
                 return res;
             }
         } else {
-            throw e;
+            throw new Error(e.message + "\n" + e.stack);
         }
     };
 
