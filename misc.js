@@ -7,18 +7,6 @@
 define(["./nativeLib", "./utils"], function(nativeLib, utils) {
     "use strict";
 
-    function threadSleepMillis(millis, options) {
-        var opts = utils.defaultObject(options);
-        try {
-            nativeLib.wiltoncall("thread_sleep_millis", JSON.stringify({
-                millis: millis
-            }));
-            utils.callOrIgnore(opts.onSuccess);
-        } catch (e) {
-            utils.callOrThrow(opts.onFailure, e);
-        }
-    };
-
     function tcpWaitForConnection(options) {
         var opts = utils.defaultObject(options);
         var onSuccess = opts.onSuccess;
@@ -31,10 +19,9 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
         } catch (e) {
             utils.callOrThrow(onFailure, e);
         }
-    };
+    }
 
     return {
-        threadSleepMillis: threadSleepMillis,
         tcpWaitForConnection: tcpWaitForConnection
     };
 });

@@ -11,8 +11,17 @@ define(function() {
     if ("undefined" === typeof(Packages)) {
         console.log("Error: wilton.js requires Nashorn or Rhino JVM environment");
     }
+    
+    function wrapRunnable(callback) {
+        return new Packages.java.lang.Runnable({
+            run: function() {
+                callback();
+            }
+        });
+    }
 
     return {
-        wiltoncall: Packages.net.wiltonwebtoolkit.WiltonJni.wiltoncall
+        wiltoncall: Packages.net.wiltonwebtoolkit.WiltonJni.wiltoncall,
+        wrapRunnable: wrapRunnable
     };
 });
