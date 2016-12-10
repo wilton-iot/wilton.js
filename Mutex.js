@@ -62,14 +62,12 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
             utils.checkPropertyType(opts, "callback", "function");
             utils.checkPropertyType(opts, "timeoutMillis", "number");
             try {
-                var cond = new Packages.java.util.concurrent.Callable({
-                    call: function() {
-                        var res = opts.callback();
-                        var resbool = Boolean(res);
-                        return JSON.stringify({
-                            condition: resbool
-                        });
-                    }
+                var cond = nativeLib.wrapCallable(function() {
+                    var res = opts.callback();
+                    var resbool = Boolean(res);
+                    return JSON.stringify({
+                        condition: resbool
+                    });
                 });
                 nativeLib.wiltoncall("mutex_wait", JSON.stringify({
                     mutexHandle: this.handle,

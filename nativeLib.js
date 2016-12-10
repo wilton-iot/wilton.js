@@ -19,9 +19,32 @@ define(function() {
             }
         });
     }
+    
+    function wrapCallable(callback) {
+        return new Packages.java.util.concurrent.Callable({
+            call: function() {
+                return callback();
+            }
+        });
+    }
+    
+    function wrapWiltonGateway(callback) {
+        return new Packages.net.wiltonwebtoolkit.WiltonGateway({
+            gatewayCallback: function(requestHandle) {
+                callback(requestHandle);
+            }
+        });
+    }
+    
+    function printStdout(message) {
+        Packages.System.out.println(message);
+    }
 
     return {
         wiltoncall: Packages.net.wiltonwebtoolkit.WiltonJni.wiltoncall,
-        wrapRunnable: wrapRunnable
+        wrapRunnable: wrapRunnable,
+        wrapCallable: wrapCallable,
+        wrapWiltonGateway: wrapWiltonGateway,
+        printStdout: printStdout
     };
 });

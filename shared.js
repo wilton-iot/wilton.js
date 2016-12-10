@@ -7,4 +7,20 @@
 define(function() {
     "use strict";
 
+    function put() {
+        
+    }
+    
+    function get() {
+        
+    }
+    
+    function waitChange() {
+        
+    }
+    
+    function remove() {
+        
+    }
+
 });

@@ -17,11 +17,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
         try {
             var cb = opts.callback;
             delete opts.callback;
-            var runnable = new Packages.java.lang.Runnable({
-                run: function() {
-                    cb();
-                }
-            });
+            var runnable = nativeLib.wrapRunnable(cb);
             var data = JSON.stringify(opts);
             var handleJson = nativeLib.wiltoncall("cron_start", data, runnable);
             var handleObj = JSON.parse(handleJson);

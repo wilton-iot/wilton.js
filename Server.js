@@ -117,10 +117,8 @@ define(["./nativeLib", "./utils", "./Logger"], function(nativeLib, utils, Logger
                 delete opts.mustache.templatesRootDir;
             }
             var self = this;
-            var gatewayPass = new Packages.net.wiltonwebtoolkit.WiltonGateway({
-                gatewayCallback: function(requestHandle) {
-                    self._gatewaycb(requestHandle);
-                }
+            var gatewayPass = nativeLib.wrapWiltonGateway(function(requestHandle) {
+                self._gatewaycb(requestHandle);
             });
             delete opts.views;
             var data = JSON.stringify(opts);

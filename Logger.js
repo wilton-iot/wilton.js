@@ -59,9 +59,9 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
                 });
                 nativeLib.wiltoncall("logger_log", data);
             } catch (e) {
-                print("===LOGGER ERROR:");
-                print(e.toString() + "\n" + e.stack);
-                print("===LOGGER ERROR END:");
+                nativeLib.printStdout("===LOGGER ERROR:");
+                nativeLib.printStdout(e.toString() + "\n" + e.stack);
+                nativeLib.printStdout("===LOGGER ERROR END:");
             }
         },
         
