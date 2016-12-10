@@ -37,7 +37,7 @@ define(function() {
     }
     
     function printStdout(message) {
-        Packages.System.out.println(message);
+        Packages.java.lang.System.out.println(message);
     }
 
     return {

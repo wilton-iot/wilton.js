@@ -10,6 +10,16 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
     function run(options) {
         var opts = utils.defaultObject(options);
         utils.checkPropertyType(opts, "callback", "function");
+        
+//        utils.checkProperties(opts, ["callbackModule"]);
+//        var runnable = nativeLib.wrapRunnable(function() {
+//            // this needs to be moved into native part for
+//            // non-threaded JS runtimes (v8/duktape)
+//            require([opts.callbackModule], function(cb) {
+//                cb();
+//            });
+//        });
+        
         var runnable = nativeLib.wrapRunnable(opts.callback);
         try {
             nativeLib.wiltoncall("thread_run", "{}", runnable);

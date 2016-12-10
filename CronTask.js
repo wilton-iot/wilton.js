@@ -9,22 +9,24 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
 
     var CronTask = function(config) {
         var opts = utils.defaultObject(config);
-        utils.checkPropertyType(opts, "callback", "function");
-        var onSuccess = opts.onSuccess;
-        var onFailure = opts.onFailure;
-        delete opts.onSuccess;
-        delete opts.onFailure;
+        utils.checkProperties(opts, ["callbackModule", "callbackMethod", "expression"]);
         try {
-            var cb = opts.callback;
-            delete opts.callback;
-            var runnable = nativeLib.wrapRunnable(cb);
-            var data = JSON.stringify(opts);
+            var runnable = nativeLib.wrapRunnable(function() {
+                // this needs to be moved into native part for
+                // non-threaded JS runtimes (v8/duktape)
+                require([opts.callbackModule], function(mod) {
+                    mod[opts.callbackMethod]();
+                });
+            });
+            var data = JSON.stringify({
+                expression: opts.expression
+            });
             var handleJson = nativeLib.wiltoncall("cron_start", data, runnable);
             var handleObj = JSON.parse(handleJson);
             this.handle = handleObj.cronHandle;
-            utils.callOrIgnore(onSuccess);
+            utils.callOrIgnore(opts.onSuccess);
         } catch (e) {
-            utils.callOrThrow(onFailure, e);
+            utils.callOrThrow(opts.onFailure, e);
         }
     };
 

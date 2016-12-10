@@ -4,23 +4,81 @@
  * and open the template in the editor.
  */
 
-define(function() {
+define(["./nativeLib", "./utils"], function(nativeLib, utils) {
     "use strict";
 
-    function put() {
-        
+    function put(options) {
+        var opts = utils.defaultObject(options);
+        utils.checkProperties(opts, ["key", "value"]);
+        var val  = utils.defaultJson(opts.value);
+        try {
+            nativeLib.wiltoncall("shared_put", JSON.stringify({
+                key: opts.key,
+                value: val
+            }));
+            utils.callOrIgnore(opts.onSuccess);
+        } catch (e) {
+            utils.callOrThrow(opts.onFailure, e);
+        }
     }
     
-    function get() {
-        
+    function get(options) {
+        var opts = utils.defaultObject(options);
+        utils.checkProperties(opts, ["key"]);
+        try {
+            var res = nativeLib.wiltoncall("shared_get", JSON.stringify({
+                key: opts.key
+            }));
+            var resstr = String(res);
+            var resout = null;
+            if ("" !== resstr) {
+                resout = JSON.parse(resstr);
+            }
+            utils.callOrIgnore(opts.onSuccess, resout);
+            return resout;
+        } catch (e) {
+            utils.callOrThrow(opts.onFailure, e);
+        }
     }
     
-    function waitChange() {
-        
+    function waitChange(options) {
+        var opts = utils.defaultObject(options);
+        utils.checkProperties(opts, ["timeoutMillis", "key", "currentValue"]);
+        try {
+            var res = nativeLib.wiltoncall("shared_wait_change", JSON.stringify({
+                timeoutMillis: opts.timeoutMillis,
+                key: opts.key,
+                currentValue: opts.currentValue
+            }));
+            var resout = null;
+            if ("" !== res) {
+                resout = JSON.parse(res);
+            }
+            utils.callOrIgnore(opts.onSuccess, resout);
+            return resout;
+        } catch (e) {
+            utils.callOrThrow(opts.onFailure, e);
+        }
     }
     
-    function remove() {
-        
+    function remove(options) {
+        var opts = utils.defaultObject(options);
+        utils.checkProperties(opts, ["key"]);
+        try {
+            nativeLib.wiltoncall("shared_remove", JSON.stringify({
+                key: opts.key
+            }));
+            utils.callOrIgnore(opts.onSuccess);
+        } catch (e) {
+            utils.callOrThrow(opts.onFailure, e);
+        }
     }
+    
+    return {
+        put: put,
+        get: get,
+        waitChange: waitChange,
+        remove: remove
+    };
 
 });
