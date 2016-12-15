@@ -7,122 +7,65 @@
 define(["./nativeLib", "./utils", "./Logger"], function(nativeLib, utils, Logger) {
     "use strict";
 
-    // Response
+    var logger = new Logger("wilton.server");
+    var METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"];
 
-    var Response = function(server, handle) {
-        this.server = server;
-        this.handle = handle;
-    };
-
-    Response.prototype = {
-        send: function(data, options) {
-            var opts = utils.defaultObject(options);
-            try {
-                this._setMeta(opts);
-                var dt = utils.defaultJson(data);
-                nativeLib.wiltoncall("request_send_response", JSON.stringify({
-                    requestHandle: this.handle,
-                    data: dt
-                }));
-                utils.callOrIgnore(opts.onSuccess);
-            } catch (e) {
-                utils.callOrThrow(opts.onFailure, e);
-            }
-        },
-        
-        sendTempFile: function(filePath, options) {
-            var opts = utils.defaultObject(options);
-            try {
-                this._setMeta(opts);
-                nativeLib.wiltoncall("request_send_temp_file", JSON.stringify({
-                    requestHandle: this.handle,
-                    filePath: filePath
-                }));
-                utils.callOrIgnore(opts.onSuccess);
-            } catch (e) {
-                utils.callOrThrow(opts.onFailure, e);
-            }
-        },
-        
-        sendMustache: function(filePath, values, options) {
-            var opts = utils.defaultObject(options);
-            try {
-                this._setMeta(opts);
-                var vals = utils.defaultObject(values);
-                nativeLib.wiltoncall("request_send_mustache", JSON.stringify({
-                    requestHandle: this.handle,
-                    mustacheFilePath: this.server.mustacheTemplatesRootDir + filePath,
-                    values: vals
-                }));
-                utils.callOrIgnore(opts.onSuccess);
-            } catch (e) {
-                utils.callOrThrow(opts.onFailure, e);
-            }
-        },
-        
-        _setMeta: function(opts) {
-            if ("object" === typeof (opts.meta) && null !== opts.meta) {
-                nativeLib.wiltoncall("request_set_response_metadata", JSON.stringify({
-                    requestHandle: this.handle,
-                    metadata: opts.meta
-                }));
+    function prepareViews(views) {
+        if(utils.undefinedOrNull(views)) {
+            throw new Error("Invalid null 'views'attribute specified");
+        }
+        if (!(views instanceof Array)) {
+            throw new Error("Invalid non-array 'views'attribute specified");
+        }
+        if (0 === views.length) {
+            throw new Error("Invalid empty array 'views'attribute specified");
+        }
+        var res = [];
+        for (var i = 0; i < views.length; i++) {
+            var vi = views[i];
+            if (utils.undefinedOrNull(vi)) {
+                throw new Error("Invalid null 'views' element, index: [" + i + "]");
+            } else if ("string" === typeof(vi)) {
+                // expects that it is sync
+                require([vi], function(mod) {
+                    var methodEntries = [];
+                    for (var j = 0; j < METHODS.length; j++) {
+                        var me = METHODS[j];
+                        if ("function" === typeof(mod[me])) {
+                            methodEntries.push({
+                                method: me,
+                                path: "/" + vi,
+                                module: vi
+                            });
+                        }
+                    }
+                    if (0 === methodEntries.length) {
+                        throw new Error("Invalid 'views' element: must have one or more" +
+                                " function attrs: GET, POST, PUT, DELETE, OPTIONS," +
+                                " index: [" + i + "]");
+                    }
+                    for (var j = 0; j < methodEntries.length; j++) {
+                        res.push(methodEntries[j]);
+                    }
+                });
+            } else {
+                utils.checkProperties(vi, ["method", "path", "module"]);
+                res.push(vi);
             }
         }
-    };
-
-
-    // Server
+        return res;
+    }
 
     var Server = function(config) {
         var opts = utils.defaultObject(config);
-
-        var _prepateViews = function(views) {
-            if ("object" !== typeof (views)) {
-                throw new Error("Invalid 'views' property");
-            }
-            if (views instanceof Array) {
-                var res = {};
-                for (var i = 0; i < views.length; i++) {
-                    if ("object" !== typeof (views[i])) {
-                        throw new Error("Invalid 'views' array, index: [" + i + "]");
-                    }
-                    for (var path in views[i]) {
-                        var cb = views[i];
-                        if (cb.hasOwnProperty(path)) {
-                            if (res.hasOwnProperty(path)) {
-                                throw new Error("Invalid 'views', duplicate path: [" + path + "]");
-                            }
-                            res[path] = cb[path];
-                        }
-                    }
-                }
-                return res;
-            } else {
-                return views;
-            }
-        };
-
         var onSuccess = opts.onSuccess;
         var onFailure = opts.onFailure;
         delete opts.onSuccess;
         delete opts.onFailure;
         try {
-            this.logger = new Logger("wilton.server");
-            this.gateway = opts.gateway;
-            this.views = _prepateViews(opts.views);
-            this.mustacheTemplatesRootDir = "";
-            if ("undefined" !== typeof (opts.mustache) &&
-                    "string" === typeof (opts.mustache.templatesRootDir)) {
-                this.mustacheTemplatesRootDir = opts.mustache.templatesRootDir;
-                delete opts.mustache.templatesRootDir;
-            }
-            var self = this;
-            var gatewayPass = nativeLib.wrapWiltonGateway(function(requestHandle) {
-                self._gatewaycb(requestHandle);
-            });
-            delete opts.views;
-            var data = JSON.stringify(opts);
-            var handleJson = nativeLib.wiltoncall("server_create", data, gatewayPass);
+            // in future use opts.gatewayModule for non-JVM engines
+            opts.views = prepareViews(opts.views);
+            var handleJson = nativeLib.wiltoncall("server_create", JSON.stringify(opts), nativeLib.wiltonGateway);
             var handleObj = JSON.parse(handleJson);
             this.handle = handleObj.serverHandle;
             utils.callOrIgnore(onSuccess);
@@ -132,57 +75,6 @@ define(["./nativeLib", "./utils", "./Logger"], function(nativeLib, utils, Logger
     };
 
     Server.prototype = {
-        _gatewaycb: function(requestHandle) {
-            try {
-                var json = nativeLib.wiltoncall("request_get_metadata", JSON.stringify({
-                    requestHandle: requestHandle
-                }));
-                var req = JSON.parse(json);
-                var cb = null;
-                if ("function" === typeof (this.gateway)) {
-                    cb = gateway;
-                } else {
-                    cb = this.views[req.pathname];
-                    if ("undefined" === typeof (cb)) {
-                        nativeLib.wiltoncall("request_set_response_metadata", JSON.stringify({
-                            requestHandle: requestHandle,
-                            metadata: {
-                                statusCode: 404,
-                                statusMessage: "Not Found"
-                            }
-                        }));
-                        nativeLib.wiltoncall("request_send_response", JSON.stringify({
-                            requestHandle: requestHandle,
-                            data: "404: Not Found: [" + req.pathname + "]"
-                        }));
-                        return;
-                    }
-                }
-                req.data = "";
-                if ("POST" === req.method || "PUT" === req.method) {
-                    var bdata = nativeLib.wiltoncall("request_get_data", JSON.stringify({
-                        requestHandle: requestHandle
-                    }));
-                    req.data = "" + bdata;
-                }
-                var resp = new Response(this, requestHandle);
-                cb(req, resp);
-            } catch (e) {
-                this.logger.error(e);
-                nativeLib.wiltoncall("request_set_response_metadata", JSON.stringify({
-                    requestHandle: requestHandle,
-                    metadata: {
-                        statusCode: 500,
-                        statusMessage: "Server Error"
-                    }
-                }));
-                nativeLib.wiltoncall("request_send_response", JSON.stringify({
-                    requestHandle: requestHandle,
-                    data: "500: Server Error"
-                }));
-            }
-        },
-        
         stop: function(options) {
             var opts = utils.defaultObject(options);
             try {

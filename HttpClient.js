@@ -29,7 +29,10 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
             var opts = utils.defaultObject(options);
             try {
                 var urlstr = utils.defaultString(url);
-                var dt = utils.defaultJson(opts.data);
+                var dt = "";
+                if(!utils.undefinedOrNull(opts.data)) {
+                    dt = utils.defaultJson(opts.data);
+                }
                 var meta = utils.defaultObject(opts.meta);
                 var resp_json = nativeLib.wiltoncall("httpclient_execute", JSON.stringify({
                     httpclientHandle: this.handle,
@@ -49,7 +52,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
             var opts = utils.defaultObject(options);
             try {
                 var urlstr = utils.defaultString(url);
-                var fp = utils.defaultJson(opts.filePath);
+                var fp = utils.defaultString(opts.filePath);
                 var meta = utils.defaultObject(opts.meta);
                 var resp_json = nativeLib.wiltoncall("httpclient_send_temp_file", JSON.stringify({
                     httpclientHandle: this.handle,

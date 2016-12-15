@@ -8,9 +8,12 @@ define(function() {
     "use strict";
 
     // todo: Duktape/JerryScript support
+    
     if ("undefined" === typeof(Packages)) {
         console.log("Error: wilton.js requires Nashorn or Rhino JVM environment");
     }
+    
+    var wiltoncall = Packages.net.wiltonwebtoolkit.WiltonJni.wiltoncall;
     
     function wrapRunnable(callback) {
         return new Packages.java.lang.Runnable({
@@ -28,23 +31,25 @@ define(function() {
         });
     }
     
-    function wrapWiltonGateway(callback) {
-        return new Packages.net.wiltonwebtoolkit.WiltonGateway({
-            gatewayCallback: function(requestHandle) {
-                callback(requestHandle);
-            }
-        });
-    }
+    // this will go into native code for non-JVM engines
+    var wiltonGateway = new Packages.net.wiltonwebtoolkit.WiltonGateway({
+        gatewayCallback: function(callbackModule, requestHandle) {
+            // expects that it is sync
+            require(["wilton/gateway"], function(gateway) {
+                gateway(String(callbackModule), requestHandle);
+            });
+        }
+    });
     
     function printStdout(message) {
         Packages.java.lang.System.out.println(message);
     }
 
     return {
-        wiltoncall: Packages.net.wiltonwebtoolkit.WiltonJni.wiltoncall,
+        wiltoncall: wiltoncall,
         wrapRunnable: wrapRunnable,
         wrapCallable: wrapCallable,
-        wrapWiltonGateway: wrapWiltonGateway,
+        wiltonGateway: wiltonGateway,
         printStdout: printStdout
     };
 });
