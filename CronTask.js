@@ -7,21 +7,15 @@
 define(["./nativeLib", "./utils"], function(nativeLib, utils) {
     "use strict";
 
+    // todo: logging
     var CronTask = function(config) {
         var opts = utils.defaultObject(config);
-        utils.checkProperties(opts, ["callbackModule", "callbackMethod", "expression"]);
+        utils.checkProperties(opts, ["expression", "callbackScript"]);
         try {
-            var runnable = nativeLib.wrapRunnable(function() {
-                // this needs to be moved into native part for
-                // non-threaded JS runtimes (v8/duktape)
-                require([opts.callbackModule], function(mod) {
-                    mod[opts.callbackMethod]();
-                });
-            });
-            var data = JSON.stringify({
-                expression: opts.expression
-            });
-            var handleJson = nativeLib.wiltoncall("cron_start", data, runnable);
+            var handleJson = nativeLib.wiltoncall("cron_start", JSON.stringify({
+                expression: opts.expression,
+                callbackScript: opts.callbackScript
+            }));
             var handleObj = JSON.parse(handleJson);
             this.handle = handleObj.cronHandle;
             utils.callOrIgnore(opts.onSuccess);

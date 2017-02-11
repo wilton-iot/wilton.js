@@ -18,7 +18,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
         delete opts.onSuccess;
         delete opts.onFailure;
         try {
-            nativeLib.wiltoncall("logger_initialize", JSON.stringify(opts));
+            nativeLib.wiltoncall("logging_initialize", JSON.stringify(opts));
             utils.callOrIgnore(onSuccess);
         } catch (e) {
             utils.callOrThrow(onFailure, e);
@@ -28,7 +28,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
     Logger.shutdown = function(options) {
         var opts = utils.defaultObject(options);
         try {
-            nativeLib.wiltoncall("logger_shutdown");
+            nativeLib.wiltoncall("logging_shutdown");
             utils.callOrIgnore(opts.onSuccess);
         } catch (e) {
             utils.callOrThrow(opts.onFailure, e);
@@ -57,7 +57,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
                     logger: this.name,
                     message: msg
                 });
-                nativeLib.wiltoncall("logger_log", data);
+                nativeLib.wiltoncall("logging_log", data);
             } catch (e) {
                 nativeLib.printStdout("===LOGGER ERROR:");
                 nativeLib.printStdout(e.toString() + "\n" + e.stack);
