@@ -7,12 +7,52 @@
 define(["./nativeLib", "./utils"], function(nativeLib, utils, Logger) {
     "use strict";
     
-    var Response = function(requestHandle) {
+    var Request = function(requestHandle) {
         this.handle = requestHandle;
     };
     
-    Response.prototype = {
-        send: function(data, options) {
+    Request.prototype = {
+        getMetadata: function(options) {
+            var opts = utils.defaultObject(options);
+            try {
+                var json = nativeLib.wiltoncall("request_get_metadata", JSON.stringify({
+                    requestHandle: this.handle
+                }));
+                var res = JSON.parse(json);
+                utils.callOrIgnore(opts.onSuccess, res);
+                return res;
+            } catch (e) {
+                utils.callOrThrow(opts.onFailure, e);
+            }
+        },
+        
+        getData: function(options) {
+            var opts = utils.defaultObject(options);
+            try {
+                var res = nativeLib.wiltoncall("request_get_data", JSON.stringify({
+                    requestHandle: this.handle
+                }));
+                utils.callOrIgnore(opts.onSuccess, res);
+                return res;
+            } catch (e) {
+                utils.callOrThrow(opts.onFailure, e);
+            }
+        },
+        
+        getDataFilename: function(options) {
+            var opts = utils.defaultObject(options);
+            try {
+                var res = nativeLib.wiltoncall("request_get_data_filename", JSON.stringify({
+                    requestHandle: this.handle
+                }));
+                utils.callOrIgnore(opts.onSuccess, res);
+                return res;
+            } catch (e) {
+                utils.callOrThrow(opts.onFailure, e);
+            }
+        },
+        
+        sendResponse: function(data, options) {
             var opts = utils.defaultObject(options);
             try {
                 this._setMeta(opts);
@@ -67,5 +107,5 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils, Logger) {
         }
     };
 
-    return Response;
+    return Request;
 });

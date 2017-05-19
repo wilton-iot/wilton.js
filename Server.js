@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./nativeLib", "./utils", "./Logger"], function(nativeLib, utils, Logger) {
+define(["./Request", "./nativeLib", "./utils", "./Logger"], function(Request, nativeLib, utils, Logger) {
     "use strict";
 
     var logger = new Logger("wilton.server");
@@ -35,7 +35,15 @@ define(["./nativeLib", "./utils", "./Logger"], function(nativeLib, utils, Logger
                             methodEntries.push({
                                 method: me,
                                 path: "/" + vi,
-                                module: vi
+                                callbackScript: {
+                                    module: "wilton/Server",
+                                    func: "dispatch",
+                                    args: [{
+                                        module: vi,
+                                        func: me,
+                                        args: []
+                                    }]
+                                }
                             });
                         }
                     }
@@ -49,7 +57,7 @@ define(["./nativeLib", "./utils", "./Logger"], function(nativeLib, utils, Logger
                     }
                 });
             } else {
-                utils.checkProperties(vi, ["method", "path", "module"]);
+                utils.checkProperties(vi, ["method", "path", "callbackScript"]);
                 res.push(vi);
             }
         }
@@ -65,7 +73,7 @@ define(["./nativeLib", "./utils", "./Logger"], function(nativeLib, utils, Logger
         try {
             // in future use opts.gatewayModule for non-JVM engines
             opts.views = prepareViews(opts.views);
-            var handleJson = nativeLib.wiltoncall("server_create", JSON.stringify(opts), nativeLib.wiltonGateway);
+            var handleJson = nativeLib.wiltoncall("server_create", JSON.stringify(opts));
             var handleObj = JSON.parse(handleJson);
             this.handle = handleObj.serverHandle;
             utils.callOrIgnore(onSuccess);
@@ -86,6 +94,23 @@ define(["./nativeLib", "./utils", "./Logger"], function(nativeLib, utils, Logger
                 utils.callOrThrow(opts.onFailure, e);
             }
         }
+    };
+    
+    Server.dispatch = function (callbackScriptJson, requestHandle) {
+        var cs = callbackScriptJson;
+        if ("string" !== typeof (cs.module) || "string" !== typeof (cs.func) ||
+                "undefined" === typeof (cs.args) || !(cs.args instanceof Array)) {
+            throw new Error("Invalid 'callbackScriptJson' specified: [" + JSON.stringofy(cs) + "]");
+        }
+        var module;
+        // expected to be always sync
+        require([cs.module], function(mod) {
+            module = mod;
+        });
+        var req = new Request(requestHandle);
+        // target call
+        module[cs.func].call(module, req);
+        return null;
     };
     
     return Server;

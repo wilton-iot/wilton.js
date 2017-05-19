@@ -13,7 +13,10 @@ define(function() {
         console.log("Error: wilton.js requires Nashorn or Rhino JVM environment");
     }
     
-    var wiltoncall = Packages.net.wiltonwebtoolkit.WiltonJni.wiltoncall;
+    var wiltoncall = function(name, data) {
+        var res = Packages.net.wiltonwebtoolkit.WiltonJni.wiltoncall(name, data);
+        return null != res ? String(res) : null;
+    }
     
     function printStdout(message) {
         Packages.java.lang.System.out.println(message);
