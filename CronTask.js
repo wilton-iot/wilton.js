@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./nativeLib", "./utils"], function(nativeLib, utils) {
+define(["./utils"], function(utils) {
     "use strict";
 
     // todo: logging
@@ -12,7 +12,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
         var opts = utils.defaultObject(config);
         utils.checkProperties(opts, ["expression", "callbackScript"]);
         try {
-            var handleJson = nativeLib.wiltoncall("cron_start", JSON.stringify({
+            var handleJson = wiltoncall("cron_start", JSON.stringify({
                 expression: opts.expression,
                 callbackScript: opts.callbackScript
             }));
@@ -28,7 +28,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
         stop: function(options) {
             var opts = utils.defaultObject(options);
             try {
-                nativeLib.wiltoncall("cron_stop", JSON.stringify({
+                wiltoncall("cron_stop", JSON.stringify({
                     cronHandle: this.handle
                 }));
                 utils.callOrIgnore(opts.onSuccess);

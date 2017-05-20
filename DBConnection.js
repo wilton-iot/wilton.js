@@ -4,14 +4,14 @@
  * and open the template in the editor.
  */
 
-define(["./nativeLib", "./utils"], function(nativeLib, utils) {
+define(["./utils"], function(utils) {
     "use strict";
 
     var DBConnection = function(config) {
         var opts = utils.defaultObject(config);
         try {
             this.url = opts.url;
-            var handleJson = nativeLib.wiltoncall("db_connection_open", this.url);
+            var handleJson = wiltoncall("db_connection_open", this.url);
             var handleParsed = JSON.parse(handleJson);
             this.handle = handleParsed.connectionHandle;
             utils.callOrIgnore(opts.onSuccess);
@@ -26,7 +26,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
             try {
                 var sqlstr = utils.defaultString(sql);
                 var pars = utils.defaultObject(params);
-                nativeLib.wiltoncall("db_connection_execute", JSON.stringify({
+                wiltoncall("db_connection_execute", JSON.stringify({
                     connectionHandle: this.handle,
                     sql: sqlstr,
                     params: pars
@@ -42,7 +42,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
             try {
                 var sqlstr = utils.defaultString(sql);
                 var pars = utils.defaultObject(params);
-                var json = nativeLib.wiltoncall("db_connection_query", JSON.stringify({
+                var json = wiltoncall("db_connection_query", JSON.stringify({
                     connectionHandle: this.handle,
                     sql: sqlstr,
                     params: pars
@@ -77,17 +77,17 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
         doInTransaction: function(callback, options) {
             var opts = utils.defaultObject(options);
             try {
-                var tranJson = nativeLib.wiltoncall("db_transaction_start", JSON.stringify({
+                var tranJson = wiltoncall("db_transaction_start", JSON.stringify({
                     connectionHandle: this.handle
                 }));
                 var tran = JSON.parse(tranJson);
                 try {
                     callback();
-                    nativeLib.wiltoncall("db_transaction_commit", JSON.stringify({
+                    wiltoncall("db_transaction_commit", JSON.stringify({
                         transactionHandle: tran.transactionHandle
                     }));
                 } catch (e) {
-                    nativeLib.wiltoncall("db_transaction_rollback", JSON.stringify({
+                    wiltoncall("db_transaction_rollback", JSON.stringify({
                         transactionHandle: tran.transactionHandle
                     }));
                     utils.callOrThrow(opts.onFailure, e);
@@ -101,7 +101,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
         close: function(options) {
             var opts = utils.defaultObject(options);
             try {
-                nativeLib.wiltoncall("db_connection_close", JSON.stringify({
+                wiltoncall("db_connection_close", JSON.stringify({
                     connectionHandle: this.handle
                 }));
                 utils.callOrIgnore(opts.onSuccess);

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./nativeLib", "./Response", "./Logger", "./utils"], function(nativeLib, Response, Logger, utils) {
+define(["./Response", "./Logger", "./utils"], function(Response, Logger, utils) {
     "use strict";
 
     var logger = new Logger("wilton.gateway");
@@ -18,7 +18,7 @@ define(["./nativeLib", "./Response", "./Logger", "./utils"], function(nativeLib,
                     requestHandle: requestHandle
                 });
                 // get request metadata
-                var json = nativeLib.wiltoncall("request_get_metadata", ha);
+                var json = wiltoncall("request_get_metadata", ha);
                 var req = JSON.parse(json);
                 // check callback exists for input method
                 var cb = mod[req.method];
@@ -31,7 +31,7 @@ define(["./nativeLib", "./Response", "./Logger", "./utils"], function(nativeLib,
                 // get request data
                 req.data = "";
                 if ("POST" === req.method || "PUT" === req.method) {
-                    var bdata = nativeLib.wiltoncall("request_get_data", ha);
+                    var bdata = wiltoncall("request_get_data", ha);
                     req.data = "" + bdata;
                 }
                 // create response obj
@@ -41,14 +41,14 @@ define(["./nativeLib", "./Response", "./Logger", "./utils"], function(nativeLib,
             });        
         } catch (e) {
             logger.error(e);
-            nativeLib.wiltoncall("request_set_response_metadata", JSON.stringify({
+            wiltoncall("request_set_response_metadata", JSON.stringify({
                 requestHandle: requestHandle,
                 metadata: {
                     statusCode: 500,
                     statusMessage: "Server Error"
                 }
             }));
-            nativeLib.wiltoncall("request_send_response", JSON.stringify({
+            wiltoncall("request_send_response", JSON.stringify({
                 requestHandle: requestHandle,
                 data: JSON.stringify({
                     code: 500,

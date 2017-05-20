@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./nativeLib", "./utils"], function(nativeLib, utils) {
+define(["./utils"], function(utils) {
     "use strict";
 
     var Logger = function(name) {
@@ -18,7 +18,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
         delete opts.onSuccess;
         delete opts.onFailure;
         try {
-            nativeLib.wiltoncall("logging_initialize", JSON.stringify(opts));
+            wiltoncall("logging_initialize", JSON.stringify(opts));
             utils.callOrIgnore(onSuccess);
         } catch (e) {
             utils.callOrThrow(onFailure, e);
@@ -28,7 +28,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
     Logger.shutdown = function(options) {
         var opts = utils.defaultObject(options);
         try {
-            nativeLib.wiltoncall("logging_shutdown");
+            wiltoncall("logging_shutdown");
             utils.callOrIgnore(opts.onSuccess);
         } catch (e) {
             utils.callOrThrow(opts.onFailure, e);
@@ -57,11 +57,11 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
                     logger: this.name,
                     message: msg
                 });
-                nativeLib.wiltoncall("logging_log", data);
+                wiltoncall("logging_log", data);
             } catch (e) {
-                nativeLib.printStdout("===LOGGER ERROR:");
-                nativeLib.printStdout(e.toString() + "\n" + e.stack);
-                nativeLib.printStdout("===LOGGER ERROR END:");
+                print("===LOGGER ERROR:");
+                print(e.toString() + "\n" + e.stack);
+                print("===LOGGER ERROR END:");
             }
         },
         

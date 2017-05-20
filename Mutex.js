@@ -17,7 +17,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
                 this.handle = opts.handle;
             } else {
                 // create new
-                var handleJson = nativeLib.wiltoncall("mutex_create");
+                var handleJson = wiltoncall("mutex_create");
                 var handleObj = JSON.parse(handleJson);
                 this.handle = handleObj.mutexHandle;
             }
@@ -37,10 +37,10 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
                 });
                 var res = {};
                 try {
-                    nativeLib.wiltoncall("mutex_lock", data);
+                    wiltoncall("mutex_lock", data);
                     res = opts.callback();
                 } finally {
-                    nativeLib.wiltoncall("mutex_unlock", data);
+                    wiltoncall("mutex_unlock", data);
                 }
                 utils.callOrIgnore(opts.onSuccess, res);
                 return res;
@@ -69,7 +69,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
                         condition: resbool
                     });
                 });
-                nativeLib.wiltoncall("mutex_wait", JSON.stringify({
+                wiltoncall("mutex_wait", JSON.stringify({
                     mutexHandle: this.handle,
                     timeoutMillis: opts.timeoutMillis
                 }), cond);
@@ -97,7 +97,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
         _voidcall: function(name, options) {
             var opts = utils.defaultObject(options);
             try {
-                nativeLib.wiltoncall("mutex_" + name, JSON.stringify({
+                wiltoncall("mutex_" + name, JSON.stringify({
                     mutexHandle: this.handle
                 }));
                 utils.callOrIgnore(opts.onSuccess);

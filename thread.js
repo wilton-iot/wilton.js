@@ -4,14 +4,14 @@
  * and open the template in the editor.
  */
 
-define(["./nativeLib", "./utils"], function(nativeLib, utils) {
+define(["./utils"], function(utils) {
     "use strict";
 
     function run(options) {
         var opts = utils.defaultObject(options);
         utils.checkProperties(opts, ["callbackScript"]);
         try {
-            nativeLib.wiltoncall("thread_run", JSON.stringify({
+            wiltoncall("thread_run", JSON.stringify({
                 callbackScript: opts.callbackScript
             }));
         } catch (e) {
@@ -22,7 +22,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
     function sleepMillis(millis, options) {
         var opts = utils.defaultObject(options);
         try {
-            nativeLib.wiltoncall("thread_sleep_millis", JSON.stringify({
+            wiltoncall("thread_sleep_millis", JSON.stringify({
                 millis: millis
             }));
             utils.callOrIgnore(opts.onSuccess);

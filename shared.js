@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./nativeLib", "./utils"], function(nativeLib, utils) {
+define(["./utils"], function(utils) {
     "use strict";
 
     function put(options) {
@@ -12,7 +12,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
         utils.checkProperties(opts, ["key", "value"]);
         var val  = utils.defaultJson(opts.value);
         try {
-            nativeLib.wiltoncall("shared_put", JSON.stringify({
+            wiltoncall("shared_put", JSON.stringify({
                 key: opts.key,
                 value: val
             }));
@@ -26,7 +26,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
         var opts = utils.defaultObject(options);
         utils.checkProperties(opts, ["key"]);
         try {
-            var res = nativeLib.wiltoncall("shared_get", JSON.stringify({
+            var res = wiltoncall("shared_get", JSON.stringify({
                 key: opts.key
             }));
             var resstr = String(res);
@@ -45,7 +45,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
         var opts = utils.defaultObject(options);
         utils.checkProperties(opts, ["timeoutMillis", "key", "currentValue"]);
         try {
-            var res = nativeLib.wiltoncall("shared_wait_change", JSON.stringify({
+            var res = wiltoncall("shared_wait_change", JSON.stringify({
                 timeoutMillis: opts.timeoutMillis,
                 key: opts.key,
                 currentValue: opts.currentValue
@@ -65,7 +65,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
         var opts = utils.defaultObject(options);
         utils.checkProperties(opts, ["key"]);
         try {
-            nativeLib.wiltoncall("shared_remove", JSON.stringify({
+            wiltoncall("shared_remove", JSON.stringify({
                 key: opts.key
             }));
             utils.callOrIgnore(opts.onSuccess);

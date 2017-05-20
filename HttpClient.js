@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./nativeLib", "./utils"], function(nativeLib, utils) {
+define(["./utils"], function(utils) {
     "use strict";
 
     var HttpClient = function(config) {
@@ -15,7 +15,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
         delete opts.onFailure;
         try {
             var data = JSON.stringify(opts);
-            var json = nativeLib.wiltoncall("httpclient_create", data);
+            var json = wiltoncall("httpclient_create", data);
             var out = JSON.parse(json);
             this.handle = out.httpclientHandle;
             utils.callOrIgnore(onSuccess);
@@ -34,7 +34,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
                     dt = utils.defaultJson(opts.data);
                 }
                 var meta = utils.defaultObject(opts.meta);
-                var resp_json = nativeLib.wiltoncall("httpclient_execute", JSON.stringify({
+                var resp_json = wiltoncall("httpclient_execute", JSON.stringify({
                     httpclientHandle: this.handle,
                     url: urlstr,
                     data: dt,
@@ -54,7 +54,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
                 var urlstr = utils.defaultString(url);
                 var fp = utils.defaultString(opts.filePath);
                 var meta = utils.defaultObject(opts.meta);
-                var resp_json = nativeLib.wiltoncall("httpclient_send_temp_file", JSON.stringify({
+                var resp_json = wiltoncall("httpclient_send_temp_file", JSON.stringify({
                     httpclientHandle: this.handle,
                     url: urlstr,
                     filePath: fp,
@@ -71,7 +71,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
         close: function(options) {
             var opts = utils.defaultObject(options);
             try {
-                nativeLib.wiltoncall("httpclient_close", JSON.stringify({
+                wiltoncall("httpclient_close", JSON.stringify({
                     httpclientHandle: this.handle
                 }));
                 utils.callOrIgnore(opts.onSuccess);

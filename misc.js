@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./nativeLib", "./utils"], function(nativeLib, utils) {
+define(["./utils"], function(utils) {
     "use strict";
 
     function tcpWaitForConnection(options) {
@@ -14,7 +14,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
         delete opts.onSuccess;
         delete opts.onFailure;
         try {
-            nativeLib.wiltoncall("tcp_wait_for_connection", JSON.stringify(opts));
+            wiltoncall("tcp_wait_for_connection", JSON.stringify(opts));
             utils.callOrIgnore(onSuccess);
         } catch (e) {
             utils.callOrThrow(onFailure, e);

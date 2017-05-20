@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./nativeLib", "./utils"], function(nativeLib, utils) {
+define(["./utils"], function(utils) {
     "use strict";
 
     function render(template, values, options) {
@@ -16,7 +16,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
                 template: tp,
                 values: vals
             });
-            var res = nativeLib.wiltoncall("mustache_render", data);
+            var res = wiltoncall("mustache_render", data);
             var resstr = String(res);
             utils.callOrIgnore(opts.onSuccess, resstr);
             return resstr;
@@ -34,7 +34,7 @@ define(["./nativeLib", "./utils"], function(nativeLib, utils) {
                 file: tpf,
                 values: vals
             });
-            var res = nativeLib.wiltoncall("mustache_render_file", data);
+            var res = wiltoncall("mustache_render_file", data);
             var resstr = String(res);
             utils.callOrIgnore(opts.onSuccess, resstr);
             return resstr;
