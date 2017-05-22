@@ -43,7 +43,8 @@ define(["./utils"], function(utils) {
                     if ("string" === typeof (message)) {
                         msg = message;
                     } else if (message instanceof Error) {
-                        msg = message + "\n" + message.stack;
+                        // msg = message + "\n" + message.stack;
+                        msg = String(message.stack);
                     } else {
                         try {
                             msg = JSON.stringify(message);
