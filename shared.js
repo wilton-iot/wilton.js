@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./utils"], function(utils) {
+define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
     function put(options) {
@@ -12,10 +12,10 @@ define(["./utils"], function(utils) {
         utils.checkProperties(opts, ["key", "value"]);
         var val  = utils.defaultJson(opts.value);
         try {
-            wiltoncall("shared_put", JSON.stringify({
+            wiltoncall("shared_put", {
                 key: opts.key,
                 value: val
-            }));
+            });
             utils.callOrIgnore(opts.onSuccess);
         } catch (e) {
             utils.callOrThrow(opts.onFailure, e);
@@ -26,9 +26,9 @@ define(["./utils"], function(utils) {
         var opts = utils.defaultObject(options);
         utils.checkProperties(opts, ["key"]);
         try {
-            var res = wiltoncall("shared_get", JSON.stringify({
+            var res = wiltoncall("shared_get", {
                 key: opts.key
-            }));
+            });
             var resstr = String(res);
             var resout = null;
             if ("" !== resstr) {
@@ -45,11 +45,11 @@ define(["./utils"], function(utils) {
         var opts = utils.defaultObject(options);
         utils.checkProperties(opts, ["timeoutMillis", "key", "currentValue"]);
         try {
-            var res = wiltoncall("shared_wait_change", JSON.stringify({
+            var res = wiltoncall("shared_wait_change", {
                 timeoutMillis: opts.timeoutMillis,
                 key: opts.key,
                 currentValue: opts.currentValue
-            }));
+            });
             var resout = null;
             if ("" !== res) {
                 resout = JSON.parse(res);
@@ -65,9 +65,9 @@ define(["./utils"], function(utils) {
         var opts = utils.defaultObject(options);
         utils.checkProperties(opts, ["key"]);
         try {
-            wiltoncall("shared_remove", JSON.stringify({
+            wiltoncall("shared_remove", {
                 key: opts.key
-            }));
+            });
             utils.callOrIgnore(opts.onSuccess);
         } catch (e) {
             utils.callOrThrow(opts.onFailure, e);

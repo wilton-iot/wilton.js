@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./utils"], function(utils) {
+define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
     // todo: logging
@@ -12,10 +12,10 @@ define(["./utils"], function(utils) {
         var opts = utils.defaultObject(config);
         utils.checkProperties(opts, ["expression", "callbackScript"]);
         try {
-            var handleJson = wiltoncall("cron_start", JSON.stringify({
+            var handleJson = wiltoncall("cron_start", {
                 expression: opts.expression,
                 callbackScript: opts.callbackScript
-            }));
+            });
             var handleObj = JSON.parse(handleJson);
             this.handle = handleObj.cronHandle;
             utils.callOrIgnore(opts.onSuccess);
@@ -28,9 +28,9 @@ define(["./utils"], function(utils) {
         stop: function(options) {
             var opts = utils.defaultObject(options);
             try {
-                wiltoncall("cron_stop", JSON.stringify({
+                wiltoncall("cron_stop", {
                     cronHandle: this.handle
-                }));
+                });
                 utils.callOrIgnore(opts.onSuccess);
             } catch (e) {
                 utils.callOrThrow(opts.onFailure, e);

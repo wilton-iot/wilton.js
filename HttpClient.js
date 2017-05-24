@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./utils"], function(utils) {
+define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
     var HttpClient = function(config) {
@@ -14,8 +14,7 @@ define(["./utils"], function(utils) {
         delete opts.onSuccess;
         delete opts.onFailure;
         try {
-            var data = JSON.stringify(opts);
-            var json = wiltoncall("httpclient_create", data);
+            var json = wiltoncall("httpclient_create", opts);
             var out = JSON.parse(json);
             this.handle = out.httpclientHandle;
             utils.callOrIgnore(onSuccess);
@@ -34,12 +33,12 @@ define(["./utils"], function(utils) {
                     dt = utils.defaultJson(opts.data);
                 }
                 var meta = utils.defaultObject(opts.meta);
-                var resp_json = wiltoncall("httpclient_execute", JSON.stringify({
+                var resp_json = wiltoncall("httpclient_execute", {
                     httpclientHandle: this.handle,
                     url: urlstr,
                     data: dt,
                     metadata: meta
-                }));
+                });
                 var resp = JSON.parse(resp_json);
                 utils.callOrIgnore(opts.onSuccess, resp);
                 return resp;
@@ -54,12 +53,12 @@ define(["./utils"], function(utils) {
                 var urlstr = utils.defaultString(url);
                 var fp = utils.defaultString(opts.filePath);
                 var meta = utils.defaultObject(opts.meta);
-                var resp_json = wiltoncall("httpclient_send_temp_file", JSON.stringify({
+                var resp_json = wiltoncall("httpclient_send_temp_file", {
                     httpclientHandle: this.handle,
                     url: urlstr,
                     filePath: fp,
                     metadata: meta
-                }));
+                });
                 var resp = JSON.parse(resp_json);
                 utils.callOrIgnore(opts.onSuccess, resp);
                 return resp;
@@ -71,9 +70,9 @@ define(["./utils"], function(utils) {
         close: function(options) {
             var opts = utils.defaultObject(options);
             try {
-                wiltoncall("httpclient_close", JSON.stringify({
+                wiltoncall("httpclient_close", {
                     httpclientHandle: this.handle
-                }));
+                });
                 utils.callOrIgnore(opts.onSuccess);
             } catch (e) {
                 utils.callOrThrow(opts.onFailure, e);

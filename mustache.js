@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./utils"], function(utils) {
+define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
     function render(template, values, options) {
@@ -12,11 +12,10 @@ define(["./utils"], function(utils) {
         try {
             var tp = utils.defaultString(template);
             var vals = utils.defaultObject(values);
-            var data = JSON.stringify({
+            var res = wiltoncall("mustache_render", {
                 template: tp,
                 values: vals
             });
-            var res = wiltoncall("mustache_render", data);
             var resstr = String(res);
             utils.callOrIgnore(opts.onSuccess, resstr);
             return resstr;
@@ -30,11 +29,10 @@ define(["./utils"], function(utils) {
         try {
             var tpf = utils.defaultString(templateFile);
             var vals = utils.defaultObject(values);
-            var data = JSON.stringify({
+            var res = wiltoncall("mustache_render_file", {
                 file: tpf,
                 values: vals
             });
-            var res = wiltoncall("mustache_render_file", data);
             var resstr = String(res);
             utils.callOrIgnore(opts.onSuccess, resstr);
             return resstr;

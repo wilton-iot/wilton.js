@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./utils"], function(utils) {
+define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
     var Logger = function(name) {
@@ -18,7 +18,7 @@ define(["./utils"], function(utils) {
         delete opts.onSuccess;
         delete opts.onFailure;
         try {
-            wiltoncall("logging_initialize", JSON.stringify(opts));
+            wiltoncall("logging_initialize", opts);
             utils.callOrIgnore(onSuccess);
         } catch (e) {
             utils.callOrThrow(onFailure, e);
@@ -49,16 +49,19 @@ define(["./utils"], function(utils) {
                         try {
                             msg = JSON.stringify(message);
                         } catch (e) {
-                            msg = String(message);
+                            if ("undefined" !== typeof(WILTON_DUKTAPE)) {
+                                msg = String(message);
+                            } else {
+                                msg = message.message + "\n" + message.stack;
+                            }
                         }
                     }
                 }
-                var data = JSON.stringify({
+                wiltoncall("logging_log", {
                     level: level,
                     logger: this.name,
                     message: msg
                 });
-                wiltoncall("logging_log", data);
             } catch (e) {
                 print("===LOGGER ERROR:");
                 print(e.toString() + "\n" + e.stack);

@@ -4,16 +4,16 @@
  * and open the template in the editor.
  */
 
-define(["./utils"], function(utils) {
+define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
     function run(options) {
         var opts = utils.defaultObject(options);
         utils.checkProperties(opts, ["callbackScript"]);
         try {
-            wiltoncall("thread_run", JSON.stringify({
+            wiltoncall("thread_run", {
                 callbackScript: opts.callbackScript
-            }));
+            });
         } catch (e) {
             utils.callOrThrow(opts.onFailure, e);
         }
@@ -22,9 +22,9 @@ define(["./utils"], function(utils) {
     function sleepMillis(millis, options) {
         var opts = utils.defaultObject(options);
         try {
-            wiltoncall("thread_sleep_millis", JSON.stringify({
+            wiltoncall("thread_sleep_millis", {
                 millis: millis
-            }));
+            });
             utils.callOrIgnore(opts.onSuccess);
         } catch (e) {
             utils.callOrThrow(opts.onFailure, e);

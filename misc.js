@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./utils"], function(utils) {
+define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
     function tcpWaitForConnection(options) {
@@ -14,7 +14,7 @@ define(["./utils"], function(utils) {
         delete opts.onSuccess;
         delete opts.onFailure;
         try {
-            wiltoncall("tcp_wait_for_connection", JSON.stringify(opts));
+            wiltoncall("tcp_wait_for_connection", opts);
             utils.callOrIgnore(onSuccess);
         } catch (e) {
             utils.callOrThrow(onFailure, e);

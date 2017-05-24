@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./utils"], function(utils) {
+define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
     var DBConnection = function(config) {
@@ -26,11 +26,11 @@ define(["./utils"], function(utils) {
             try {
                 var sqlstr = utils.defaultString(sql);
                 var pars = utils.defaultObject(params);
-                wiltoncall("db_connection_execute", JSON.stringify({
+                wiltoncall("db_connection_execute", {
                     connectionHandle: this.handle,
                     sql: sqlstr,
                     params: pars
-                }));
+                });
                 utils.callOrIgnore(opts.onSuccess);
             } catch (e) {
                 utils.callOrThrow(opts.onFailure, e);
@@ -42,11 +42,11 @@ define(["./utils"], function(utils) {
             try {
                 var sqlstr = utils.defaultString(sql);
                 var pars = utils.defaultObject(params);
-                var json = wiltoncall("db_connection_query", JSON.stringify({
+                var json = wiltoncall("db_connection_query", {
                     connectionHandle: this.handle,
                     sql: sqlstr,
                     params: pars
-                }));
+                });
                 var res = JSON.parse(json);
                 utils.callOrIgnore(opts.onSuccess, res);
                 return res;
@@ -77,19 +77,19 @@ define(["./utils"], function(utils) {
         doInTransaction: function(callback, options) {
             var opts = utils.defaultObject(options);
             try {
-                var tranJson = wiltoncall("db_transaction_start", JSON.stringify({
+                var tranJson = wiltoncall("db_transaction_start", {
                     connectionHandle: this.handle
-                }));
+                });
                 var tran = JSON.parse(tranJson);
                 try {
                     callback();
-                    wiltoncall("db_transaction_commit", JSON.stringify({
+                    wiltoncall("db_transaction_commit", {
                         transactionHandle: tran.transactionHandle
-                    }));
+                    });
                 } catch (e) {
-                    wiltoncall("db_transaction_rollback", JSON.stringify({
+                    wiltoncall("db_transaction_rollback", {
                         transactionHandle: tran.transactionHandle
-                    }));
+                    });
                     utils.callOrThrow(opts.onFailure, e);
                 }
                 utils.callOrIgnore(opts.onSuccess);
@@ -101,9 +101,9 @@ define(["./utils"], function(utils) {
         close: function(options) {
             var opts = utils.defaultObject(options);
             try {
-                wiltoncall("db_connection_close", JSON.stringify({
+                wiltoncall("db_connection_close", {
                     connectionHandle: this.handle
-                }));
+                });
                 utils.callOrIgnore(opts.onSuccess);
             } catch (e) {
                 utils.callOrThrow(opts.onFailure, e);

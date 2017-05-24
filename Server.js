@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./Request", "./utils", "./Logger"], function(Request, utils, Logger) {
+define(["./wiltoncall", "./Request", "./utils", "./Logger"], function(wiltoncall, Request, utils, Logger) {
     "use strict";
 
     var logger = new Logger("wilton.server");
@@ -73,7 +73,7 @@ define(["./Request", "./utils", "./Logger"], function(Request, utils, Logger) {
         try {
             // in future use opts.gatewayModule for non-JVM engines
             opts.views = prepareViews(opts.views);
-            var handleJson = wiltoncall("server_create", JSON.stringify(opts));
+            var handleJson = wiltoncall("server_create", opts);
             var handleObj = JSON.parse(handleJson);
             this.handle = handleObj.serverHandle;
             utils.callOrIgnore(onSuccess);
@@ -86,9 +86,9 @@ define(["./Request", "./utils", "./Logger"], function(Request, utils, Logger) {
         stop: function(options) {
             var opts = utils.defaultObject(options);
             try {
-                wiltoncall("server_stop", JSON.stringify({
+                wiltoncall("server_stop", {
                     serverHandle: this.handle
-                }));
+                });
                 utils.callOrIgnore(opts.onSuccess);
             } catch (e) {
                 utils.callOrThrow(opts.onFailure, e);
