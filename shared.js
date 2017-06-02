@@ -44,11 +44,12 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     function waitChange(options) {
         var opts = utils.defaultObject(options);
         utils.checkProperties(opts, ["timeoutMillis", "key", "currentValue"]);
+        var cval = utils.defaultJson(opts.currentValue);
         try {
             var res = wiltoncall("shared_wait_change", {
                 timeoutMillis: opts.timeoutMillis,
                 key: opts.key,
-                currentValue: opts.currentValue
+                currentValue: cval
             });
             var resout = null;
             if ("" !== res) {
