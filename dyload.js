@@ -7,7 +7,7 @@
 define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
-    function loadSharedLib(options) {
+    function dyload(options) {
         var opts = utils.defaultObject(options);
         var onSuccess = opts.onSuccess;
         var onFailure = opts.onFailure;
@@ -21,7 +21,5 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
         }
     }
 
-    return {
-        loadSharedLib: loadSharedLib
-    };
+    return dyload;
 });
