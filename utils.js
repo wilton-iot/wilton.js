@@ -53,7 +53,7 @@ define(function() {
             if ("string" === typeof (data)) {
                 json = data;
             } else {
-                json = JSON.stringify(data);
+                json = JSON.stringify(data, null, 4);
             }
         }
         return json;

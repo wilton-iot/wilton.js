@@ -22,7 +22,10 @@ define(["wilton/Server", "./_testUtils"], function(Server, testUtils) {
     var prefix = "http://127.0.0.1:8080/wilton/test/views/";
     testUtils.assert(404 === testUtils.httpGetCode(prefix + "foo"));
     testUtils.assert("Hi from wilton_test!" === testUtils.httpGet(prefix + "hi"));
-    testUtils.assert("{\"foo\":1,\"bar\":\"baz\"}" === testUtils.httpGet(prefix + "respjson"));
+    var getjson = testUtils.httpGet(prefix + "respjson");
+    var getresp = JSON.parse(getjson);
+    testUtils.assert(1 === getresp.foo);
+    testUtils.assert("baz" === getresp.bar);
     testUtils.assert("Error triggered" === testUtils.httpGet(prefix + "resperror"));
     testUtils.assert("127.0.0.1:8080" === testUtils.httpGet(prefix + "reqheader"));
     testUtils.assert("header set" === testUtils.httpGet(prefix + "respfooheader"));

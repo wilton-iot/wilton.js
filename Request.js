@@ -39,6 +39,18 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils, Logger) {
             }
         },
         
+        getJson: function(options) {
+            var opts = utils.defaultObject(options);
+            try {
+                var json = this.getData(options);
+                var res = JSON.parse(json);
+                utils.callOrIgnore(opts.onSuccess, res);
+                return res;
+            } catch (e) {
+                utils.callOrThrow(opts.onFailure, e);
+            }
+        },
+        
         getDataFilename: function(options) {
             var opts = utils.defaultObject(options);
             try {
