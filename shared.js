@@ -29,11 +29,7 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
             var res = wiltoncall("shared_get", {
                 key: opts.key
             });
-            var resstr = String(res);
-            var resout = null;
-            if ("" !== resstr) {
-                resout = JSON.parse(resstr);
-            }
+            var resout = JSON.parse(res);
             utils.callOrIgnore(opts.onSuccess, resout);
             return resout;
         } catch (e) {
@@ -51,10 +47,7 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
                 key: opts.key,
                 currentValue: cval
             });
-            var resout = null;
-            if ("" !== res) {
-                resout = JSON.parse(res);
-            }
+            var resout = JSON.parse(res);
             utils.callOrIgnore(opts.onSuccess, resout);
             return resout;
         } catch (e) {
