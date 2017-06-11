@@ -7,24 +7,25 @@
 define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
-    var HttpClient = function(config) {
-        var opts = utils.defaultObject(config);
-        var onSuccess = opts.onSuccess;
-        var onFailure = opts.onFailure;
-        delete opts.onSuccess;
-        delete opts.onFailure;
+    function HttpClient(options, callback) {
+        var opts = utils.defaultObject(options);
         try {
-            var json = wiltoncall("httpclient_create", opts);
-            var out = JSON.parse(json);
-            this.handle = out.httpclientHandle;
-            utils.callOrIgnore(onSuccess);
+            if (utils.hasPropertyWithType(opts, "handle", "number")) {
+                this.handle = opts.handle;
+            } else {
+                var json = wiltoncall("httpclient_create", opts);
+                var out = JSON.parse(json);
+                utils.checkPropertyType(out, "httpclientHandle", "number");
+                this.handle = out.httpclientHandle;
+                utils.callOrIgnore(callback);
+            }
         } catch (e) {
-            utils.callOrThrow(onFailure, e);
+            utils.callOrThrow(callback, e);
         }
     };
 
     HttpClient.prototype = {
-        execute: function(url, options) {
+        execute: function(url, options, callback) {
             var opts = utils.defaultObject(options);
             try {
                 var urlstr = utils.defaultString(url);
@@ -40,14 +41,14 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
                     metadata: meta
                 });
                 var resp = JSON.parse(resp_json);
-                utils.callOrIgnore(opts.onSuccess, resp);
+                utils.callOrIgnore(callback, resp);
                 return resp;
             } catch (e) {
-                utils.callOrThrow(opts.onFailure, e);
+                utils.callOrThrow(callback, e);
             }
         },
         
-        sendTempFile: function(url, options) {
+        sendTempFile: function(url, options, callback) {
             var opts = utils.defaultObject(options);
             try {
                 var urlstr = utils.defaultString(url);
@@ -60,22 +61,22 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
                     metadata: meta
                 });
                 var resp = JSON.parse(resp_json);
-                utils.callOrIgnore(opts.onSuccess, resp);
+                utils.callOrIgnore(callback, resp);
                 return resp;
             } catch (e) {
-                utils.callOrThrow(opts.onFailure, e, {});
+                utils.callOrThrow(callback, e, {});
             }
         },
         
-        close: function(options) {
+        close: function(options, callback) {
             var opts = utils.defaultObject(options);
             try {
                 wiltoncall("httpclient_close", {
                     httpclientHandle: this.handle
                 });
-                utils.callOrIgnore(opts.onSuccess);
+                utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(opts.onFailure, e);
+                utils.callOrThrow(callback, e);
             }
         }
     };

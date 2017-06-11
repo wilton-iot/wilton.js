@@ -12,59 +12,55 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils, Logger) {
     };
     
     Request.prototype = {
-        getMetadata: function(options) {
-            var opts = utils.defaultObject(options);
+        getMetadata: function(callback) {
             try {
                 var json = wiltoncall("request_get_metadata", {
                     requestHandle: this.handle
                 });
                 var res = JSON.parse(json);
-                utils.callOrIgnore(opts.onSuccess, res);
+                utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {
-                utils.callOrThrow(opts.onFailure, e);
+                utils.callOrThrow(callback, e);
             }
         },
         
-        getData: function(options) {
-            var opts = utils.defaultObject(options);
+        getData: function(callback) {
             try {
                 var res = wiltoncall("request_get_data", {
                     requestHandle: this.handle
                 });
-                utils.callOrIgnore(opts.onSuccess, res);
+                utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {
-                utils.callOrThrow(opts.onFailure, e);
+                utils.callOrThrow(callback, e);
             }
         },
         
-        getJson: function(options) {
-            var opts = utils.defaultObject(options);
+        getJson: function(callback) {
             try {
-                var json = this.getData(options);
+                var json = this.getData();
                 var res = JSON.parse(json);
-                utils.callOrIgnore(opts.onSuccess, res);
+                utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {
-                utils.callOrThrow(opts.onFailure, e);
+                utils.callOrThrow(callback, e);
             }
         },
         
-        getDataFilename: function(options) {
-            var opts = utils.defaultObject(options);
+        getDataFilename: function(callback) {
             try {
                 var res = wiltoncall("request_get_data_filename", {
                     requestHandle: this.handle
                 });
-                utils.callOrIgnore(opts.onSuccess, res);
+                utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {
-                utils.callOrThrow(opts.onFailure, e);
+                utils.callOrThrow(callback, e);
             }
         },
         
-        sendResponse: function(data, options) {
+        sendResponse: function(data, options, callback) {
             var opts = utils.defaultObject(options);
             try {
                 this._setMeta(opts);
@@ -73,13 +69,13 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils, Logger) {
                     requestHandle: this.handle,
                     data: dt
                 });
-                utils.callOrIgnore(opts.onSuccess);
+                utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(opts.onFailure, e);
+                utils.callOrThrow(callback, e);
             }
         },
         
-        sendTempFile: function(filePath, options) {
+        sendTempFile: function(filePath, options, callback) {
             var opts = utils.defaultObject(options);
             try {
                 this._setMeta(opts);
@@ -87,13 +83,13 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils, Logger) {
                     requestHandle: this.handle,
                     filePath: filePath
                 });
-                utils.callOrIgnore(opts.onSuccess);
+                utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(opts.onFailure, e);
+                utils.callOrThrow(callback, e);
             }
         },
         
-        sendMustache: function(filePath, values, options) {
+        sendMustache: function(filePath, values, options, callback) {
             var opts = utils.defaultObject(options);
             try {
                 this._setMeta(opts);
@@ -103,9 +99,9 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils, Logger) {
                     mustacheFilePath: this.server.mustacheTemplatesRootDir + filePath,
                     values: vals
                 });
-                utils.callOrIgnore(opts.onSuccess);
+                utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(opts.onFailure, e);
+                utils.callOrThrow(callback, e);
             }
         },
         

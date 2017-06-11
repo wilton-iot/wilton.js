@@ -12,10 +12,9 @@ define(function() {
             req.sendResponse("", {
                 meta: {
                     foo: "bar"
-                },
-                onFailure: function() {
-                    req.sendResponse("Error triggered");
                 }
+            }, function(err) {
+                req.sendResponse("Error triggered");
             });
         }
     };

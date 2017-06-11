@@ -6,10 +6,11 @@
 
 define(["wilton/mustache", "./_testUtils"], function(mustache, testUtils) {
     "use strict";
+    var assert = testUtils.assert;
 
     var rendered = mustache.render("{{#names}}Hi {{name}}!\n{{/names}}", {
         names: [{name: "Chris"}, {name: "Mark"}, {name: "Scott"}]
     });
-    testUtils.assert("Hi Chris!\nHi Mark!\nHi Scott!\n" === rendered);
+    assert("Hi Chris!\nHi Mark!\nHi Scott!\n" === rendered);
 
 });

@@ -23,7 +23,7 @@ define(function() {
             return false;
         }
         return str.indexOf(suffix, str.length - suffix.length) !== -1;
-    };
+    }
 
     function defaultObject(options) {
         var opts = {};
@@ -31,7 +31,7 @@ define(function() {
             opts = options;
         }
         return opts;
-    };
+    }
 
     function defaultString(str, value) {
         if ("string" === typeof (str)) {
@@ -45,7 +45,7 @@ define(function() {
                 return "";
             }
         }
-    };
+    }
 
     function defaultJson(data) {
         var json = "{}";
@@ -57,7 +57,7 @@ define(function() {
             }
         }
         return json;
-    };
+    }
 
     function callOrThrow(onFailure, e, res) {
         if ("function" === typeof (onFailure)) {
@@ -66,19 +66,19 @@ define(function() {
                 return res;
             }
         } else {
-            throw new Error(e.message + "\n" + e.stack);
+            throw new Error(formatError(e));
         }
-    };
-
+    }
+    
     function callOrIgnore(onSuccess, params) {
         if ("function" === typeof (onSuccess)) {
             if ("undefined" !== typeof (params)) {
-                onSuccess(params);
+                onSuccess(null, params);
             } else {
-                onSuccess();
+                onSuccess(null);
             }
         }
-    };
+    }
 
     function listProperties(obj) {
         var res = [];
@@ -90,7 +90,7 @@ define(function() {
             }
         }
         return res;
-    };
+    }
 
     function checkProperties(obj, props) {
         if (undefinedOrNull(obj)) {
@@ -110,7 +110,7 @@ define(function() {
                         " missed property name: [" + pr + "], object: [" + listProperties(obj) + "]");
             }
         }
-    };
+    }
 
     function checkPropertyType(obj, prop, type) {
         if (undefinedOrNull(obj)) {
@@ -128,7 +128,41 @@ define(function() {
                     " required type: [" + type + "], actual type: [" + actual + "]," +
                     " object: [" + listProperties(obj) + "]");
         }
-    };
+    }
+    
+    function checkEmptyObject(obj) {
+        if (undefinedOrNull(obj)) {
+            throw new Error("'checkEmptyObject' error: specified object is invalid");
+        }
+        var props = listProperties(obj);
+        if (0 !== props.length) {
+            throw new Error("'checkEmptyObject' error: specified object is not empty," +
+                    " object: [" + props + "]");
+        }
+    }
+    
+    function hasPropertyWithType(obj, prop, type) {
+        if (!undefinedOrNull(obj) && "string" === typeof (prop) && "string" === typeof (type)) {
+            var actual = typeof (obj[prop]);
+            return type === actual;
+        }
+        return false;
+    }
+    
+    function formatError(e) {
+        if ("undefined" !== typeof (WILTON_DUKTAPE) || !(e instanceof Error)) {
+            return String(e);
+        } else {
+            return e.message + "\n" + e.stack;
+        }
+    }
+    
+    function promisifyAll(obj) {
+        var bluebird = WILTON_requiresync("bluebird");
+        return bluebird.promisifyAll(obj, {
+            suffix: "Promise"
+        });
+    }
 
     return {
         undefinedOrNull: undefinedOrNull,
@@ -141,7 +175,11 @@ define(function() {
         callOrIgnore: callOrIgnore,
         listProperties: listProperties,
         checkProperties:checkProperties,
-        checkPropertyType: checkPropertyType
+        checkPropertyType: checkPropertyType,
+        checkEmptyObject: checkEmptyObject,
+        hasPropertyWithType: hasPropertyWithType,
+        formatError: formatError,
+        promisifyAll: promisifyAll
     };
     
 });

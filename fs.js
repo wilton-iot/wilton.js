@@ -7,48 +7,36 @@
 define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
-    function listDirectory(options) {
+    function listDirectory(options, callback) {
         var opts = utils.defaultObject(options);
-        var onSuccess = opts.onSuccess;
-        var onFailure = opts.onFailure;
-        delete opts.onSuccess;
-        delete opts.onFailure;
         try {
             var res = wiltoncall("fs_list_directory", opts);
             var list = JSON.parse(res);
-            utils.callOrIgnore(onSuccess, list);
+            utils.callOrIgnore(callback, list);
             return list;
         } catch (e) {
-            utils.callOrThrow(onFailure, e);
+            utils.callOrThrow(callback, e);
         }
     }
     
-    function readFile(options) {
+    function readFile(options, callback) {
         var opts = utils.defaultObject(options);
-        var onSuccess = opts.onSuccess;
-        var onFailure = opts.onFailure;
-        delete opts.onSuccess;
-        delete opts.onFailure;
         try {
             var res = wiltoncall("fs_read_file", opts);
-            utils.callOrIgnore(onSuccess, res);
+            utils.callOrIgnore(callback, res);
             return res;
         } catch (e) {
-            utils.callOrThrow(onFailure, e);
+            utils.callOrThrow(callback, e);
         }
     }
     
-    function writeFile(options) {
+    function writeFile(options, callback) {
         var opts = utils.defaultObject(options);
-        var onSuccess = opts.onSuccess;
-        var onFailure = opts.onFailure;
-        delete opts.onSuccess;
-        delete opts.onFailure;
         try {
             wiltoncall("fs_write_file", opts);
-            utils.callOrIgnore(onSuccess);
+            utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(onFailure, e);
+            utils.callOrThrow(callback, e);
         }
     }
 

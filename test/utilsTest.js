@@ -6,15 +6,16 @@
 
 define(["wilton/utils", "./_testUtils"], function(utils, testUtils) {
     "use strict";
+    var assert = testUtils.assert;
 
-    testUtils.assert(utils.undefinedOrNull(null));
-    testUtils.assert(!utils.undefinedOrNull(testUtils));
+    assert(utils.undefinedOrNull(null));
+    assert(!utils.undefinedOrNull(testUtils));
 
-    testUtils.assert(utils.startsWith("foo", "fo"));
-    testUtils.assert(!utils.startsWith("foo", "ba"));
+    assert(utils.startsWith("foo", "fo"));
+    assert(!utils.startsWith("foo", "ba"));
 
-    testUtils.assert(utils.endsWith("foo", "oo"));
-    testUtils.assert(!utils.endsWith("foo", "ar"));
+    assert(utils.endsWith("foo", "oo"));
+    assert(!utils.endsWith("foo", "ar"));
 
     // todo
     

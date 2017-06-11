@@ -7,64 +7,77 @@
 define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
-    function put(options) {
+    function put(options, callback) {
         var opts = utils.defaultObject(options);
-        utils.checkProperties(opts, ["key", "value"]);
-        var val  = utils.defaultJson(opts.value);
         try {
-            wiltoncall("shared_put", {
+            utils.checkProperties(opts, ["key", "value"]);
+            var val = utils.defaultJson(opts.value);
+            var res = wiltoncall("shared_put", {
                 key: opts.key,
                 value: val
             });
-            utils.callOrIgnore(opts.onSuccess);
-        } catch (e) {
-            utils.callOrThrow(opts.onFailure, e);
-        }
-    }
-    
-    function get(options) {
-        var opts = utils.defaultObject(options);
-        utils.checkProperties(opts, ["key"]);
-        try {
-            var res = wiltoncall("shared_get", {
-                key: opts.key
-            });
-            var resout = JSON.parse(res);
-            utils.callOrIgnore(opts.onSuccess, resout);
+            var resout = null !== res ? JSON.parse(res) : {};
+            utils.callOrIgnore(callback, resout);
             return resout;
         } catch (e) {
-            utils.callOrThrow(opts.onFailure, e);
+            utils.callOrThrow(callback, e);
         }
     }
     
-    function waitChange(options) {
-        var opts = utils.defaultObject(options);
-        utils.checkProperties(opts, ["timeoutMillis", "key", "currentValue"]);
-        var cval = utils.defaultJson(opts.currentValue);
+    function get(key, callback) {
         try {
+            var res = wiltoncall("shared_get", {
+                key: key
+            });
+            var resout = null !== res ? JSON.parse(res) : {};
+            utils.callOrIgnore(callback, resout);
+            return resout;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+    
+    function waitChange(options, callback) {
+        var opts = utils.defaultObject(options);
+        try {
+            utils.checkProperties(opts, ["timeoutMillis", "key", "currentValue"]);
+            var cval = utils.defaultJson(opts.currentValue);
             var res = wiltoncall("shared_wait_change", {
                 timeoutMillis: opts.timeoutMillis,
                 key: opts.key,
                 currentValue: cval
             });
-            var resout = JSON.parse(res);
-            utils.callOrIgnore(opts.onSuccess, resout);
+            var resout = null !== res ? JSON.parse(res) : {};
+            utils.callOrIgnore(callback, resout);
             return resout;
         } catch (e) {
-            utils.callOrThrow(opts.onFailure, e);
+            utils.callOrThrow(callback, e);
         }
     }
     
-    function remove(options) {
-        var opts = utils.defaultObject(options);
-        utils.checkProperties(opts, ["key"]);
+    function remove(key, callback) {
         try {
-            wiltoncall("shared_remove", {
-                key: opts.key
+            var res = wiltoncall("shared_remove", {
+                key: key
             });
-            utils.callOrIgnore(opts.onSuccess);
+            var resout = null !== res ? JSON.parse(res) : {};
+            utils.callOrIgnore(callback, resout);
+            return resout;
         } catch (e) {
-            utils.callOrThrow(opts.onFailure, e);
+            utils.callOrThrow(callback, e);
+        }
+    }
+    
+    function getFromHandle(type, callback) {
+        try {
+            utils.checkPropertyType(type, "name", "string");
+            var handleObj = this.get(type.name);
+            utils.checkPropertyType(handleObj, "handle", "number");
+            var res = new type(handleObj);
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
         }
     }
     
@@ -72,7 +85,8 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
         put: put,
         get: get,
         waitChange: waitChange,
-        remove: remove
+        remove: remove,
+        getFromHandle: getFromHandle
     };
 
 });

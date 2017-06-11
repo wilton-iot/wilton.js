@@ -7,8 +7,7 @@
 define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
-    function render(template, values, options) {
-        var opts = utils.defaultObject(options);
+    function render(template, values, callback) {
         try {
             var tp = utils.defaultString(template);
             var vals = utils.defaultObject(values);
@@ -16,16 +15,14 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
                 template: tp,
                 values: vals
             });
-            var resstr = String(res);
-            utils.callOrIgnore(opts.onSuccess, resstr);
-            return resstr;
+            utils.callOrIgnore(callback, res);
+            return res;
         } catch (e) {
-            utils.callOrThrow(opts.onFailure, e, "");
+            utils.callOrThrow(callback, e, "");
         }
     };
 
-    function renderFile(templateFile, values, options) {
-        var opts = utils.defaultObject(options);
+    function renderFile(templateFile, values, callback) {
         try {
             var tpf = utils.defaultString(templateFile);
             var vals = utils.defaultObject(values);
@@ -33,11 +30,10 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
                 file: tpf,
                 values: vals
             });
-            var resstr = String(res);
-            utils.callOrIgnore(opts.onSuccess, resstr);
-            return resstr;
+            utils.callOrIgnore(callback, res);
+            return res;
         } catch (e) {
-            utils.callOrThrow(opts.onFailure, e, "");
+            utils.callOrThrow(callback, e, "");
         }
     };
 

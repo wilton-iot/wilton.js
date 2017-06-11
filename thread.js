@@ -7,27 +7,27 @@
 define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
-    function run(options) {
+    function run(options, callback) {
         var opts = utils.defaultObject(options);
-        utils.checkProperties(opts, ["callbackScript"]);
         try {
+            utils.checkProperties(opts, ["callbackScript"]);
             wiltoncall("thread_run", {
                 callbackScript: opts.callbackScript
             });
+            utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(opts.onFailure, e);
+            utils.callOrThrow(callback, e);
         }
     }
 
-    function sleepMillis(millis, options) {
-        var opts = utils.defaultObject(options);
+    function sleepMillis(millis, callback) {
         try {
             wiltoncall("thread_sleep_millis", {
                 millis: millis
             });
-            utils.callOrIgnore(opts.onSuccess);
+            utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(opts.onFailure, e);
+            utils.callOrThrow(callback, e);
         }
     }
 

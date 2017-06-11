@@ -7,33 +7,36 @@
 define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
-    // todo: logging
-    var CronTask = function(config) {
-        var opts = utils.defaultObject(config);
-        utils.checkProperties(opts, ["expression", "callbackScript"]);
+    function CronTask(options, callback) {
+        var opts = utils.defaultObject(options);
         try {
-            var handleJson = wiltoncall("cron_start", {
-                expression: opts.expression,
-                callbackScript: opts.callbackScript
-            });
-            var handleObj = JSON.parse(handleJson);
-            this.handle = handleObj.cronHandle;
-            utils.callOrIgnore(opts.onSuccess);
+            if (utils.hasPropertyWithType(opts, "handle", "number")) {
+                this.handle = opts.handle;
+            } else {
+                utils.checkProperties(opts, ["expression", "callbackScript"]);
+                var handleJson = wiltoncall("cron_start", {
+                    expression: opts.expression,
+                    callbackScript: opts.callbackScript
+                });
+                var handleObj = JSON.parse(handleJson);
+                utils.checkPropertyType(handleObj, "cronHandle", "number");
+                this.handle = handleObj.cronHandle;
+            }
+            utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(opts.onFailure, e);
+            utils.callOrThrow(callback, e);
         }
     };
 
     CronTask.prototype = {
-        stop: function(options) {
-            var opts = utils.defaultObject(options);
+        stop: function(callback) {
             try {
                 wiltoncall("cron_stop", {
                     cronHandle: this.handle
                 });
-                utils.callOrIgnore(opts.onSuccess);
+                utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(opts.onFailure, e);
+                utils.callOrThrow(callback, e);
             }
         }
     };

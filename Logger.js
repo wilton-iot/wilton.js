@@ -7,31 +7,27 @@
 define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
-    var Logger = function(name) {
+    function Logger(name) {
         this.name = utils.defaultString(name, "wilton");
-    };
+    }
 
-    Logger.initialize = function(config) {
+    Logger.initialize = function(config, callback) {
         var opts = utils.defaultObject(config);
-        var onSuccess = opts.onSuccess;
-        var onFailure = opts.onFailure;
-        delete opts.onSuccess;
-        delete opts.onFailure;
         try {
             wiltoncall("logging_initialize", opts);
-            utils.callOrIgnore(onSuccess);
+            utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(onFailure, e);
+            utils.callOrThrow(callback, e);
         }
     };
 
-    Logger.shutdown = function(options) {
+    Logger.shutdown = function(options, callback) {
         var opts = utils.defaultObject(options);
         try {
             wiltoncall("logging_shutdown");
-            utils.callOrIgnore(opts.onSuccess);
+            utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(opts.onFailure, e);
+            utils.callOrThrow(callback, e);
         }
     };
 
@@ -43,17 +39,12 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
                     if ("string" === typeof (message)) {
                         msg = message;
                     } else if (message instanceof Error) {
-                        // msg = message + "\n" + message.stack;
-                        msg = String(message.stack);
+                        msg = utils.formatError(message);
                     } else {
                         try {
                             msg = JSON.stringify(message);
                         } catch (e) {
-                            if ("undefined" !== typeof(WILTON_DUKTAPE)) {
-                                msg = String(message);
-                            } else {
-                                msg = message.message + "\n" + message.stack;
-                            }
+                            msg = utils.formatError(e);
                         }
                     }
                 }
@@ -64,7 +55,7 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
                 });
             } catch (e) {
                 print("===LOGGER ERROR:");
-                print(e.toString() + "\n" + e.stack);
+                print(utils.formatError(e));
                 print("===LOGGER ERROR END:");
             }
         },

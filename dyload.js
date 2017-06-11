@@ -7,17 +7,13 @@
 define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
-    function dyload(options) {
+    function dyload(options, callback) {
         var opts = utils.defaultObject(options);
-        var onSuccess = opts.onSuccess;
-        var onFailure = opts.onFailure;
-        delete opts.onSuccess;
-        delete opts.onFailure;
         try {
             wiltoncall("dyload_shared_library", opts);
-            utils.callOrIgnore(onSuccess);
+            utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(onFailure, e);
+            utils.callOrThrow(callback, e);
         }
     }
 

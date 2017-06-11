@@ -6,12 +6,8 @@
 
 define(["wilton/HttpClient", "wilton/shared"], function(HttpClient, shared) {
     "use strict";
-
-    var http = new HttpClient();
-
-    function closeHttpClient() {
-        http.close();
-    }
+    
+    var http = shared.getFromHandle(HttpClient);
 
     function assert(value) {
         if (true !== value) {
@@ -60,7 +56,6 @@ define(["wilton/HttpClient", "wilton/shared"], function(HttpClient, shared) {
             data: data,
             meta: {
                 method: "POST",
-                forceHttp10: true,
                 abortOnResponseError: false,
                 connecttimeoutMillis: 500,
                 timeoutMillis: 60000
@@ -70,9 +65,7 @@ define(["wilton/HttpClient", "wilton/shared"], function(HttpClient, shared) {
     }
     
     function cronTestMethod() {
-        var stored = shared.get({
-            key: "CronTaskTest"
-        });
+        var stored = shared.get("CronTaskTest");
         if (null !== stored) {
             stored.val += 1;
             shared.put({
@@ -83,9 +76,7 @@ define(["wilton/HttpClient", "wilton/shared"], function(HttpClient, shared) {
     }
     
     function threadTestMethod() {
-        var stored = shared.get({
-            key: "threadTest"
-        });
+        var stored = shared.get("threadTest");
         if (null !== stored) {
             stored.val += 1;
             shared.put({
@@ -95,35 +86,36 @@ define(["wilton/HttpClient", "wilton/shared"], function(HttpClient, shared) {
         }
     }
     
-    function mutexTestMethod1() {
-        var stored = shared.get({
-            key: "mutexTest"
-        });
-        if (null !== stored) {
-            stored.val += 1;
-            shared.put({
-                key: "mutexTest",
-                value: stored
+    function clientTestMethod() {
+        var http = shared.getFromHandle(HttpClient);
+        for (var i = 0; i < 10; i++) {
+            var resp = http.execute("http://127.0.0.1:8080/wilton/test/views/postmirror", {
+                data: "foobar",
+                meta: {
+                    timeoutMillis: 60000
+                }
             });
+            assert("foobar" === resp.data);
+        
+            var stored = shared.get("clientTest");
+            if (null !== stored) {
+                stored.val += 1;
+                shared.put({
+                    key: "clientTest",
+                    value: stored
+                });
+            }
         }
     }
     
-    function mutexTestMethod2() {
-
-    }
-    
-    function mutexTestMethod3() {
-
-    }
-    
     return {
-        closeHttpClient: closeHttpClient,
         assert: assert,
         httpGet: httpGet,
         httpGetHeader: httpGetHeader,
         httpGetCode: httpGetCode,
         httpPost: httpPost,
         cronTestMethod: cronTestMethod,
-        threadTestMethod: threadTestMethod
+        threadTestMethod: threadTestMethod,
+        clientTestMethod: clientTestMethod
     };
 });

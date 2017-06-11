@@ -64,34 +64,29 @@ define(["./wiltoncall", "./Request", "./utils", "./Logger"], function(wiltoncall
         return res;
     }
 
-    var Server = function(config) {
-        var opts = utils.defaultObject(config);
-        var onSuccess = opts.onSuccess;
-        var onFailure = opts.onFailure;
-        delete opts.onSuccess;
-        delete opts.onFailure;
+    var Server = function(options, callback) {
+        var opts = utils.defaultObject(options);
         try {
             // in future use opts.gatewayModule for non-JVM engines
             opts.views = prepareViews(opts.views);
             var handleJson = wiltoncall("server_create", opts);
             var handleObj = JSON.parse(handleJson);
             this.handle = handleObj.serverHandle;
-            utils.callOrIgnore(onSuccess);
+            utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(onFailure, e);
+            utils.callOrThrow(callback, e);
         }
     };
 
     Server.prototype = {
-        stop: function(options) {
-            var opts = utils.defaultObject(options);
+        stop: function(callback) {
             try {
                 wiltoncall("server_stop", {
                     serverHandle: this.handle
                 });
-                utils.callOrIgnore(opts.onSuccess);
+                utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(opts.onFailure, e);
+                utils.callOrThrow(callback, e);
             }
         }
     };
@@ -102,11 +97,7 @@ define(["./wiltoncall", "./Request", "./utils", "./Logger"], function(wiltoncall
                 "undefined" === typeof (cs.args) || !(cs.args instanceof Array)) {
             throw new Error("Invalid 'callbackScriptJson' specified: [" + JSON.stringofy(cs) + "]");
         }
-        var module;
-        // expected to be always sync
-        require([cs.module], function(mod) {
-            module = mod;
-        });
+        var module = WILTON_requiresync(cs.module);
         var req = new Request(requestHandle);
         // target call
         module[cs.func].call(module, req);

@@ -10,6 +10,7 @@ define([
     "./_testUtils"
 ], function(shared, utils, testUtils) {
     "use strict";
+    var assert = testUtils.assert;
 
     shared.put({
         key: "foo",
@@ -18,16 +19,12 @@ define([
         }
     });
     
-    var out1 = shared.get({
-        key: "foo"
-    });
-    testUtils.assert(!utils.undefinedOrNull(out1.bar));
-    testUtils.assert(42 === out1.bar);
+    var out1 = shared.get("foo");
+    assert(!utils.undefinedOrNull(out1.bar));
+    assert(42 === out1.bar);
 
     // todo: wait for change
 
-    shared.remove({
-        key: "foo"
-    });
+    shared.remove("foo");
 
 });

@@ -6,6 +6,9 @@
 
 define(["wilton/thread", "wilton/shared", "./_testUtils"], function(thread, shared, testUtils) {
     "use strict";
+    var assert = testUtils.assert;
+
+    
 
     shared.put({
         key: "threadTest",
@@ -21,15 +24,19 @@ define(["wilton/thread", "wilton/shared", "./_testUtils"], function(thread, shar
             "args": []
         }
     });
-    // todo: use wait for change here
-    thread.sleepMillis(500);
-    
-    var loaded = shared.get({
-        key: "threadTest"
-    });
-    testUtils.assert(1 === loaded.val);
 
-    shared.remove({
-        key: "threadTest"
+    shared.waitChange({
+        timeoutMillis: 15000,
+        key: "threadTest",
+        currentValue: {
+            val: 0
+        }
     });
+    
+    var loaded = shared.get("threadTest");
+    assert(1 === loaded.val);
+
+    shared.remove("threadTest");
+    
+    thread.sleepMillis(500);
 });
