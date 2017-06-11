@@ -29,7 +29,7 @@ define(["wilton/fs", "wilton/utils", "./_testUtils"], function(fs, utils, testUt
     }).then(function(li) {
         assert(false);
     }).catch(function(err) {
-        assert(err.stack.length > 0);
+        assert(!utils.undefinedOrNull(err));
         called = true;
     });
     assert(true === called);

@@ -19,7 +19,7 @@ define(["wilton/fs", "wilton/utils", "./_testUtils"], function(fs, utils, testUt
     fs.listDirectory({
         path: "FAIL"
     }, function(err, li) {
-        assert(err.stack.length > 0);
+        assert(!utils.undefinedOrNull(err));
         assert("undefined" === typeof(li));
         called = true;
     });
