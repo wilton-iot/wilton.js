@@ -4,11 +4,13 @@
  * and open the template in the editor.
  */
 
-define(["wilton/DBConnection", "./_testUtils"], function(DBConnection, testUtils) {
+define(["wilton/db/DBConnection", "./_testUtils"], function(DBConnection, testUtils) {
     "use strict";
+    var assert = testUtils.assert;
 
     var conn = new DBConnection({
         url: "sqlite://test.db"
+//        url: "postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test"
     });
     conn.execute("drop table if exists t1", {});
     // insert
@@ -19,23 +21,23 @@ define(["wilton/DBConnection", "./_testUtils"], function(DBConnection, testUtils
         foo: "bbb",
         bar: 42
     });
-    conn.execute("insert into t1 values(?, ?)", ["ccc", 43]);
+    conn.execute("insert into t1 values(:foo, :bar)", ["ccc", 43]);
     // select
     var rs = conn.query("select foo, bar from t1 where foo = :foo or bar = :bar order by bar", {
         foo: "ccc",
         bar: 42
     });
-    testUtils.assert(2 === rs.length);
-    testUtils.assert("bbb" === rs[0].foo);
-    testUtils.assert(42 === rs[0].bar);
-    testUtils.assert("ccc" === rs[1].foo);
-    testUtils.assert(43 === rs[1].bar);
+    assert(2 === rs.length);
+    assert("bbb" === rs[0].foo);
+    assert(42 === rs[0].bar);
+    assert("ccc" === rs[1].foo);
+    assert(43 === rs[1].bar);
     var el = conn.query("select foo, bar from t1 where foo = :foo or bar = :bar order by bar", {
         foo: "bbb",
         bar: 42
     });
-    testUtils.assert("bbb" === el.foo);
-    testUtils.assert(42 === el.bar);
+    assert("bbb" === el.foo);
+    assert(42 === el.bar);
 
     conn.doInTransaction(function() {/* some db actions */});
 

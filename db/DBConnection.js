@@ -4,25 +4,26 @@
  * and open the template in the editor.
  */
 
-define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
+define(["../wiltoncall", "../utils"], function(wiltoncall, utils) {
     "use strict";
 
-    var DBConnection = function(config) {
-        var opts = utils.defaultObject(config);
+    // todo: shareing
+    var DBConnection = function(options, callback) {
+        var opts = utils.defaultObject(options);
         try {
+            utils.hasPropertyWithType(opts, "url", "string");
             this.url = opts.url;
             var handleJson = wiltoncall("db_connection_open", this.url);
             var handleParsed = JSON.parse(handleJson);
             this.handle = handleParsed.connectionHandle;
-            utils.callOrIgnore(opts.onSuccess);
+            utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(opts.onFailure, e);
+            utils.callOrThrow(callback, e);
         }
     };
 
     DBConnection.prototype = {
-        execute: function(sql, params, options) {
-            var opts = utils.defaultObject(options);
+        execute: function(sql, params, callback) {
             try {
                 var sqlstr = utils.defaultString(sql);
                 var pars = utils.defaultObject(params);
@@ -31,14 +32,13 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
                     sql: sqlstr,
                     params: pars
                 });
-                utils.callOrIgnore(opts.onSuccess);
+                utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(opts.onFailure, e);
+                utils.callOrThrow(callback, e);
             }
         },
         
-        queryList: function(sql, params, options) {
-            var opts = utils.defaultObject(options);
+        queryList: function(sql, params, callback) {
             try {
                 var sqlstr = utils.defaultString(sql);
                 var pars = utils.defaultObject(params);
@@ -48,17 +48,20 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
                     params: pars
                 });
                 var res = JSON.parse(json);
-                utils.callOrIgnore(opts.onSuccess, res);
+                utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {
-                utils.callOrThrow(opts.onFailure, e, []);
+                utils.callOrThrow(callback, e, []);
             }
         },
         
-        query: function(sql, params, options) {
-            var opts = utils.defaultObject(options);
+        query: function(sql, params, callback) {
             var list = this.queryList(sql, params, {
-                onFailure: opts.onFailure
+                onFailure: function(err) {
+                    if (!utils.undefinedOrNull(err)) {
+                        callback(err);
+                    }
+                }
             });
             if (list instanceof Array) {
                 var res = null;
@@ -67,22 +70,21 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
                 } else if (1 === list.length) {
                     res = list[0];
                 }
-                utils.callOrIgnore(opts.onSuccess, res);
+                utils.callOrIgnore(callback, res);
                 return res;
             }
             // else error happened
             return {};
         },
         
-        doInTransaction: function(callback, options) {
-            var opts = utils.defaultObject(options);
+        doInTransaction: function(operations, callback) {
             try {
                 var tranJson = wiltoncall("db_transaction_start", {
                     connectionHandle: this.handle
                 });
                 var tran = JSON.parse(tranJson);
                 try {
-                    callback();
+                    operations();
                     wiltoncall("db_transaction_commit", {
                         transactionHandle: tran.transactionHandle
                     });
@@ -90,23 +92,22 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
                     wiltoncall("db_transaction_rollback", {
                         transactionHandle: tran.transactionHandle
                     });
-                    utils.callOrThrow(opts.onFailure, e);
+                    utils.callOrThrow(callback, e);
                 }
-                utils.callOrIgnore(opts.onSuccess);
+                utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(opts.onFailure, e);
+                utils.callOrThrow(callback, e);
             }
         },
         
-        close: function(options) {
-            var opts = utils.defaultObject(options);
+        close: function(callback) {
             try {
                 wiltoncall("db_connection_close", {
                     connectionHandle: this.handle
                 });
-                utils.callOrIgnore(opts.onSuccess);
+                utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(opts.onFailure, e);
+                utils.callOrThrow(callback, e);
             }
         }
     };

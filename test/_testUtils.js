@@ -7,7 +7,7 @@
 define(["wilton/HttpClient", "wilton/shared"], function(HttpClient, shared) {
     "use strict";
     
-    var http = shared.getFromHandle(HttpClient);
+    var http = shared.getFromHandle(HttpClient, function() {/* ignore */});
 
     function assert(value) {
         if (true !== value) {
