@@ -9,7 +9,9 @@ define(["wilton/shared", "wilton/utils", "./Connection"], function(shared, utils
         var opts = utils.defaultObject(options);
         try {
             utils.checkProperties(opts, ["sharedKey", "url"]);
-            var res = new Connection(opts.url);
+            var res = new Connection({
+                url: opts.url
+            });
             shared.listAppend(opts.sharedKey, res.handle);
             utils.callOrIgnore(callback, res);
             return res;

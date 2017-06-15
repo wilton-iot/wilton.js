@@ -4,13 +4,12 @@
  * and open the template in the editor.
  */
 
-define(["wilton/db/DBConnection", "./testUtils"], function(DBConnection, testUtils) {
+define(["./appContext", "assert", "wilton/db/connManager"], function(ctx, assert, connManager) {
     "use strict";
-    var assert = testUtils.assert;
 
-    var conn = new DBConnection({
-        url: "sqlite://test.db"
-//        url: "postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test"
+    var conn = connManager.open({
+        url: ctx.config.dbUrl,
+        sharedKey: ctx.config.connManagerKey
     });
     conn.execute("drop table if exists t1", {});
     // insert
@@ -40,7 +39,5 @@ define(["wilton/db/DBConnection", "./testUtils"], function(DBConnection, testUti
     assert(42 === el.bar);
 
     conn.doInTransaction(function() {/* some db actions */});
-
-    conn.close();
 
 });

@@ -14,9 +14,8 @@ define(["../wiltoncall", "../utils"], function(wiltoncall, utils) {
                 utils.checkPropertyType(opts, "handle", "number");
                 this.handle = opts.handle;
             } else {
-                utils.hasPropertyWithType(opts, "url", "string");
-                this.url = opts.url;
-                var handleJson = wiltoncall("db_connection_open", this.url);
+                utils.checkPropertyType(opts, "url", "string");
+                var handleJson = wiltoncall("db_connection_open", opts.url);
                 var handleParsed = JSON.parse(handleJson);
                 this.handle = handleParsed.connectionHandle;
             }
