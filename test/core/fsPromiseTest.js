@@ -4,10 +4,8 @@
  * and open the template in the editor.
  */
 
-define(["wilton/fs", "wilton/utils", "./_testUtils"], function(fs, utils, testUtils) {
+define(["assert", "wilton/fs", "wilton/utils"], function(assert, fs, utils) {
     "use strict";
-
-    var assert = testUtils.assert;
     utils.promisifyAll(fs);
 
     // listDirectory promise

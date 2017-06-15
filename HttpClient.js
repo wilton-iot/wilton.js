@@ -10,15 +10,16 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     function HttpClient(options, callback) {
         var opts = utils.defaultObject(options);
         try {
-            if (utils.hasPropertyWithType(opts, "handle", "number")) {
+            if (utils.hasProperties(opts, ["handle"])) {
+                utils.checkPropertyType(opts, "handle", "number");
                 this.handle = opts.handle;
             } else {
                 var json = wiltoncall("httpclient_create", opts);
                 var out = JSON.parse(json);
                 utils.checkPropertyType(out, "httpclientHandle", "number");
                 this.handle = out.httpclientHandle;
-                utils.callOrIgnore(callback);
             }
+            utils.callOrIgnore(callback);
         } catch (e) {
             utils.callOrThrow(callback, e);
         }

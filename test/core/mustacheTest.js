@@ -4,9 +4,8 @@
  * and open the template in the editor.
  */
 
-define(["wilton/mustache", "./_testUtils"], function(mustache, testUtils) {
+define(["assert", "wilton/mustache"], function(assert, mustache) {
     "use strict";
-    var assert = testUtils.assert;
 
     var rendered = mustache.render("{{#names}}Hi {{name}}!\n{{/names}}", {
         names: [{name: "Chris"}, {name: "Mark"}, {name: "Scott"}]

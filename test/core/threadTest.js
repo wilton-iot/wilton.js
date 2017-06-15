@@ -4,24 +4,17 @@
  * and open the template in the editor.
  */
 
-define(["wilton/thread", "wilton/shared", "./_testUtils"], function(thread, shared, testUtils) {
+define(["assert", "wilton/thread", "wilton/shared"], function(assert, thread, shared) {
     "use strict";
-    var assert = testUtils.assert;
 
-    
-
-    shared.put({
-        key: "threadTest",
-        value: {
-            val: 0
-        }
+    shared.put("threadTest", {
+        val: 0
     });
 
     thread.run({
         callbackScript: {
-            "module": "wilton/test/_testUtils",
-            "func": "threadTestMethod",
-            "args": []
+            "module": "wilton/test/core/helpers/threadHelper",
+            "func": "increment1"
         }
     });
 
@@ -38,5 +31,5 @@ define(["wilton/thread", "wilton/shared", "./_testUtils"], function(thread, shar
 
     shared.remove("threadTest");
     
-    thread.sleepMillis(500);
+    thread.sleepMillis(100);
 });

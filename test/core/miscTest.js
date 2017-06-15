@@ -10,7 +10,7 @@ define(["wilton/misc", "wilton/Server"], function(misc, Server) {
     var server = new Server({
         tcpPort: 8080,
         views: [
-            "wilton/test/views/hi"
+            "wilton/test/core/views/hi"
         ]
     });
 

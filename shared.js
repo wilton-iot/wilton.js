@@ -7,13 +7,11 @@
 define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
-    function put(options, callback) {
-        var opts = utils.defaultObject(options);
+    function put(key, value, callback) {
         try {
-            utils.checkProperties(opts, ["key", "value"]);
-            var val = utils.defaultJson(opts.value);
+            var val = utils.defaultJson(value);
             var res = wiltoncall("shared_put", {
-                key: opts.key,
+                key: key,
                 value: val
             });
             var resout = null !== res ? JSON.parse(res) : {};
@@ -29,9 +27,12 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
             var res = wiltoncall("shared_get", {
                 key: key
             });
-            var resout = null !== res ? JSON.parse(res) : {};
-            utils.callOrIgnore(callback, resout);
-            return resout;
+            if (null !== res) {
+                var resout = JSON.parse(res);
+                utils.callOrIgnore(callback, resout);
+                return resout;
+            }
+            throw new Error("Shared entry not found for key: [" + key + "]");
         } catch (e) {
             utils.callOrThrow(callback, e);
         }
@@ -68,14 +69,38 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
         }
     }
     
-    function getFromHandle(type, callback) {
+    function listAppend(key, value, callback) {
         try {
-            utils.checkPropertyType(type, "name", "string");
-            var handleObj = this.get(type.name);
+            var val = utils.defaultJson(value);
+            var res = wiltoncall("shared_list_append", {
+                key: key,
+                value: val
+            });
+            var resout = JSON.parse(res);
+            utils.callOrIgnore(callback, resout);
+            return resout;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+    
+    function getFromHandle(options, callback) {
+        var opts = utils.defaultObject(options);
+        try {
+            utils.checkProperties(opts, ["key", "type"]);
+            var handleObj = this.get(opts.key);
             utils.checkPropertyType(handleObj, "handle", "number");
-            var res = new type(handleObj);
+            var res = new opts.type(handleObj);
             utils.callOrIgnore(callback, res);
             return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+    
+    function dump(callback) {
+        try {
+            return wiltoncall("shared_dump");
         } catch (e) {
             utils.callOrThrow(callback, e);
         }
@@ -86,7 +111,9 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
         get: get,
         waitChange: waitChange,
         remove: remove,
-        getFromHandle: getFromHandle
+        listAppend: listAppend,
+        getFromHandle: getFromHandle,
+        dump: dump
     };
 
 });

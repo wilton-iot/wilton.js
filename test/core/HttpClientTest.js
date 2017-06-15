@@ -5,26 +5,24 @@
  */
 
 define([
-    "wilton/HttpClient",
+    "./appContext",
+    "assert",
     "wilton/Server",
     "wilton/shared",
-    "wilton/thread",
-    "./_testUtils"
-], function(HttpClient, Server, shared, thread, testUtils) {
+    "wilton/thread"
+], function(ctx, assert, Server, shared, thread) {
     "use strict";
-    var assert = testUtils.assert;
+    var http = ctx.httpClient;
 
     var server = new Server({
         tcpPort: 8080,
         views: [
-            "wilton/test/views/hi",
-            "wilton/test/views/postmirror"
+            "wilton/test/core/views/hi",
+            "wilton/test/core/views/postmirror"
         ]
     });
 
-    var http = shared.getFromHandle(HttpClient);
-    
-    var resp = http.execute("http://127.0.0.1:8080/wilton/test/views/hi", {
+    var resp = http.execute("http://127.0.0.1:8080/wilton/test/core/views/hi", {
         meta: {
             forceHttp10: true,
             timeoutMillis: 60000
@@ -33,7 +31,7 @@ define([
     assert("Hi from wilton_test!" === resp.data);
     assert("close" === resp.headers.Connection);
     
-    var resp = http.execute("http://127.0.0.1:8080/wilton/test/views/postmirror", {
+    var resp = http.execute("http://127.0.0.1:8080/wilton/test/core/views/postmirror", {
         data: "foobar",
         meta: {
             timeoutMillis: 60000
@@ -42,28 +40,22 @@ define([
     assert("foobar" === resp.data);
 
     // threads
-    shared.put({
-       key: "clientTest",
-       value: {
-           val:0
-       }
-    });
+    shared.put("clientTest", []);
     
     var num_workers = 2;
-    var target = num_workers * 10;
+    var target = num_workers * 5;
     
     for (var i = 0; i < num_workers; i++) {
         thread.run({
             callbackScript: {
-                "module": "wilton/test/_testUtils",
-                "func": "clientTestMethod",
-                "args": []
+                "module": "wilton/test/core/helpers/httpClientHelper",
+                "func": "postAndIncrement"
             }
         });
     }
 
     for(;;) {
-        var count = shared.get("clientTest").val;
+        var count = shared.get("clientTest").length;
         print("waiting, count: [" + count + "] of: [" + target + "]");
         if (target === count) {
             break;

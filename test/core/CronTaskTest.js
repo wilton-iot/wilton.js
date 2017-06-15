@@ -5,29 +5,24 @@
  */
 
 define([
+    "assert",
     "wilton/CronTask",
     "wilton/thread",
-    "wilton/shared",
-    "./_testUtils"
-], function(CronTask, thread, shared, testUtils) {
+    "wilton/shared"
+], function(assert, CronTask, thread, shared) {
     "use strict";
-    var assert = testUtils.assert;
     
-    shared.put({
-        key: "CronTaskTest",
-        value: {
-            val: 0
-        }
+    shared.put("CronTaskTest", {
+        val: 0
     });
     var cron = new CronTask({
         expression: "* * * * * *",
         callbackScript: {
-            "module": "wilton/test/_testUtils",
-            "func": "cronTestMethod",
-            "args": []
+            "module": "wilton/test/core/helpers/cronHelper",
+            "func": "increment1"
         }
     });
-//    takes long, enable me for cron retest
+    // takes long, enable me for cron retest
 //    thread.sleepMillis(1500);
 //    var sh1 = shared.get("CronTaskTest");
 //    assert(1 === sh1.val || 2 === sh1.val);

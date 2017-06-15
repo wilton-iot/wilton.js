@@ -5,26 +5,31 @@
  */
 
 define([
+    "assert",
     "wilton/shared", 
-    "wilton/utils", 
-    "./_testUtils"
-], function(shared, utils, testUtils) {
+    "wilton/utils"
+], function(assert, shared, utils) {
     "use strict";
-    var assert = testUtils.assert;
 
-    shared.put({
-        key: "foo",
-        value: {
-            bar: 42
-        }
+    shared.put("foo", {
+        bar: 42
     });
     
     var out1 = shared.get("foo");
     assert(!utils.undefinedOrNull(out1.bar));
     assert(42 === out1.bar);
 
-    // todo: wait for change
+    shared.listAppend("bar", 41);
+    shared.listAppend("bar", 42);
+    
+    var bar = shared.get("bar");
+    assert(2 === bar.length);
+    assert(41 === bar[0]);
+    assert(42 === bar[1]);
+
+    // see wait for change test in threadTest
 
     shared.remove("foo");
+    shared.remove("bar");
 
 });

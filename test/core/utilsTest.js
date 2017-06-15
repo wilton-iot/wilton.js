@@ -4,12 +4,11 @@
  * and open the template in the editor.
  */
 
-define(["wilton/utils", "./_testUtils"], function(utils, testUtils) {
+define(["assert", "wilton/utils"], function(assert, utils) {
     "use strict";
-    var assert = testUtils.assert;
 
     assert(utils.undefinedOrNull(null));
-    assert(!utils.undefinedOrNull(testUtils));
+    assert(!utils.undefinedOrNull(utils));
 
     assert(utils.startsWith("foo", "fo"));
     assert(!utils.startsWith("foo", "ba"));

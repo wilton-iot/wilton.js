@@ -3,18 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-define(["wilton/HttpClient", "wilton/shared"], function(HttpClient, shared) {
+define([
+    "../appContext",
+    "assert",
+    "wilton/shared"
+], function(ctx, assert, shared) {
     "use strict";
-    
-    var http = shared.getFromHandle(HttpClient, function() {/* ignore */});
+    var http = ctx.httpClient;
 
-    function assert(value) {
-        if (true !== value) {
-            throw new Error("Assertion error");
-        }
-    }
-    
     function httpGet(url) {
         var resp = http.execute(url, {
             meta: {
@@ -23,10 +19,10 @@ define(["wilton/HttpClient", "wilton/shared"], function(HttpClient, shared) {
                 connecttimeoutMillis: 500,
                 timeoutMillis: 60000
             }
-        });        
+        });
         return resp.data;
     }
-    
+
     function httpGetHeader(url, header) {
         var resp = http.execute(url, {
             meta: {
@@ -38,7 +34,7 @@ define(["wilton/HttpClient", "wilton/shared"], function(HttpClient, shared) {
         });
         return resp.headers[header];
     }
-    
+
     function httpGetCode(url) {
         var resp = http.execute(url, {
             meta: {
@@ -63,59 +59,27 @@ define(["wilton/HttpClient", "wilton/shared"], function(HttpClient, shared) {
         });
         return resp.data;
     }
-    
-    function cronTestMethod() {
-        var stored = shared.get("CronTaskTest");
-        if (null !== stored) {
-            stored.val += 1;
-            shared.put({
-                key: "CronTaskTest",
-                value: stored
-            });
-        }
-    }
-    
-    function threadTestMethod() {
-        var stored = shared.get("threadTest");
-        if (null !== stored) {
-            stored.val += 1;
-            shared.put({
-                key: "threadTest",
-                value: stored
-            });
-        }
-    }
-    
-    function clientTestMethod() {
-        var http = shared.getFromHandle(HttpClient);
-        for (var i = 0; i < 10; i++) {
-            var resp = http.execute("http://127.0.0.1:8080/wilton/test/views/postmirror", {
+
+    function postAndIncrement() {
+        for (var i = 0; i < 5; i++) {
+            var resp = http.execute("http://127.0.0.1:8080/wilton/test/core/views/postmirror", {
                 data: "foobar",
                 meta: {
                     timeoutMillis: 60000
                 }
             });
             assert("foobar" === resp.data);
-        
-            var stored = shared.get("clientTest");
-            if (null !== stored) {
-                stored.val += 1;
-                shared.put({
-                    key: "clientTest",
-                    value: stored
-                });
-            }
+            shared.listAppend("clientTest", resp);
         }
     }
-    
+
     return {
-        assert: assert,
         httpGet: httpGet,
         httpGetHeader: httpGetHeader,
         httpGetCode: httpGetCode,
         httpPost: httpPost,
-        cronTestMethod: cronTestMethod,
-        threadTestMethod: threadTestMethod,
-        clientTestMethod: clientTestMethod
+        postAndIncrement: postAndIncrement
     };
 });
+
+

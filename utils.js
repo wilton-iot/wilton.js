@@ -111,6 +111,26 @@ define(function() {
             }
         }
     }
+    
+    function hasProperties(obj, props) {
+        if (undefinedOrNull(obj)) {
+            throw new Error("'hasProperties' error: specified object is invalid");
+        }
+        if (undefinedOrNull(props) || !(props instanceof Array) || 0 === props.length) {
+            throw new Error("'hasProperties' error: specified props are invalid");
+        }
+        for (var i = 0; i < props.length; i++) {
+            var pr = props[i];
+            if ("string" !== typeof (pr)) {
+                throw new Error("'hasProperties' error:" +
+                        " invalid non-string property name: [" + pr + "], object: [" + listProperties(obj) + "]");
+            }
+            if (!obj.hasOwnProperty(pr)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     function checkPropertyType(obj, prop, type) {
         if (undefinedOrNull(obj)) {
@@ -175,6 +195,7 @@ define(function() {
         callOrIgnore: callOrIgnore,
         listProperties: listProperties,
         checkProperties:checkProperties,
+        hasProperties:hasProperties,
         checkPropertyType: checkPropertyType,
         checkEmptyObject: checkEmptyObject,
         hasPropertyWithType: hasPropertyWithType,
