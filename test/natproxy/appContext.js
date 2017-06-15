@@ -10,17 +10,19 @@ define([
 ], function(HttpClient, shared, connManager) {
     "use strict";
     
+    var config = shared.get("wilton.test.natproxy.config"); 
+    
     return {
-        config: shared.get("wilton.test.natproxy.config"),
+        conf: config,
         
         dbConn: connManager.open({
-            url: this.config.dbUrl,
-            sharedKey: this.config.connManagerKey
+            url: config.dbUrl,
+            sharedKey: config.connManagerKey
         }),
         
         httpClient: shared.getFromHandle({
             type: HttpClient,
-            key: this.config.HttpClientKey
+            key: config.httpClientKey
         })
     };
 });

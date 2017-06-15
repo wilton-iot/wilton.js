@@ -11,7 +11,10 @@ define([
 
     return {
         POST: function(req) {
-            proxy.postResponse(ctx.dbConn, req);
+            proxy.postResponse({
+                dbConn: ctx.dbConn, 
+                req: req
+            });
         }
     };
 });

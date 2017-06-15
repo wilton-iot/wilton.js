@@ -66,7 +66,11 @@ define(function() {
                 return res;
             }
         } else {
-            throw new Error(formatError(e));
+            if (e instanceof Error) {
+                throw e;
+            } else {
+                throw new Error(String(e));
+            }
         }
     }
     
@@ -170,10 +174,14 @@ define(function() {
     }
     
     function formatError(e) {
-        if ("undefined" !== typeof (WILTON_DUKTAPE) || !(e instanceof Error)) {
-            return String(e);
+        if (e instanceof Error) {
+            if ("undefined" !== typeof (WILTON_DUKTAPE)) {
+                return e.stack;
+            } else {
+                return e.message + "\n" + e.stack;
+            }
         } else {
-            return e.message + "\n" + e.stack;
+            return String(e);
         }
     }
     

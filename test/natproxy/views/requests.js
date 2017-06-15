@@ -4,14 +4,18 @@
  * and open the template in the editor.
  */
 define([
-    "wilton/test/natproxy/appContext",
+    "../appContext",
     "wilton/natproxy/proxy"
 ], function(ctx, proxy) {
     "use strict";
     
     return {
         GET: function(req) {
-            proxy.getRequests(ctx.dbConn, req);
+            proxy.getRequests({
+                req:req,
+                dbConn: ctx.dbConn,
+                emptyStatusCode: ctx.conf.emptyStatusCode
+            });
         }
     };
 });

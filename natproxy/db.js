@@ -12,33 +12,38 @@ define([], function() {
             return obj.id;
         },
         
-        saveRequest: function(conn, id, req) {
-            conn.execute(
-                    "insert into natproxy_requests(id, method, path, headers, data, request_date)" +
-                    " values(:id, :method, :path, :headers, :data, current_timestamp())", {
-                        id: id,
-                        method: req.method,
-                        path: req.path,
-                        headers: req.headers,
-                        data: req.data
-                    });
+        saveRequest: function(conn, id, endpoint, req) {
+            conn.doInTransaction(function() {
+                conn.execute(
+                        "insert into natproxy_requests(id, endpoint, method, path, headers, data, request_date)" +
+                        " values(:id, :endpoint, :method, :path, :headers, :data, current_timestamp)", {
+                            id: id,
+                            endpoint: endpoint,
+                            method: req.method,
+                            path: req.path,
+                            headers: req.headers,
+                            data: req.data
+                        });
+            });
         },
         
         addResponse: function(conn, id, resp) {
-            conn.execute(
-                    "update natproxy_requests set" +
-                    " response = :resp," +
-                    " response_date = current_timestamp()" +
-                    " where id = :id", {
-                        id: id,
-                        resp: resp
-                    });
+            conn.doInTransaction(function() {
+                conn.execute(
+                        "update natproxy_requests set" +
+                        " response = :resp," +
+                        " response_date = current_timestamp" +
+                        " where id = :id", {
+                            id: id,
+                            resp: resp
+                        });
+            });
         },
         
         findRequestsForEndpoint: function(conn, endpoint) {
             return conn.queryList(
                     "select * from natproxy_requests" +
-                    " where response is NULL" +
+                    " where response_date is NULL" +
                     " and endpoint = :endpoint", {
                         endpoint: endpoint
                     });

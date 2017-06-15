@@ -10,7 +10,12 @@ define([
     "use strict";
     
     function enqueue(req) {
-        return proxy.enqueueRequest(ctx.dbConn, req);
+        return proxy.enqueueRequest({
+            dbConn: ctx.dbConn,
+            req: req,
+            waitTimeoutMillis: ctx.conf.waitTimeoutMillis,
+            timeoutStatusCode: ctx.conf.timeoutStatusCode            
+        });
     }
     
     return {

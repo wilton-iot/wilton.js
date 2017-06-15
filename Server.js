@@ -26,36 +26,34 @@ define(["./wiltoncall", "./Request", "./utils", "./Logger"], function(wiltoncall
             if (utils.undefinedOrNull(vi)) {
                 throw new Error("Invalid null 'views' element, index: [" + i + "]");
             } else if ("string" === typeof(vi)) {
-                // expects that it is sync
-                require([vi], function(mod) {
-                    var methodEntries = [];
-                    for (var j = 0; j < METHODS.length; j++) {
-                        var me = METHODS[j];
-                        if ("function" === typeof(mod[me])) {
-                            methodEntries.push({
-                                method: me,
-                                path: "/" + vi,
-                                callbackScript: {
-                                    module: "wilton/Server",
-                                    func: "dispatch",
-                                    args: [{
-                                        module: vi,
-                                        func: me,
-                                        args: []
-                                    }]
-                                }
-                            });
-                        }
+                var mod = WILTON_requiresync(vi);
+                var methodEntries = [];
+                for (var j = 0; j < METHODS.length; j++) {
+                    var me = METHODS[j];
+                    if ("function" === typeof(mod[me])) {
+                        methodEntries.push({
+                            method: me,
+                            path: "/" + vi,
+                            callbackScript: {
+                                module: "wilton/Server",
+                                func: "dispatch",
+                                args: [{
+                                    module: vi,
+                                    func: me,
+                                    args: []
+                                }]
+                            }
+                        });
                     }
-                    if (0 === methodEntries.length) {
-                        throw new Error("Invalid 'views' element: must have one or more" +
-                                " function attrs: GET, POST, PUT, DELETE, OPTIONS," +
-                                " index: [" + i + "]");
-                    }
-                    for (var j = 0; j < methodEntries.length; j++) {
-                        res.push(methodEntries[j]);
-                    }
-                });
+                }
+                if (0 === methodEntries.length) {
+                    throw new Error("Invalid 'views' element: must have one or more" +
+                            " function attrs: GET, POST, PUT, DELETE, OPTIONS," +
+                            " index: [" + i + "]");
+                }
+                for (var j = 0; j < methodEntries.length; j++) {
+                    res.push(methodEntries[j]);
+                }
             } else {
                 utils.checkProperties(vi, ["method", "path", "callbackScript"]);
                 res.push(vi);

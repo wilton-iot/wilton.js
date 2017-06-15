@@ -69,8 +69,7 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
             }
         },
         
-        close: function(options, callback) {
-            var opts = utils.defaultObject(options);
+        close: function(callback) {
             try {
                 wiltoncall("httpclient_close", {
                     httpclientHandle: this.handle
