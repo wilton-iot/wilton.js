@@ -8,8 +8,13 @@ define([], function() {
     
     return {
         genId: function(conn) {
+            //postgres
             var obj = conn.query("select nextval('natproxy_requests_seq') as id");
             return obj.id;
+            //sqlite
+//            conn.execute("update natproxy_requests_seq set value = value + 1");
+//            var obj = conn.query("select value as id from natproxy_requests_seq");
+//            return obj.id;
         },
         
         saveRequest: function(conn, id, endpoint, req) {

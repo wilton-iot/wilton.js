@@ -8,18 +8,20 @@ define([
     "wilton/shared",
     "wilton/CronTask",
     "wilton/Server",
-    "wilton/HttpClient",
+    "wilton/clientManager",
     "wilton/db/connManager",
     "wilton/thread",
     "wilton/wiltoncall"
-], function(shared, CronTask, Server, HttpClient, connManager, thread, wiltoncall) {   
+], function(shared, CronTask, Server, clientManager, connManager, thread, wiltoncall) {   
     "use strict";
     
     // config, in app will come from outside
     var config = {
         connManagerKey: "wilton.test.natproxy.connManager",
+        clientManagerKey: "wilton.test.natproxy.clientManager",
         httpClientKey: "wilton.test.natproxy.httpClient",
         dbUrl: "postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test",
+//        dbUrl: "sqlite://test.db",
         emptyStatusCode: 204,
         timeoutStatusCode: 504,
         waitTimeoutMillis: 10000
@@ -27,10 +29,10 @@ define([
     
     // context        
     shared.put("wilton.test.natproxy.config", config);
-    var client = new HttpClient();
-    shared.put(config.httpClientKey, {
-        handle: client.handle
-    });        
+//    var client = new HttpClient();
+//    shared.put(config.httpClientKey, {
+//        handle: client.handle
+//    });        
     
     // destination server
     var serverDest = new Server({
@@ -64,7 +66,7 @@ define([
             module: "wilton/natproxy/agent",
             func: "agentJob",
             args: [{
-                clientHandle: client.handle,
+                clientManagerKey: config.clientManagerKey,
                 proxyGetUrl: "http://127.0.0.1:8081/wilton/test/natproxy/views/requests",
                 proxyPostUrl: "http://127.0.0.1:8081/wilton/test/natproxy/views/response",
                 endpointName: "server1",
@@ -74,6 +76,9 @@ define([
     });
     
     // make requests
+    var client = clientManager.create({
+        sharedKey: config.clientManagerKey
+    });
     var opts = {
         meta: {
             headers: {
@@ -124,7 +129,9 @@ define([
 
     // shutdown
     cron.stop();
-    client.close();
+    clientManager.shutdown({
+        sharedKey: config.clientManagerKey
+    });
     serverDest.stop();
     serverProxy.stop();
     connManager.shutdown({

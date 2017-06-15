@@ -1,7 +1,13 @@
 
+-- cat ../../modules/wilton/natproxy/schema.sql | sqlite3 test.db
 begin;
 drop sequence if exists natproxy_requests_seq;
 create sequence natproxy_requests_seq;
+--drop table if exists natproxy_requests_seq;
+--create table natproxy_requests_seq(
+--    value bigint
+--);
+--insert into natproxy_requests_seq(value) values(0);
 
 drop table if exists natproxy_requests;
 create table natproxy_requests(

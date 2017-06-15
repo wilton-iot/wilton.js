@@ -93,7 +93,7 @@ define([
                 endpoint: meta.queries.endpoint,
                 response: resp
             });
-            logger.info("Notified response, id: [" + id + "]");
+            logger.debug("Notified response, id: [" + id + "]");
             db.addResponse(opts.dbConn, id, resp);
             utils.callOrIgnore(callback);
         } catch (e) {

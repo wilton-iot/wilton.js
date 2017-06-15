@@ -3,20 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-define(["wilton/shared", "wilton/HttpClient"], function(shared, HttpClient) {
+define(["wilton/shared", "wilton/clientManager"], function(shared, clientManager) {
 
     return {
         main: function() {
             print("test: wilton.core ...");
             var config = {
-                httpClientKey: "wilton.test.core.httpClient"
+                clientManagerKey: "wilton.test.core.clientManager",
             };
             shared.put("wilton.test.core.config", config);
-
-            var httpClient = new HttpClient();
-            shared.put(config.httpClientKey, {
-                handle: httpClient.handle
-            });
 
             require([
                 "wilton/test/core/LoggerTest",
@@ -30,10 +25,11 @@ define(["wilton/shared", "wilton/HttpClient"], function(shared, HttpClient) {
                 "wilton/test/core/fsTest",
                 "wilton/test/core/fsPromiseTest",
                 "wilton/test/core/utilsTest"
-            ], function() {
-            });
+            ], function() {});
 
-            httpClient.close();
+            clientManager.shutdown({
+                sharedKey: config.clientManagerKey
+            });
             print("test: wilton.core passed");
         }
     };

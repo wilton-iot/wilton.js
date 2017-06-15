@@ -6,28 +6,27 @@
 
 define([
     "wilton/Logger",
-    "wilton/HttpClient",
+    "wilton/clientManager",
     "wilton/utils"
-], function(Logger, HttpClient, utils) {
+], function(Logger, clientManager, utils) {
     "use strict";
 
     var logger = new Logger("wilton.natproxy.agent");
 
     function agentJob(conf) {
         utils.checkProperties(conf, [
-            "clientHandle",
+            "clientManagerKey",
             "proxyGetUrl",
             "proxyPostUrl",
             "endpointName",
             "endpointBaseUrl"]);
-        var client = new HttpClient();
-//        {
-//            handle: conf.clientHandle
-//        });
-        logger.info("polling");
+        var client = clientManager.create({
+            sharedKey: conf.clientManagerKey
+        });
+        logger.debug("polling");
         var resp = client.execute(conf.proxyGetUrl + "?endpoint=" + conf.endpointName);
         if (200 === resp.responseCode) {
-            logger.debug(resp.data);
+            logger.warn(resp.data);
             var reqlist = JSON.parse(resp.data);
             for (var i = 0; i < reqlist.length; i++) {
                 var req = reqlist[i];

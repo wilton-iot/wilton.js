@@ -7,12 +7,15 @@
 define([
     "./appContext",
     "assert",
+    "wilton/clientManager",
     "wilton/Server",
     "wilton/shared",
     "wilton/thread"
-], function(ctx, assert, Server, shared, thread) {
+], function(ctx, assert, clientManager, Server, shared, thread) {
     "use strict";
-    var http = ctx.httpClient;
+    var http = clientManager.create({
+        sharedKey: ctx.conf.clientManagerKey
+    });
 
     var server = new Server({
         tcpPort: 8080,

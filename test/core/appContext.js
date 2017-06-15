@@ -4,20 +4,12 @@
  * and open the template in the editor.
  */
 define([
-    "wilton/HttpClient",
     "wilton/shared"
-], function(HttpClient, shared) {
+], function(shared) {
     "use strict";
     
-    var config = shared.get("wilton.test.core.config");
-
     return {
-        config: config,
-        
-        httpClient: shared.getFromHandle({
-            type: HttpClient,
-            key: config.httpClientKey
-        })
+        conf: shared.get("wilton.test.core.config")
     };
 });
 

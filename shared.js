@@ -84,19 +84,19 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
         }
     }
     
-    function getFromHandle(options, callback) {
-        var opts = utils.defaultObject(options);
-        try {
-            utils.checkProperties(opts, ["key", "type"]);
-            var handleObj = this.get(opts.key);
-            utils.checkPropertyType(handleObj, "handle", "number");
-            var res = new opts.type(handleObj);
-            utils.callOrIgnore(callback, res);
-            return res;
-        } catch (e) {
-            utils.callOrThrow(callback, e);
-        }
-    }
+//    function getFromHandle(options, callback) {
+//        var opts = utils.defaultObject(options);
+//        try {
+//            utils.checkProperties(opts, ["key", "type"]);
+//            var handleObj = this.get(opts.key);
+//            utils.checkPropertyType(handleObj, "handle", "number");
+//            var res = new opts.type(handleObj);
+//            utils.callOrIgnore(callback, res);
+//            return res;
+//        } catch (e) {
+//            utils.callOrThrow(callback, e);
+//        }
+//    }
     
     function dump(callback) {
         try {
@@ -112,7 +112,7 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
         waitChange: waitChange,
         remove: remove,
         listAppend: listAppend,
-        getFromHandle: getFromHandle,
+//        getFromHandle: getFromHandle,
         dump: dump
     };
 

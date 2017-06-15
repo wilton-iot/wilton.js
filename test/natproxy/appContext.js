@@ -18,11 +18,6 @@ define([
         dbConn: connManager.open({
             url: config.dbUrl,
             sharedKey: config.connManagerKey
-        }),
-        
-        httpClient: shared.getFromHandle({
-            type: HttpClient,
-            key: config.httpClientKey
         })
     };
 });

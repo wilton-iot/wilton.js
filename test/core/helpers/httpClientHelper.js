@@ -6,10 +6,13 @@
 define([
     "../appContext",
     "assert",
+    "wilton/clientManager",
     "wilton/shared"
-], function(ctx, assert, shared) {
+], function(ctx, assert, clientManager, shared) {
     "use strict";
-    var http = ctx.httpClient;
+    var http = clientManager.create({
+        sharedKey: ctx.conf.clientManagerKey
+    });
 
     function httpGet(url) {
         var resp = http.execute(url, {
