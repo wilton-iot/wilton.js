@@ -26,7 +26,7 @@ define([
         logger.debug("polling");
         var resp = client.execute(conf.proxyGetUrl + "?endpoint=" + conf.endpointName);
         if (200 === resp.responseCode) {
-            logger.warn(resp.data);
+            logger.debug(resp.data);
             var reqlist = JSON.parse(resp.data);
             for (var i = 0; i < reqlist.length; i++) {
                 var req = reqlist[i];

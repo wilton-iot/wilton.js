@@ -5,6 +5,7 @@
  */
 
 define([
+    "assert",
     "wilton/shared",
     "wilton/CronTask",
     "wilton/Server",
@@ -12,9 +13,10 @@ define([
     "wilton/db/connManager",
     "wilton/thread",
     "wilton/wiltoncall"
-], function(shared, CronTask, Server, clientManager, connManager, thread, wiltoncall) {   
+], function(assert, shared, CronTask, Server, clientManager, connManager, thread, wiltoncall) {   
     "use strict";
     
+    print("test: wilton.natproxy ...");
     // config, in app will come from outside
     var config = {
         connManagerKey: "wilton.test.natproxy.connManager",
@@ -24,7 +26,8 @@ define([
 //        dbUrl: "sqlite://test.db",
         emptyStatusCode: 204,
         timeoutStatusCode: 504,
-        waitTimeoutMillis: 10000
+        waitTimeoutMillis: 10000,
+        maxRequestRecords: 8
     };
     
     // context        
@@ -90,42 +93,40 @@ define([
     var directUrl = "http://127.0.0.1:8080/wilton/test/natproxy/views/server";
     var proxiedUrl = "http://127.0.0.1:8081/wilton/test/natproxy/views/gateway?endpoint=server1&path=%2Fwilton%2Ftest%2Fnatproxy%2Fviews%2Fserver";
     // get
-    {
+    {        
+        print("test: GET");
         var direct = client.execute(directUrl, opts);
-        print("GET direct: [" + direct.data + "]");
         var proxied = client.execute(proxiedUrl, opts);
-        print("GET proxied: [" + proxied.data + "]");
+        assert.deepEqual(direct.data, proxied.data);
     }
     // post
-//    {
-//        opts.meta.method = "POST";
-//        opts.data = {
-//            sender: "client"
-//        };
-//        var direct = client.execute(directUrl, opts);
-//        print("POST direct: [" + direct.data + "]");
-//        var proxied = client.execute(proxiedUrl, opts);
-//        print("POST proxied: [" + proxied.data + "]");
-//    }
-//    // put
-//    {
-//        opts.meta.method = "PUT";
-//        var direct = client.execute(directUrl, opts);
-//        print("PUT direct: [" + direct.data + "]");
-//        var proxied = client.execute(proxiedUrl, opts);
-//        print("PUT proxied: [" + proxied.data + "]");
-//    }
-//    // delete
-//    {
-//        opts.meta.method = "DELETE";
-//        delete opts.data;
-//        var direct = client.execute(directUrl, opts);
-//        print("DELETE direct: [" + direct.data + "]");
-//        var proxied = client.execute(proxiedUrl, opts);
-//        print("DELETE proxied: [" + proxied.data + "]");
-//    }
-
-//    thread.sleepMillis(1000000);
+    {
+        print("test: POST");
+        opts.meta.method = "POST";
+        opts.data = {
+            sender: "client"
+        };
+        var direct = client.execute(directUrl, opts);
+        var proxied = client.execute(proxiedUrl, opts);
+        assert.deepEqual(direct.data, proxied.data);
+    }
+    // put
+    {
+        print("test: PUT");
+        opts.meta.method = "PUT";
+        var direct = client.execute(directUrl, opts);
+        var proxied = client.execute(proxiedUrl, opts);        
+        assert.deepEqual(direct.data, proxied.data);
+    }
+    // delete
+    {
+        print("test: DELETE");
+        opts.meta.method = "DELETE";
+        delete opts.data;
+        var direct = client.execute(directUrl, opts);
+        var proxied = client.execute(proxiedUrl, opts);
+        assert.deepEqual(direct.data, proxied.data);
+    }
 
     // shutdown
     cron.stop();
@@ -137,4 +138,5 @@ define([
     connManager.shutdown({
         sharedKey: config.connManagerKey
     });
+    print("test: wilton.natproxy passed");
 });

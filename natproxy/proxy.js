@@ -63,10 +63,10 @@ define([
         logger.debug("Looking for requests ...");
         var opts = utils.defaultObject(options);
         try {
-            utils.checkProperties(opts, ["req", "dbConn", "emptyStatusCode"]);
+            utils.checkProperties(opts, ["req", "dbConn", "emptyStatusCode", "maxRequestRecords"]);
             var meta = opts.req.getMetadata();
             utils.checkProperties(meta.queries, ["endpoint"]);
-            var reqList = db.findRequestsForEndpoint(opts.dbConn, meta.queries.endpoint);
+            var reqList = db.findRequestsForEndpoint(opts.dbConn, meta.queries.endpoint, opts.maxRequestRecords);
             var code = 0 === reqList.length ? opts.emptyStatusCode : 200;
             opts.req.sendResponse(reqList, {
                 meta: {

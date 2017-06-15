@@ -45,12 +45,15 @@ define([], function() {
             });
         },
         
-        findRequestsForEndpoint: function(conn, endpoint) {
+        findRequestsForEndpoint: function(conn, endpoint, limit) {
             return conn.queryList(
                     "select * from natproxy_requests" +
                     " where response_date is NULL" +
-                    " and endpoint = :endpoint", {
-                        endpoint: endpoint
+                    " and endpoint = :endpoint" +
+                    " order by request_date desc" +
+                    " limit :limit", {
+                        endpoint: endpoint,
+                        limit: limit
                     });
         }
         

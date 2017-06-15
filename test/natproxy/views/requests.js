@@ -14,7 +14,8 @@ define([
             proxy.getRequests({
                 req:req,
                 dbConn: ctx.dbConn,
-                emptyStatusCode: ctx.conf.emptyStatusCode
+                emptyStatusCode: ctx.conf.emptyStatusCode,
+                maxRequestRecords: ctx.conf.maxRequestRecords
             });
         }
     };

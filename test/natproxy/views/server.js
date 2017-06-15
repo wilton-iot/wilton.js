@@ -11,7 +11,7 @@ define(["wilton/Logger"], function(Logger) {
 
     return {
         GET: function(req) {
-            logger.info("GET view called");
+            logger.debug("GET view called");
             req.sendResponse({
                 message: "hello from server",
                 requestMethod: "GET",
@@ -19,7 +19,7 @@ define(["wilton/Logger"], function(Logger) {
             });
         },
         POST: function(req) {
-            logger.info("POST view called, data: [" + req.getData() + "]");
+            logger.debug("POST view called, data: [" + req.getData() + "]");
             req.sendResponse({
                 message: "hello from server",
                 requestMethod: "POST",
@@ -28,7 +28,7 @@ define(["wilton/Logger"], function(Logger) {
             });
         },
         PUT: function(req) {
-            logger.info("PUT view called");
+            logger.debug("PUT view called");
             req.sendResponse({
                 message: "hello from server",
                 requestMethod: "PUT",
@@ -37,7 +37,7 @@ define(["wilton/Logger"], function(Logger) {
             });
         },
         DELETE: function(req) {
-            logger.info("DELETE view called");
+            logger.debug("DELETE view called");
             req.sendResponse({
                 message: "hello from server",
                 requestMethod: "DELETE",
