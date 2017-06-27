@@ -30,6 +30,7 @@ define([
     var cron2 = new CronTask({
         handle: cron.handle
     });
+    // optional
     cron2.stop();
 //    thread.sleepMillis(1000);
 //    var sh2 = shared.get("CronTaskTest");

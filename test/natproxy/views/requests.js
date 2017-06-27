@@ -4,18 +4,22 @@
  * and open the template in the editor.
  */
 define([
-    "../appContext",
+    "wilton/shared",
+    "wilton/db/DBConnection",
     "wilton/natproxy/proxy"
-], function(ctx, proxy) {
+], function(shared, DBConnection, proxy) {
     "use strict";
+    
+    var conf = shared.get("wilton.test.natproxy.config");
+    var dbConn = new DBConnection(conf.dbUrl);
     
     return {
         GET: function(req) {
             proxy.getRequests({
                 req:req,
-                dbConn: ctx.dbConn,
-                emptyStatusCode: ctx.conf.emptyStatusCode,
-                maxRequestRecords: ctx.conf.maxRequestRecords
+                dbConn: dbConn,
+                emptyStatusCode: conf.emptyStatusCode,
+                maxRequestRecords: conf.maxRequestRecords
             });
         }
     };

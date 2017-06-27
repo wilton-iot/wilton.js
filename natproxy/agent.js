@@ -6,43 +6,46 @@
 
 define([
     "wilton/Logger",
-    "wilton/clientManager",
+    "wilton/httpClient",
     "wilton/utils"
-], function(Logger, clientManager, utils) {
+], function(Logger, http, utils) {
     "use strict";
 
     var logger = new Logger("wilton.natproxy.agent");
 
     function agentJob(conf) {
         utils.checkProperties(conf, [
-            "clientManagerKey",
             "proxyGetUrl",
+            "proxyGetMetadata",
             "proxyPostUrl",
+            "proxyPostMetadata",
             "endpointName",
-            "endpointBaseUrl"]);
-        var client = clientManager.create({
-            sharedKey: conf.clientManagerKey
-        });
+            "endpointBaseUrl",
+            "endpointRequestMetadata"]);
         logger.debug("polling");
-        var resp = client.execute(conf.proxyGetUrl + "?endpoint=" + conf.endpointName);
+        var resp = http.sendRequest(conf.proxyGetUrl + "?endpoint=" + conf.endpointName, {
+            meta: conf.proxyGetMetadata
+        });
         if (200 === resp.responseCode) {
             logger.debug(resp.data);
             var reqlist = JSON.parse(resp.data);
+            logger.debug("Fetched requests, count: [" + reqlist.length + "]");
             for (var i = 0; i < reqlist.length; i++) {
                 var req = reqlist[i];
-                var sresp = client.execute(conf.endpointBaseUrl + req.path, {
+                var meta = utils.clone(conf.endpointRequestMetadata);
+                meta.method = req.method;
+                meta.headers = JSON.parse(req.headers);
+                logger.debug("Is due to query endpoint ...");
+                var sresp = http.sendRequest(conf.endpointBaseUrl + req.path, {
                     data: req.data,
-                    meta: {
-                        method: req.method,
-                        headers: JSON.parse(req.headers)
-                    }
+                    meta: meta
                 });
-                client.execute(conf.proxyPostUrl + "?endpoint=" + conf.endpointName + "&id=" + req.id, {
+                logger.debug("Got endpoint response, posting ...");
+                http.sendRequest(conf.proxyPostUrl + "?endpoint=" + conf.endpointName + "&id=" + req.id, {
                     data: sresp.data,
-                    meta: {
-                        method: "POST"
-                    }
+                    meta: conf.proxyPostMetadata
                 });
+                logger.debug("Post complete");
             }
         }
     }

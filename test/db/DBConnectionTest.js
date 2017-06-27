@@ -4,17 +4,16 @@
  * and open the template in the editor.
  */
 
-define(["./appContext", "assert", "wilton/db/connManager"], function(ctx, assert, connManager) {
+define(["assert", "wilton/db/DBConnection"], function(assert, DBConnection) {
     "use strict";
 
-    var conn = connManager.open({
-        url: ctx.config.dbUrl,
-        sharedKey: ctx.config.connManagerKey
-    });
-    conn.execute("drop table if exists t1", {});
+//    var conn = new DBConnection("sqlite://test.db");
+    var conn = new DBConnection("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
+
+    conn.execute("drop table if exists t1");
     // insert
-    conn.execute("create table t1 (foo varchar, bar int)", {});
-    conn.execute("insert into t1 values('aaa', 41)", {});
+    conn.execute("create table t1 (foo varchar, bar int)");
+    conn.execute("insert into t1 values('aaa', 41)");
     // named params
     conn.execute("insert into t1 values(:foo, :bar)", {
         foo: "bbb",

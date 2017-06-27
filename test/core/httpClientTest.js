@@ -5,17 +5,13 @@
  */
 
 define([
-    "./appContext",
     "assert",
-    "wilton/clientManager",
+    "wilton/httpClient",
     "wilton/Server",
     "wilton/shared",
     "wilton/thread"
-], function(ctx, assert, clientManager, Server, shared, thread) {
+], function(assert, http, Server, shared, thread) {
     "use strict";
-    var http = clientManager.create({
-        sharedKey: ctx.conf.clientManagerKey
-    });
 
     var server = new Server({
         tcpPort: 8080,
@@ -25,7 +21,7 @@ define([
         ]
     });
 
-    var resp = http.execute("http://127.0.0.1:8080/wilton/test/core/views/hi", {
+    var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/core/views/hi", {
         meta: {
             forceHttp10: true,
             timeoutMillis: 60000
@@ -34,7 +30,7 @@ define([
     assert("Hi from wilton_test!" === resp.data);
     assert("close" === resp.headers.Connection);
     
-    var resp = http.execute("http://127.0.0.1:8080/wilton/test/core/views/postmirror", {
+    var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/core/views/postmirror", {
         data: "foobar",
         meta: {
             timeoutMillis: 60000
@@ -46,7 +42,7 @@ define([
     shared.put("clientTest", []);
     
     var num_workers = 2;
-    var target = num_workers * 5;
+    var target = num_workers * 10;
     
     for (var i = 0; i < num_workers; i++) {
         thread.run({

@@ -191,6 +191,11 @@ define(function() {
             suffix: "Promise"
         });
     }
+    
+    // https://stackoverflow.com/a/5344074/314015
+    function clone(obj) {
+        return JSON.parse(JSON.stringify(obj));
+    }
 
     return {
         undefinedOrNull: undefinedOrNull,
@@ -208,7 +213,8 @@ define(function() {
         checkEmptyObject: checkEmptyObject,
         hasPropertyWithType: hasPropertyWithType,
         formatError: formatError,
-        promisifyAll: promisifyAll
+        promisifyAll: promisifyAll,
+        clone: clone
     };
     
 });

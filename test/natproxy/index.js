@@ -8,34 +8,26 @@ define([
     "assert",
     "wilton/shared",
     "wilton/CronTask",
+    "wilton/httpClient",
     "wilton/Server",
-    "wilton/clientManager",
-    "wilton/db/connManager",
     "wilton/thread",
     "wilton/wiltoncall"
-], function(assert, shared, CronTask, Server, clientManager, connManager, thread, wiltoncall) {   
+], function(assert, shared, CronTask, http, Server, thread, wiltoncall) {   
     "use strict";
     
     print("test: wilton.natproxy ...");
     // config, in app will come from outside
     var config = {
-        connManagerKey: "wilton.test.natproxy.connManager",
-        clientManagerKey: "wilton.test.natproxy.clientManager",
-        httpClientKey: "wilton.test.natproxy.httpClient",
         dbUrl: "postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test",
 //        dbUrl: "sqlite://test.db",
         emptyStatusCode: 204,
         timeoutStatusCode: 504,
-        waitTimeoutMillis: 10000,
+        waitTimeoutMillis: 30000,
         maxRequestRecords: 8
     };
     
     // context        
     shared.put("wilton.test.natproxy.config", config);
-//    var client = new HttpClient();
-//    shared.put(config.httpClientKey, {
-//        handle: client.handle
-//    });        
     
     // destination server
     var serverDest = new Server({
@@ -69,19 +61,22 @@ define([
             module: "wilton/natproxy/agent",
             func: "agentJob",
             args: [{
-                clientManagerKey: config.clientManagerKey,
                 proxyGetUrl: "http://127.0.0.1:8081/wilton/test/natproxy/views/requests",
+                proxyGetMetadata: {
+                    connecttimeoutMillis: 10000,
+                    timeoutMillis: 30000
+                },
                 proxyPostUrl: "http://127.0.0.1:8081/wilton/test/natproxy/views/response",
+                proxyPostMetadata: {},
                 endpointName: "server1",
-                endpointBaseUrl: "http://127.0.0.1:8080"
+                endpointBaseUrl: "http://127.0.0.1:8080",
+                endpointRequestMetadata: {}
             }]
         }
     });
     
+
     // make requests
-    var client = clientManager.create({
-        sharedKey: config.clientManagerKey
-    });
     var opts = {
         meta: {
             headers: {
@@ -95,10 +90,11 @@ define([
     // get
     {        
         print("test: GET");
-        var direct = client.execute(directUrl, opts);
-        var proxied = client.execute(proxiedUrl, opts);
-        assert.deepEqual(direct.data, proxied.data);
+        var direct = http.sendRequest(directUrl, opts);
+        var proxied = http.sendRequest(proxiedUrl, opts);
+        assert.equal(direct.data, proxied.data);
     }
+
     // post
     {
         print("test: POST");
@@ -106,37 +102,33 @@ define([
         opts.data = {
             sender: "client"
         };
-        var direct = client.execute(directUrl, opts);
-        var proxied = client.execute(proxiedUrl, opts);
-        assert.deepEqual(direct.data, proxied.data);
+        var direct = http.sendRequest(directUrl, opts);
+        var proxied = http.sendRequest(proxiedUrl, opts);
+        assert.equal(direct.data, proxied.data);
     }
+    
     // put
     {
         print("test: PUT");
         opts.meta.method = "PUT";
-        var direct = client.execute(directUrl, opts);
-        var proxied = client.execute(proxiedUrl, opts);        
-        assert.deepEqual(direct.data, proxied.data);
+        var direct = http.sendRequest(directUrl, opts);
+        var proxied = http.sendRequest(proxiedUrl, opts);        
+        assert.equal(direct.data, proxied.data);
     }
     // delete
     {
         print("test: DELETE");
         opts.meta.method = "DELETE";
         delete opts.data;
-        var direct = client.execute(directUrl, opts);
-        var proxied = client.execute(proxiedUrl, opts);
-        assert.deepEqual(direct.data, proxied.data);
+        var direct = http.sendRequest(directUrl, opts);
+        var proxied = http.sendRequest(proxiedUrl, opts);
+        assert.equal(direct.data, proxied.data);
     }
-
-    // shutdown
+    
+    // shutdown, optional
     cron.stop();
-    clientManager.shutdown({
-        sharedKey: config.clientManagerKey
-    });
     serverDest.stop();
     serverProxy.stop();
-    connManager.shutdown({
-        sharedKey: config.connManagerKey
-    });
+    
     print("test: wilton.natproxy passed");
 });

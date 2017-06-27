@@ -7,25 +7,18 @@
 define(["../wiltoncall", "../utils"], function(wiltoncall, utils) {
     "use strict";
 
-    var Connection = function(options, callback) {
-        var opts = utils.defaultObject(options);
+    var DBConnection = function(url, callback) {
         try {
-            if (utils.hasProperties(opts, ["handle"])) {
-                utils.checkPropertyType(opts, "handle", "number");
-                this.handle = opts.handle;
-            } else {
-                utils.checkPropertyType(opts, "url", "string");
-                var handleJson = wiltoncall("db_connection_open", opts.url);
-                var handleParsed = JSON.parse(handleJson);
-                this.handle = handleParsed.connectionHandle;
-            }
+            var handleJson = wiltoncall("db_connection_open", url);
+            var handleParsed = JSON.parse(handleJson);
+            this.handle = handleParsed.connectionHandle;
             utils.callOrIgnore(callback);
         } catch (e) {
             utils.callOrThrow(callback, e);
         }
     };
 
-    Connection.prototype = {
+    DBConnection.prototype = {
         execute: function(sql, params, callback) {
             try {
                 var sqlstr = utils.defaultString(sql);
@@ -115,5 +108,5 @@ define(["../wiltoncall", "../utils"], function(wiltoncall, utils) {
         }
     };
     
-    return Connection;
+    return DBConnection;
 });

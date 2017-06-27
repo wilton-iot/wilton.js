@@ -4,15 +4,19 @@
  * and open the template in the editor.
  */
 define([
-    "wilton/test/natproxy/appContext",
+    "wilton/shared",
+    "wilton/db/DBConnection",
     "wilton/natproxy/proxy"
-], function(ctx, proxy) {
+], function(shared, DBConnection, proxy) {
     "use strict";
+
+    var conf = shared.get("wilton.test.natproxy.config");
+    var dbConn = new DBConnection(conf.dbUrl);
 
     return {
         POST: function(req) {
             proxy.postResponse({
-                dbConn: ctx.dbConn, 
+                dbConn: dbConn, 
                 req: req
             });
         }

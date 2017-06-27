@@ -4,18 +4,14 @@
  * and open the template in the editor.
  */
 define([
-    "../appContext",
     "assert",
-    "wilton/clientManager",
+    "wilton/httpClient",
     "wilton/shared"
-], function(ctx, assert, clientManager, shared) {
+], function(assert, http, shared) {
     "use strict";
-    var http = clientManager.create({
-        sharedKey: ctx.conf.clientManagerKey
-    });
 
     function httpGet(url) {
-        var resp = http.execute(url, {
+        var resp = http.sendRequest(url, {
             meta: {
                 method: "GET",
                 abortOnResponseError: false,
@@ -27,7 +23,7 @@ define([
     }
 
     function httpGetHeader(url, header) {
-        var resp = http.execute(url, {
+        var resp = http.sendRequest(url, {
             meta: {
                 method: "GET",
                 abortOnResponseError: false,
@@ -39,7 +35,7 @@ define([
     }
 
     function httpGetCode(url) {
-        var resp = http.execute(url, {
+        var resp = http.sendRequest(url, {
             meta: {
                 method: "GET",
                 abortOnResponseError: false,
@@ -51,7 +47,7 @@ define([
     }
 
     function httpPost(url, data) {
-        var resp = http.execute(url, {
+        var resp = http.sendRequest(url, {
             data: data,
             meta: {
                 method: "POST",
@@ -64,8 +60,8 @@ define([
     }
 
     function postAndIncrement() {
-        for (var i = 0; i < 5; i++) {
-            var resp = http.execute("http://127.0.0.1:8080/wilton/test/core/views/postmirror", {
+        for (var i = 0; i < 10; i++) {
+            var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/core/views/postmirror", {
                 data: "foobar",
                 meta: {
                     timeoutMillis: 60000

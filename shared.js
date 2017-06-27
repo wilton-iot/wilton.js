@@ -14,7 +14,7 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
                 key: key,
                 value: val
             });
-            var resout = null !== res ? JSON.parse(res) : {};
+            var resout = null !== res ? JSON.parse(res) : null;
             utils.callOrIgnore(callback, resout);
             return resout;
         } catch (e) {
@@ -48,7 +48,7 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
                 key: opts.key,
                 currentValue: cval
             });
-            var resout = null !== res ? JSON.parse(res) : {};
+            var resout = null !== res ? JSON.parse(res) : null;
             utils.callOrIgnore(callback, resout);
             return resout;
         } catch (e) {
@@ -61,7 +61,7 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
             var res = wiltoncall("shared_remove", {
                 key: key
             });
-            var resout = null !== res ? JSON.parse(res) : {};
+            var resout = null !== res ? JSON.parse(res) : null;
             utils.callOrIgnore(callback, resout);
             return resout;
         } catch (e) {
@@ -82,21 +82,7 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
         } catch (e) {
             utils.callOrThrow(callback, e);
         }
-    }
-    
-//    function getFromHandle(options, callback) {
-//        var opts = utils.defaultObject(options);
-//        try {
-//            utils.checkProperties(opts, ["key", "type"]);
-//            var handleObj = this.get(opts.key);
-//            utils.checkPropertyType(handleObj, "handle", "number");
-//            var res = new opts.type(handleObj);
-//            utils.callOrIgnore(callback, res);
-//            return res;
-//        } catch (e) {
-//            utils.callOrThrow(callback, e);
-//        }
-//    }
+    }    
     
     function dump(callback) {
         try {
@@ -112,7 +98,6 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
         waitChange: waitChange,
         remove: remove,
         listAppend: listAppend,
-//        getFromHandle: getFromHandle,
         dump: dump
     };
 
