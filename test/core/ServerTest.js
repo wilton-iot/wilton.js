@@ -11,8 +11,10 @@ define([
 ], function(assert, Server, clientHelper) {
     "use strict";
 
+    var certdir = WILTON_MODULES_DIRECTORY + "wilton/test/certificates/";
+    
     var server = new Server({
-        tcpPort: 8088,
+        tcpPort: 8443,
         views: [
             "wilton/test/core/views/hi",
             "wilton/test/core/views/postmirror",
@@ -20,23 +22,41 @@ define([
             "wilton/test/core/views/resperror",
             "wilton/test/core/views/respfooheader",
             "wilton/test/core/views/respjson"
-        ]
-    });
+        ],
+        ssl: {
+            keyFile: certdir + "server/localhost.pem",
+            keyPassword: "test",
+            verifyFile: certdir + "server/staticlibs_test_ca.cer",
+            verifySubjectSubstr: "CN=testclient"
+        }
+    });      
+    
+    var meta = {
+        sslcertFilename: certdir + "client/testclient.pem",
+        sslcertype: "PEM",
+        sslkeyFilename: certdir + "client/testclient.pem",
+        sslKeyType: "PEM",
+        sslKeypasswd: "test",
+        requireTls: true,
+        sslVerifyhost: true,
+        sslVerifypeer: true,
+        cainfoFilename: certdir + "client/staticlibs_test_ca.cer"
+    };
 
-    var prefix = "http://127.0.0.1:8088/wilton/test/core/views/";
-    assert(404 === clientHelper.httpGetCode(prefix + "foo"));
-    assert("Hi from wilton_test!" === clientHelper.httpGet(prefix + "hi"));
-    var getjson = clientHelper.httpGet(prefix + "respjson");
+    var prefix = "https://localhost:8443/wilton/test/core/views/";
+    assert(404 === clientHelper.httpGetCode(prefix + "foo", meta));
+    assert("Hi from wilton_test!" === clientHelper.httpGet(prefix + "hi", meta));
+    var getjson = clientHelper.httpGet(prefix + "respjson", meta);
     var getresp = JSON.parse(getjson);
     assert(1 === getresp.foo);
     assert("baz" === getresp.bar);
-    assert("Error triggered" === clientHelper.httpGet(prefix + "resperror"));
-    assert("127.0.0.1:8088" === clientHelper.httpGet(prefix + "reqheader"));
-    assert("header set" === clientHelper.httpGet(prefix + "respfooheader"));
-    assert("foo" === clientHelper.httpGetHeader(prefix + "respfooheader", "X-Foo"));
-    assert("foobar" === clientHelper.httpPost(prefix + "postmirror", "foobar"));
+    assert("Error triggered" === clientHelper.httpGet(prefix + "resperror", meta));
+    assert("localhost:8443" === clientHelper.httpGet(prefix + "reqheader", meta));
+    assert("header set" === clientHelper.httpGet(prefix + "respfooheader", meta));
+    assert("foo" === clientHelper.httpGetHeader(prefix + "respfooheader", "X-Foo", meta));
+    assert("foobar" === clientHelper.httpPost(prefix + "postmirror", "foobar", meta));
 
     // optional
     server.stop();
-
+    
 });

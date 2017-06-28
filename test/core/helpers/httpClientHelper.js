@@ -6,55 +6,56 @@
 define([
     "assert",
     "wilton/httpClient",
-    "wilton/shared"
-], function(assert, http, shared) {
+    "wilton/shared",
+    "wilton/utils"
+], function(assert, http, shared, utils) {
     "use strict";
 
-    function httpGet(url) {
+    function httpGet(url, meta) {
+        var mt = utils.defaultObject(meta);
+        mt.method = "GET";
+        mt.abortOnResponseError = false;
+        mt.connecttimeoutMillis = 20000;
+        mt.timeoutMillis = 60000;
         var resp = http.sendRequest(url, {
-            meta: {
-                method: "GET",
-                abortOnResponseError: false,
-                connecttimeoutMillis: 500,
-                timeoutMillis: 60000
-            }
+            meta: mt
         });
         return resp.data;
     }
 
-    function httpGetHeader(url, header) {
+    function httpGetHeader(url, header, meta) {
+        var mt = utils.defaultObject(meta);
+        mt.method = "GET";
+        mt.abortOnResponseError = false;
+        mt.connecttimeoutMillis = 20000;
+        mt.timeoutMillis = 60000;
         var resp = http.sendRequest(url, {
-            meta: {
-                method: "GET",
-                abortOnResponseError: false,
-                connecttimeoutMillis: 500,
-                timeoutMillis: 60000
-            }
+            meta: mt
         });
         return resp.headers[header];
     }
 
-    function httpGetCode(url) {
+    function httpGetCode(url, meta) {
+        var mt = utils.defaultObject(meta);
+        mt.method = "GET";
+        mt.abortOnResponseError = false;
+        mt.connecttimeoutMillis = 20000;
+        mt.timeoutMillis = 60000;
         var resp = http.sendRequest(url, {
-            meta: {
-                method: "GET",
-                abortOnResponseError: false,
-                connecttimeoutMillis: 500,
-                timeoutMillis: 60000
-            }
+            meta: mt
         });
         return resp.responseCode;
     }
 
-    function httpPost(url, data) {
+    function httpPost(url, data, meta) {
+        var mt = utils.defaultObject(meta);
+        mt.method = "POST";
+        mt.abortOnResponseError = false;
+        mt.connecttimeoutMillis = 20000;
+        mt.timeoutMillis = 60000;
         var resp = http.sendRequest(url, {
             data: data,
-            meta: {
-                method: "POST",
-                abortOnResponseError: false,
-                connecttimeoutMillis: 500,
-                timeoutMillis: 60000
-            }
+            meta: mt
         });
         return resp.data;
     }
