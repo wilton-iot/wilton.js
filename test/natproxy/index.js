@@ -43,16 +43,37 @@ define([
         queueTtlMillis: config.waitTimeoutMillis
     });
     
+    var certdir = WILTON_MODULES_DIRECTORY + "wilton/test/certificates/";
+    
     // proxy server
     var serverProxy = new Server({
-        numberOfThreads: 8,
-        tcpPort: 8081,
+        tcpPort: 8444,
         views: [
             "wilton/test/natproxy/views/gateway",
             "wilton/test/natproxy/views/requests",
             "wilton/test/natproxy/views/response"
-        ]
+        ],
+        ssl: {
+            keyFile: certdir + "server/localhost.pem",
+            keyPassword: "test",
+            verifyFile: certdir + "server/staticlibs_test_ca.cer",
+            verifySubjectSubstr: "CN=testclient"
+        }
     });   
+    
+    var agent_proxy_meta = {
+        connecttimeoutMillis: 10000,
+        timeoutMillis: 30000,
+        sslcertFilename: certdir + "client/testclient.pem",
+        sslcertype: "PEM",
+        sslkeyFilename: certdir + "client/testclient.pem",
+        sslKeyType: "PEM",
+        sslKeypasswd: "test",
+        requireTls: true,
+        sslVerifyhost: true,
+        sslVerifypeer: true,
+        cainfoFilename: certdir + "client/staticlibs_test_ca.cer"
+    };
     
     // agent task
     var cron = new CronTask({
@@ -61,13 +82,10 @@ define([
             module: "wilton/natproxy/agent",
             func: "agentJob",
             args: [{
-                proxyGetUrl: "http://127.0.0.1:8081/wilton/test/natproxy/views/requests",
-                proxyGetMetadata: {
-                    connecttimeoutMillis: 10000,
-                    timeoutMillis: 30000
-                },
-                proxyPostUrl: "http://127.0.0.1:8081/wilton/test/natproxy/views/response",
-                proxyPostMetadata: {},
+                proxyGetUrl: "https://localhost:8444/wilton/test/natproxy/views/requests",
+                proxyGetMetadata: agent_proxy_meta,
+                proxyPostUrl: "https://localhost:8444/wilton/test/natproxy/views/response",
+                proxyPostMetadata: agent_proxy_meta,
                 endpointName: "server1",
                 endpointBaseUrl: "http://127.0.0.1:8080",
                 endpointRequestMetadata: {}
@@ -77,7 +95,7 @@ define([
     
 
     // make requests
-    var opts = {
+    var optsDirect = {
         meta: {
             headers: {
                 "X-Test-Foo": "Bar"
@@ -85,43 +103,68 @@ define([
             timeoutMillis: 60000
         }
     };
+    var optsProxy = {
+        meta: {
+            headers: {
+                "X-Test-Foo": "Bar"
+            },
+            timeoutMillis: 60000,
+            sslcertFilename: certdir + "client/testclient.pem",
+            sslcertype: "PEM",
+            sslkeyFilename: certdir + "client/testclient.pem",
+            sslKeyType: "PEM",
+            sslKeypasswd: "test",
+            requireTls: true,
+            sslVerifyhost: true,
+            sslVerifypeer: true,
+            cainfoFilename: certdir + "client/staticlibs_test_ca.cer"
+        }
+    };
     var directUrl = "http://127.0.0.1:8080/wilton/test/natproxy/views/server";
-    var proxiedUrl = "http://127.0.0.1:8081/wilton/test/natproxy/views/gateway?endpoint=server1&path=%2Fwilton%2Ftest%2Fnatproxy%2Fviews%2Fserver";
+    var proxiedUrl = "https://localhost:8444/wilton/test/natproxy/views/gateway?endpoint=server1&path=%2Fwilton%2Ftest%2Fnatproxy%2Fviews%2Fserver";
     // get
     {        
         print("test: GET");
-        var direct = http.sendRequest(directUrl, opts);
-        var proxied = http.sendRequest(proxiedUrl, opts);
+        var direct = http.sendRequest(directUrl, optsDirect);
+        var proxied = http.sendRequest(proxiedUrl, optsProxy);
         assert.equal(direct.data, proxied.data);
     }
-
+    
+    var postData = {
+        sender: "client"
+    };
+    
     // post
     {
         print("test: POST");
-        opts.meta.method = "POST";
-        opts.data = {
-            sender: "client"
-        };
-        var direct = http.sendRequest(directUrl, opts);
-        var proxied = http.sendRequest(proxiedUrl, opts);
+        optsDirect.meta.method = "POST";
+        optsProxy.meta.method = "POST";
+        optsDirect.data = postData;
+        optsProxy.data = postData;
+        var direct = http.sendRequest(directUrl, optsDirect);
+        var proxied = http.sendRequest(proxiedUrl, optsProxy);
         assert.equal(direct.data, proxied.data);
     }
     
     // put
     {
         print("test: PUT");
-        opts.meta.method = "PUT";
-        var direct = http.sendRequest(directUrl, opts);
-        var proxied = http.sendRequest(proxiedUrl, opts);        
+        optsDirect.meta.method = "PUT";
+        optsProxy.meta.method = "PUT";
+        var direct = http.sendRequest(directUrl, optsDirect);
+        var proxied = http.sendRequest(proxiedUrl, optsProxy);        
         assert.equal(direct.data, proxied.data);
     }
+    
     // delete
     {
         print("test: DELETE");
-        opts.meta.method = "DELETE";
-        delete opts.data;
-        var direct = http.sendRequest(directUrl, opts);
-        var proxied = http.sendRequest(proxiedUrl, opts);
+        optsDirect.meta.method = "DELETE";
+        optsProxy.meta.method = "DELETE";
+        delete optsDirect.data;
+        delete optsProxy.data;
+        var direct = http.sendRequest(directUrl, optsDirect);
+        var proxied = http.sendRequest(proxiedUrl, optsProxy);
         assert.equal(direct.data, proxied.data);
     }
     
