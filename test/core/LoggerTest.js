@@ -13,7 +13,7 @@ define(["wilton/Logger"], function(Logger) {
                 thresholdLevel: "WARN" // lower me for debugging
             }],
         loggers: [{
-                name: "staticlib.httpserver",
+                name: "staticlib.pion",
                 level: "INFO"
             }, {
                 name: "wilton",
