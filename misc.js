@@ -16,8 +16,20 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
             utils.callOrThrow(callback, e);
         }
     }
+    
+    function spawnProcess(options, callback) {
+        var opts = utils.defaultObject(options);
+        try {
+            var res = wiltoncall("process_spawn", opts);
+            utils.callOrIgnore(callback,res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
 
     return {
-        tcpWaitForConnection: tcpWaitForConnection
+        tcpWaitForConnection: tcpWaitForConnection,
+        spawnProcess: spawnProcess
     };
 });
