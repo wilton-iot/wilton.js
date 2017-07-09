@@ -6,11 +6,12 @@
 
 define([
     "assert",
+    "wilton/fs",
     "wilton/httpClient",
     "wilton/Server",
     "wilton/shared",
     "wilton/thread"
-], function(assert, http, Server, shared, thread) {
+], function(assert, fs, http, Server, shared, thread) {
     "use strict";
 
     var server = new Server({
@@ -61,6 +62,21 @@ define([
         }
         thread.sleepMillis(1000);
     }
+
+    // response data to file
+    var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/core/views/postmirror", {
+        data: "foobaz",
+        meta: {
+            timeoutMillis: 60000,
+            responseDataFilePath: "httpClientTest.response"
+        }
+    });
+    var data_obj = JSON.parse(resp.data);
+    assert("httpClientTest.response" === data_obj.responseDataFilePath);
+    var contents = fs.readFile({
+        path: "httpClientTest.response"
+    });
+    assert("foobaz" === contents);
 
     shared.remove("clientTest");
     server.stop();

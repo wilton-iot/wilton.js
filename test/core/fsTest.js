@@ -34,7 +34,7 @@ define(["assert", "wilton/fs", "wilton/utils"], function(assert, fs, utils) {
     });
     assert(true === called);        
     
-    // readFile
+    // readFile, see httpClientTest
     
 //    testUtils.assert(li.length > 0);
 //    var contents = fs.readFile({
