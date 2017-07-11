@@ -27,9 +27,21 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
             utils.callOrThrow(callback, e);
         }
     }
+    
+    function getWiltonConfig(callback) {
+        try {
+            var resobj= wiltoncall("get_wiltoncall_config");
+            var res = JSON.parse(resobj);
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
 
     return {
         tcpWaitForConnection: tcpWaitForConnection,
-        spawnProcess: spawnProcess
+        spawnProcess: spawnProcess,
+        getWiltonConfig: getWiltonConfig
     };
 });

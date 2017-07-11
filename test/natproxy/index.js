@@ -11,8 +11,9 @@ define([
     "wilton/httpClient",
     "wilton/Server",
     "wilton/thread",
-    "wilton/wiltoncall"
-], function(assert, shared, CronTask, http, Server, thread, wiltoncall) {   
+    "wilton/wiltoncall",
+    "wilton/misc"
+], function(assert, shared, CronTask, http, Server, thread, wiltoncall, misc) {   
     "use strict";
     
     print("test: wilton.natproxy ...");
@@ -43,7 +44,7 @@ define([
         queueTtlMillis: config.waitTimeoutMillis
     });
     
-    var certdir = WILTON_MODULES_DIRECTORY + "wilton/test/certificates/";
+    var certdir = misc.getWiltonConfig().requireJsConfig.baseUrl + "/wilton/test/certificates/";
     
     // proxy server
     var serverProxy = new Server({
