@@ -30,9 +30,19 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
             utils.callOrThrow(callback, e);
         }
     }
+    
+    function waitForSignal(callback) {
+        try {
+            wiltoncall("thread_wait_for_signal");
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
 
     return {
         run: run,
-        sleepMillis: sleepMillis
+        sleepMillis: sleepMillis,
+        waitForSignal: waitForSignal
     };
 });
