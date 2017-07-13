@@ -44,7 +44,7 @@ define([
         queueTtlMillis: config.waitTimeoutMillis
     });
     
-    var certdir = misc.getWiltonConfig().requireJsConfig.baseUrl + "/wilton/test/certificates/";
+    var certdir = misc.getModulePath("wilton/test/certificates/");
     
     // proxy server
     var serverProxy = new Server({

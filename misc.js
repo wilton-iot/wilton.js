@@ -28,10 +28,23 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
         }
     }
     
-    function getWiltonConfig(callback) {
+    function getModulePath(moduleName, callback) {
+        var modname = utils.defaultString(moduleName);
         try {
-            var resobj= wiltoncall("get_wiltoncall_config");
-            var res = JSON.parse(resobj);
+            var cfobj = wiltoncall("get_wiltoncall_config");
+            var cf = JSON.parse(cfobj);
+            var res = null;
+            if ("object" === typeof (cf.requireJsConfig.paths) &&
+                    "string" === typeof(cf.requireJsConfig.paths[modname])) {
+                var fullpath = cf.requireJsConfig.paths[modname];
+                if (utils.startsWith(fullpath, "file://")) {
+                    res = fullpath.substr(7);
+                } else {
+                    res = fullpath;
+                }
+            } else {
+                res = cf.requireJsConfig.baseUrl + "/" + modname;
+            }
             utils.callOrIgnore(callback, res);
             return res;
         } catch (e) {
@@ -42,6 +55,6 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     return {
         tcpWaitForConnection: tcpWaitForConnection,
         spawnProcess: spawnProcess,
-        getWiltonConfig: getWiltonConfig
+        getModulePath: getModulePath
     };
 });

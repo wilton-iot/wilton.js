@@ -12,7 +12,7 @@ define([
 ], function(assert, Server, misc, clientHelper) {
     "use strict";
 
-    var certdir = misc.getWiltonConfig().requireJsConfig.baseUrl + "/wilton/test/certificates/";
+    var certdir = misc.getModulePath("wilton/test/certificates/");
     
     var server = new Server({
         tcpPort: 8443,
