@@ -7,6 +7,15 @@
 define(function() {
     "use strict";
    
+    var engineName = function() {
+        var conf = WILTON_wiltoncall("get_wiltoncall_config", "{}");
+        var obj = JSON.parse(conf);
+        if ("string" !== typeof(obj.defaultScriptEngine)) {
+            throw new Error("Invalid incomplete wiltoncall config: [" + conf + "]");
+        }
+        return obj.defaultScriptEngine;
+    } ();
+   
     function undefinedOrNull(obj) {
         return "undefined" === typeof (obj) || null === obj;
     }
@@ -175,7 +184,7 @@ define(function() {
     
     function formatError(e) {
         if (e instanceof Error) {
-            if ("undefined" !== typeof (WILTON_DUKTAPE)) {
+            if ("duktape" === engineName) {
                 return e.stack;
             } else {
                 return e.message + "\n" + e.stack;
