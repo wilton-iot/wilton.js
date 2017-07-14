@@ -34,15 +34,29 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
             var cfobj = wiltoncall("get_wiltoncall_config");
             var cf = JSON.parse(cfobj);
             var res = null;
-            if ("object" === typeof (cf.requireJsConfig.paths) &&
-                    "string" === typeof(cf.requireJsConfig.paths[modname])) {
-                var fullpath = cf.requireJsConfig.paths[modname];
-                if (utils.startsWith(fullpath, "file://")) {
-                    res = fullpath.substr(7);
-                } else {
-                    res = fullpath;
+            if ("object" === typeof (cf.requireJsConfig.paths)) {
+                for (var mod in cf.requireJsConfig.paths) {
+                    if (cf.requireJsConfig.paths.hasOwnProperty(mod)) {
+                        var modshort = mod;
+                        if (utils.endsWith(mod, "/")) {
+                            var modshort = mod.substring(0, mod.length - 2);
+                        }
+                        if (utils.startsWith(modname, modshort)) {
+                            var modpath = cf.requireJsConfig.paths[mod];
+                            if (utils.startsWith(modpath, "file://")) {
+                                modpath = modpath.substr(7);
+                            }
+                            if (modname.length > mod.length) {
+                                var tail = modname.substr(mod.lenght);
+                                modpath = modpath + tail;
+                            }
+                            res = modpath;
+                            break;
+                        }
+                    }
                 }
-            } else {
+            } 
+            if (null === res) {
                 res = cf.requireJsConfig.baseUrl + "/" + modname;
             }
             utils.callOrIgnore(callback, res);
