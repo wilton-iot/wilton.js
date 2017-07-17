@@ -8,12 +8,13 @@ define([
     "assert",
     "wilton/fs",
     "wilton/Server",
+    "wilton/loader",
     "wilton/misc",
     "wilton/test/core/helpers/httpClientHelper"
-], function(assert, fs, Server, misc, clientHelper) {
+], function(assert, fs, Server, loader, misc, clientHelper) {
     "use strict";
 
-    var certdir = misc.getModulePath("wilton/test/certificates/");
+    var certdir = loader.findModulePath("wilton/test/certificates/");
     // check path can be read
     var checkpath = certdir + "server/localhost.pem";
     try {
@@ -23,8 +24,9 @@ define([
     } catch(e) {
         // fallback for the case when tests are run from zip file
         var zippath = misc.getWiltonConfig().requireJsConfig.baseUrl;
-        var parentpath = zippath.replace(/\/.*?$/g, "");
-        certdir = parentpath + "/../wilton_core/test/certificates/";
+        var parenturl = zippath.replace(/\/[^/]+$/g, "");
+        var parentpath = parenturl.replace(/^\w+?\:\/\//g, "");
+        certdir = parentpath + "/wilton_core/test/certificates/";
     }
     
     var server = new Server({

@@ -52,24 +52,9 @@ define(["./wiltoncall", "./misc", "./utils"], function(wiltoncall, misc, utils) 
         }
     }
     
-    function readModuleResource(path, callback) {        
-        try {
-            if ("string" !== typeof(path)) {
-                throw new Error("Invalid path specified: [" + path + "]");
-            }
-            var rpath = modulesPath + path;
-            var res = wiltoncall("fs_read_module_resource", rpath);
-            utils.callOrIgnore(callback, res);
-            return res;
-        } catch (e) {
-            utils.callOrThrow(callback, e);
-        }
-    }
-
     return {
         listDirectory: listDirectory,
         readFile: readFile,
-        writeFile: writeFile,
-        readModuleResource: readModuleResource
+        writeFile: writeFile
     };
 });
