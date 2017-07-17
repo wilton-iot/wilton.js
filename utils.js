@@ -8,6 +8,7 @@ define(function() {
     "use strict";
    
     var engineName = function() {
+        // direct call to not require misc
         var conf = WILTON_wiltoncall("get_wiltoncall_config", "{}");
         var obj = JSON.parse(conf);
         if ("string" !== typeof(obj.defaultScriptEngine)) {

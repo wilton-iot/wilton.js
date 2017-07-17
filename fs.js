@@ -4,8 +4,20 @@
  * and open the template in the editor.
  */
 
-define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
+define(["./wiltoncall", "./misc", "./utils"], function(wiltoncall, misc, utils) {
     "use strict";
+
+    var modulesPath = function() {
+        var obj = misc.getWiltonConfig();
+        if (!("object" === typeof(obj.requireJsConfig) && "string" === typeof (obj.requireJsConfig.baseUrl))) {
+            throw new Error("Invalid incomplete wiltoncall config: [" + JSON.stringify(obj) + "]");
+        }
+        var path = obj.requireJsConfig.baseUrl;
+        if (utils.endsWith(path, ".zip")) {
+            path += "/";
+        }
+        return path;
+    }();
 
     function listDirectory(options, callback) {
         var opts = utils.defaultObject(options);
@@ -39,10 +51,25 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
             utils.callOrThrow(callback, e);
         }
     }
+    
+    function readModuleResource(path, callback) {        
+        try {
+            if ("string" !== typeof(path)) {
+                throw new Error("Invalid path specified: [" + path + "]");
+            }
+            var rpath = modulesPath + path;
+            var res = wiltoncall("fs_read_module_resource", rpath);
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
 
     return {
         listDirectory: listDirectory,
         readFile: readFile,
-        writeFile: writeFile
+        writeFile: writeFile,
+        readModuleResource: readModuleResource
     };
 });
