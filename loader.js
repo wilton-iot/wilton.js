@@ -3,9 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-define(["./misc", "./utils", "./wiltoncall"], function(misc, utils, wiltoncall) {
+define(["./misc", "./mustache", "./utils", "./wiltoncall"], function(misc, mustache, utils, wiltoncall) {
    
     var conf = misc.getWiltonConfig();
+    
+    var fileProtocolPrefix = "file://";
+    var zipProtocolPrefix = "zip://";
    
     function _findModuleUrl(modname, callback) {
         try {
@@ -13,7 +16,7 @@ define(["./misc", "./utils", "./wiltoncall"], function(misc, utils, wiltoncall) 
                 throw new Error("Invalid non-string module name specified, modname: [" + modname + "]");
             }
             var res = null;
-            var paths = conf.requireJsConfig.paths;
+            var paths = conf.requireJs.paths;
             if ("object" === typeof (paths)) {
                 for (var mod in paths) {
                     if (paths.hasOwnProperty(mod)) {
@@ -34,7 +37,7 @@ define(["./misc", "./utils", "./wiltoncall"], function(misc, utils, wiltoncall) 
                 }
             }
             if (null === res) {
-                res = conf.requireJsConfig.baseUrl + "/" + modname;
+                res = conf.requireJs.baseUrl + "/" + modname;
             }
             return res;
         } catch (e) {
@@ -45,13 +48,13 @@ define(["./misc", "./utils", "./wiltoncall"], function(misc, utils, wiltoncall) 
     function findModulePath(modname, callback) {
         try {
             var url = _findModuleUrl(modname);
-            if (url.length > 7) {
-                var res = url.substr(7);
-                utils.callOrIgnore(callback, res);
-                return res;
+            if (utils.startsWith(url, fileProtocolPrefix)) {
+                url = url.substr(fileProtocolPrefix.length);
+            } else if (utils.startsWith(url, zipProtocolPrefix)) {
+                url = url.substr(zipProtocolPrefix.length);
             }
-            throw new Error("Error finding module path," +
-                    " modname: [" + modname + "], url: [" + url + "]");
+            utils.callOrIgnore(callback, url);
+            return url;
         } catch (e) {
             utils.callOrThrow(callback, e);
         }
@@ -79,10 +82,21 @@ define(["./misc", "./utils", "./wiltoncall"], function(misc, utils, wiltoncall) 
         }
     }
     
+    function loadAppConfig() {
+        var wconf = misc.getWiltonConfig();
+        var values = {"appdir": wconf.applicationDirectory};
+        var confPath = wconf.applicationDirectory + "conf/config.json";
+        var confStr = mustache.renderFile(confPath, values);
+        return JSON.parse(confStr);
+    }
+    
     return {
+        fileProtocolPrefix: fileProtocolPrefix,
+        zipProtocolPrefix: zipProtocolPrefix,
         findModulePath: findModulePath,
         loadModuleResource: loadModuleResource,
-        loadModuleJson: loadModuleJson
+        loadModuleJson: loadModuleJson,
+        loadAppConfig: loadAppConfig
     };
 });
 

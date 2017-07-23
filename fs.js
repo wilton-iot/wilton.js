@@ -9,10 +9,10 @@ define(["./wiltoncall", "./misc", "./utils"], function(wiltoncall, misc, utils) 
 
     var modulesPath = function() {
         var obj = misc.getWiltonConfig();
-        if (!("object" === typeof(obj.requireJsConfig) && "string" === typeof (obj.requireJsConfig.baseUrl))) {
+        if (!("object" === typeof(obj.requireJs) && "string" === typeof (obj.requireJs.baseUrl))) {
             throw new Error("Invalid incomplete wiltoncall config: [" + JSON.stringify(obj) + "]");
         }
-        var path = obj.requireJsConfig.baseUrl;
+        var path = obj.requireJs.baseUrl;
         if (utils.endsWith(path, ".zip")) {
             path += "/";
         }
