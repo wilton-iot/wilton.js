@@ -22,6 +22,7 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
                 metadata: meta
             });
             var resp = JSON.parse(resp_json);
+            resp.data = utils.hexToString(resp.dataHex);
             utils.callOrIgnore(callback, resp);
             return resp;
         } catch (e) {
