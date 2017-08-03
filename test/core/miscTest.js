@@ -7,9 +7,10 @@
 define([
     "assert",
     "wilton/fs",
+    "wilton/loader",
     "wilton/misc",
     "wilton/Server"
-], function(assert, fs, misc, Server) {
+], function(assert, fs, loader, misc, Server) {
     "use strict";
 
     var server = new Server({
@@ -27,7 +28,7 @@ define([
 
     server.stop();
     
-    var executable = "bin/wilton_cli";
+    var executable = loader.findModulePath("") + "/../build/bin/wilton_cli";
     if (!fs.exists(executable)) {
         executable += ".exe";
     }
