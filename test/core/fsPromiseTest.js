@@ -11,9 +11,7 @@ define(["assert", "wilton/fs", "wilton/utils"], function(assert, fs, utils) {
     // listDirectory promise
 
     var called = false;
-    fs.listDirectoryPromise({
-        path: "."
-    }).then(function(li) {
+    fs.readdirPromise(".").then(function(li) {
         assert(li.length > 0);
         called = true;
     }).catch(function(err) {
@@ -22,9 +20,7 @@ define(["assert", "wilton/fs", "wilton/utils"], function(assert, fs, utils) {
     assert(true === called);
     
     called = false;
-    fs.listDirectoryPromise({
-        path: "FAIL"
-    }).then(function(li) {
+    fs.readdirPromise("FAIL").then(function(li) {
         assert(false);
     }).catch(function(err) {
         assert(!utils.undefinedOrNull(err));

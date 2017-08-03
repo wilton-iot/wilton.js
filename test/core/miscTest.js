@@ -4,7 +4,12 @@
  * and open the template in the editor.
  */
 
-define(["assert", "wilton/misc", "wilton/Server"], function(assert, misc, Server) {
+define([
+    "assert",
+    "wilton/fs",
+    "wilton/misc",
+    "wilton/Server"
+], function(assert, fs, misc, Server) {
     "use strict";
 
     var server = new Server({
@@ -22,12 +27,17 @@ define(["assert", "wilton/misc", "wilton/Server"], function(assert, misc, Server
 
     server.stop();
     
+    var executable = "bin/wilton_cli";
+    if (!fs.exists(executable)) {
+        executable += ".exe";
+    }
+    
     var pid = misc.spawnProcess({
-        executable: "/bin/ls", 
-        args: ["-l", "-a", "-h"], 
+        executable: executable, 
+        args: ["-h"], 
         outputFile: "miscTest_out.txt",
         awaitExit: false
     });
     assert(pid > 0);
-
+    
 });

@@ -15,13 +15,9 @@ define([
     "use strict";
 
     var certdir = loader.findModulePath("wilton/test/certificates/");
-    // check path can be read
+    // check path exists
     var checkpath = certdir + "server/localhost.pem";
-    try {
-        fs.readFile({
-            path: checkpath
-        });
-    } catch(e) {
+    if (!fs.exists(checkpath)) {
         // fallback for the case when tests are run from zip file
         var zippath = misc.getWiltonConfig().requireJs.baseUrl;
         var parenturl = zippath.replace(/\/[^/]+$/g, "");

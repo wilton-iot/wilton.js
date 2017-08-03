@@ -7,43 +7,46 @@
 define(["assert", "wilton/fs", "wilton/utils"], function(assert, fs, utils) {
     "use strict";
 
-    // listDirectory
+    // mkdir
+    fs.mkdir("fstest");
 
-    var li = fs.listDirectory({
-        path: "."
-    });
-    assert(li.length > 0);        
+    // appendFile
+    var tf = "fstest/appendFile_test.txt";
     
-    var called = false;
-    fs.listDirectory({
-        path: "FAIL"
-    }, function(err, li) {
-        assert(!utils.undefinedOrNull(err));
-        assert("undefined" === typeof(li));
-        called = true;
-    });
-    assert(true === called);
+    // writeFile
+    fs.writeFile(tf, "foo");
+    fs.appendFile(tf, "bar");
     
-    called = false;
-    fs.listDirectory({
-        path: "."
-    }, function(err, li) {
-        assert(null === err);
-        assert(li.length > 0);
-        called = true;
-    });
-    assert(true === called);        
+    // readFile
+    assert("foobar" === fs.readFile(tf));
     
-    // readFile, see httpClientTest
+    // exists
+    assert(true === fs.exists("fstest"));
+    assert(true === fs.exists(tf));
     
-//    testUtils.assert(li.length > 0);
-//    var contents = fs.readFile({
-//        path: "../test/wilton_test.c"
-//    });
-////    print(contents);
-//    fs.writeFile({
-//        path: "fsTest.tmp",
-//        contents: contents
-//    });
+    // readdir
+    assert("appendFile_test.txt" === fs.readdir("fstest")[0]);
+    
+    // stat
+    var sdir = fs.stat("fstest");
+    assert(false === sdir.isFile);
+    assert(true === sdir.isDirectory);
+    var sfile = fs.stat(tf);
+    assert(true === sfile.isFile);
+    assert(false === sfile.isDirectory);
+    
+    // rename
+    var tfMoved = "fstest/appendFile_test_moved.txt";
+    fs.rename(tf, tfMoved);
+    assert(false === fs.exists(tf));
+    assert(true === fs.exists(tfMoved));
+    
+    // unlink
+    fs.unlink(tfMoved);
+    assert(false === fs.exists(tfMoved));
+    
+    // rmdir
+    fs.rmdir("fstest");
+    assert(false === fs.exists("fstest"));
 
 });

@@ -4,25 +4,59 @@
  * and open the template in the editor.
  */
 
-define(["./wiltoncall", "./misc", "./utils"], function(wiltoncall, misc, utils) {
+define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     "use strict";
 
-    var modulesPath = function() {
-        var obj = misc.getWiltonConfig();
-        if (!("object" === typeof(obj.requireJs) && "string" === typeof (obj.requireJs.baseUrl))) {
-            throw new Error("Invalid incomplete wiltoncall config: [" + JSON.stringify(obj) + "]");
+    function appendFile(path, data, options, callback) {
+        if ("undefined" === typeof(callback)) {
+            callback = options;
         }
-        var path = obj.requireJs.baseUrl;
-        if (utils.endsWith(path, ".zip")) {
-            path += "/";
-        }
-        return path;
-    }();
-
-    function listDirectory(options, callback) {
-        var opts = utils.defaultObject(options);
         try {
-            var res = wiltoncall("fs_list_directory", opts);
+            wiltoncall("fs_append_file", {
+                path: path,
+                data: data
+            });
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+    
+    function exists(path, callback) {
+        try {
+            var resstr = wiltoncall("fs_exists", {
+                path: path
+            });
+            var res = JSON.parse(resstr).exists;
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+    
+    function mkdir(path, mode, callback) {
+        if ("undefined" === typeof (callback)) {
+            callback = mode;
+        }
+        try {
+            wiltoncall("fs_mkdir", {
+                path: path
+            });
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+       
+    function readdir(path, options, callback) {
+        if ("undefined" === typeof (callback)) {
+            callback = options;
+        }
+        try {
+            var res = wiltoncall("fs_readdir", {
+                path: path
+            });
             var list = JSON.parse(res);
             utils.callOrIgnore(callback, list);
             return list;
@@ -31,10 +65,50 @@ define(["./wiltoncall", "./misc", "./utils"], function(wiltoncall, misc, utils) 
         }
     }
     
-    function readFile(options, callback) {
-        var opts = utils.defaultObject(options);
+    function readFile(path, options, callback) {
+        if ("undefined" === typeof (callback)) {
+            callback = options;
+        }
         try {
-            var res = wiltoncall("fs_read_file", opts);
+            var res = wiltoncall("fs_read_file", {
+                path: path
+            });
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+            
+    function rename(oldPath, newPath, callback) {
+        try {
+            wiltoncall("fs_rename", {
+                oldPath: oldPath,
+                newPath: newPath
+            });
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+    
+    function rmdir(path, callback) {
+        try {
+            wiltoncall("fs_rmdir", {
+                path: path
+            });
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+    
+    function stat(path, callback) {
+        try {
+            var resstr = wiltoncall("fs_stat", {
+                path: path
+            });
+            var res = JSON.parse(resstr);
             utils.callOrIgnore(callback, res);
             return res;
         } catch (e) {
@@ -42,10 +116,26 @@ define(["./wiltoncall", "./misc", "./utils"], function(wiltoncall, misc, utils) 
         }
     }
     
-    function writeFile(options, callback) {
-        var opts = utils.defaultObject(options);
+    function unlink(path, callback) {
         try {
-            wiltoncall("fs_write_file", opts);
+            wiltoncall("fs_unlink", {
+                path: path
+            });
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+    
+    function writeFile(path, data, options, callback) {
+        if ("undefined" === typeof (callback)) {
+            callback = options;
+        }
+        try {
+            wiltoncall("fs_write_file", {
+                path: path,
+                data: data
+            });
             utils.callOrIgnore(callback);
         } catch (e) {
             utils.callOrThrow(callback, e);
@@ -53,8 +143,25 @@ define(["./wiltoncall", "./misc", "./utils"], function(wiltoncall, misc, utils) 
     }
     
     return {
-        listDirectory: listDirectory,
+        appendFile: appendFile,
+        appendFileSync: appendFile,
+        exists: exists,
+        existsSync: exists,
+        mkdir: mkdir,
+        mkdirSync: mkdir,
+        readdir: readdir,
+        readdirSync: readdir,
         readFile: readFile,
-        writeFile: writeFile
+        readFileSync: readFile,
+        rename: rename,
+        renameSync: rename,
+        rmdir: rmdir,
+        rmdirSync: rmdir,
+        stat: stat,
+        statSync: stat,
+        unlink: unlink,
+        unlinkSync: unlink,
+        writeFile: writeFile,
+        writeFileSync: writeFile
     };
 });

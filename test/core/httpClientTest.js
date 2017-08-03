@@ -73,9 +73,7 @@ define([
     });
     var data_obj = JSON.parse(resp.data);
     assert("httpClientTest.response" === data_obj.responseDataFilePath);
-    var contents = fs.readFile({
-        path: "httpClientTest.response"
-    });
+    var contents = fs.readFile("httpClientTest.response");
     assert("foobaz" === contents);
 
     shared.remove("clientTest");
