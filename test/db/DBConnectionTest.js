@@ -7,8 +7,8 @@
 define(["assert", "wilton/db/DBConnection"], function(assert, DBConnection) {
     "use strict";
 
-//    var conn = new DBConnection("sqlite://test.db");
-    var conn = new DBConnection("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
+    var conn = new DBConnection("sqlite://test.db");
+//    var conn = new DBConnection("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
 
     conn.execute("drop table if exists t1");
     // insert
