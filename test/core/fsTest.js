@@ -35,6 +35,15 @@ define(["assert", "wilton/fs", "wilton/utils"], function(assert, fs, utils) {
     assert(true === sfile.isFile);
     assert(false === sfile.isDirectory);
     
+    // copy
+    var tfCopied = "fstest/appendFile_test_copied.txt";
+    fs.copyFile(tf, tfCopied);
+    assert(true === fs.exists(tf));
+    assert(true === fs.exists(tfCopied));
+    assert("foobar" === fs.readFile(tfCopied));
+    fs.unlink(tfCopied);
+    assert(false === fs.exists(tfCopied));
+    
     // rename
     var tfMoved = "fstest/appendFile_test_moved.txt";
     fs.rename(tf, tfMoved);

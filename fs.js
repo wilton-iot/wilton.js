@@ -142,6 +142,18 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
         }
     }
     
+    function copyFile(oldPath, newPath, callback) {
+        try {
+            wiltoncall("fs_copy_file", {
+                oldPath: oldPath,
+                newPath: newPath
+            });
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+    
     return {
         appendFile: appendFile,
         appendFileSync: appendFile,
@@ -162,6 +174,8 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
         unlink: unlink,
         unlinkSync: unlink,
         writeFile: writeFile,
-        writeFileSync: writeFile
+        writeFileSync: writeFile,
+        copyFile: copyFile,
+        copyFileSync: copyFile
     };
 });
