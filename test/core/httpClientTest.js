@@ -62,6 +62,7 @@ define([
         }
         thread.sleepMillis(1000);
     }
+    shared.remove("clientTest");
 
     // response data to file
     var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/core/views/postmirror", {
@@ -76,7 +77,19 @@ define([
     var contents = fs.readFile("httpClientTest.response");
     assert("foobaz" === contents);
 
-    shared.remove("clientTest");
+    // send file
+    fs.writeFile("clientTestSend.txt", "foobaf");
+    var respFile = http.sendFile("http://127.0.0.1:8080/wilton/test/core/views/postmirror", {
+        filePath: "clientTestSend.txt",
+        meta: {
+            timeoutMillis: 60000
+        }
+    });
+    assert("foobaf" === respFile.data);
+    assert(fs.exists("clientTestSend.txt"));
+    fs.unlink("clientTestSend.txt");
+    assert(!fs.exists("clientTestSend.txt"));
+    
     server.stop();
 
 });

@@ -30,18 +30,20 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
         }
     }
 
-    function sendTempFile(url, options, callback) {
+    function sendFile(url, options, callback) {
         var opts = utils.defaultObject(options);
         try {
             var urlstr = utils.defaultString(url);
             var fp = utils.defaultString(opts.filePath);
             var meta = utils.defaultObject(opts.meta);
-            var resp_json = wiltoncall("httpclient_send_temp_file", {
+            var resp_json = wiltoncall("httpclient_send_file", {
                 url: urlstr,
                 filePath: fp,
-                metadata: meta
+                metadata: meta,
+                remove: true === opts.remove
             });
             var resp = JSON.parse(resp_json);
+            resp.data = utils.hexToString(resp.dataHex);
             utils.callOrIgnore(callback, resp);
             return resp;
         } catch (e) {
@@ -51,6 +53,6 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
 
     return {
         sendRequest: sendRequest,
-        sendTempFile: sendTempFile
+        sendFile: sendFile
     };
 });
