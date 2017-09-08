@@ -39,9 +39,20 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
         }
     }
     
+    function stdinReadline(callback) {
+        try {
+            var res = wiltoncall("stdin_readline");
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+    
     return {
         tcpWaitForConnection: tcpWaitForConnection,
         spawnProcess: spawnProcess,
-        getWiltonConfig: getWiltonConfig
+        getWiltonConfig: getWiltonConfig,
+        stdinReadline: stdinReadline
     };
 });
