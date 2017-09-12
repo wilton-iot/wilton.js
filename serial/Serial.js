@@ -43,11 +43,14 @@ define(["../wiltoncall", "../utils"], function(wiltoncall, utils) {
 
         write: function(data, callback) {
             try {
-                wiltoncall("serial_write", {
+                var resstr = wiltoncall("serial_write", {
                     serialHandle: this.handle,
                     data: utils.defaultString(data)
                 });
-                utils.callOrIgnore(callback);
+                var resjson = JSON.parse(resstr);
+                var res = resjson.bytesWritten;
+                utils.callOrIgnore(callback, res);
+                return res;
             } catch (e) {
                 utils.callOrThrow(callback, e);
             }
