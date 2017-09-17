@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["utf8"], function(utf8) {
+define([], function() {
     "use strict";
    
     var engineName = function() {
@@ -207,20 +207,6 @@ define(["utf8"], function(utf8) {
         return JSON.parse(JSON.stringify(obj));
     }
     
-    function hexToString(hex) {
-        var utf8str = "";
-        var i = 0;
-        if (hex.length > 2 && '0' === hex[0] &&
-                ('x' === hex[1] || 'X' === hex[1])) {
-            i += 2;
-        }
-        for (; i < hex.length; i += 2) {
-            var num = parseInt(hex.substr(i, 2), 16);
-            utf8str += String.fromCharCode(num);
-        }
-        return utf8.decode(utf8str);
-    }
-
     return {
         undefinedOrNull: undefinedOrNull,
         startsWith: startsWith,
@@ -238,8 +224,7 @@ define(["utf8"], function(utf8) {
         hasPropertyWithType: hasPropertyWithType,
         formatError: formatError,
         promisifyAll: promisifyAll,
-        clone: clone,
-        hexToString: hexToString
+        clone: clone
     };
     
 });

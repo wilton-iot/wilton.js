@@ -12,6 +12,7 @@ define([], function() {
             require([
                 "wilton/test/core/LoggerTest",
                 "wilton/test/core/CronTaskTest",
+                "wilton/test/core/hexTest",
                 "wilton/test/core/httpClientTest",
                 "wilton/test/core/ServerTest",
                 "wilton/test/core/miscTest",

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
+define(["./hex", "./wiltoncall", "./utils"], function(hex, wiltoncall, utils) {
     "use strict";
 
     function sendRequest(url, options, callback) {
@@ -22,7 +22,7 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
                 metadata: meta
             });
             var resp = JSON.parse(resp_json);
-            resp.data = utils.hexToString(resp.dataHex);
+            resp.data = hex.decodeUTF8(resp.dataHex);
             utils.callOrIgnore(callback, resp);
             return resp;
         } catch (e) {
@@ -43,7 +43,7 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
                 remove: true === opts.remove
             });
             var resp = JSON.parse(resp_json);
-            resp.data = utils.hexToString(resp.dataHex);
+            resp.data = hex.decodeUTF8(resp.dataHex);
             utils.callOrIgnore(callback, resp);
             return resp;
         } catch (e) {

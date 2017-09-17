@@ -7,27 +7,26 @@ define([
 ], function(dyload, hex, wiltoncall, utils) {
     "use strict";
 
-    var Serial = function(options, callback) {
+    var USB = function(options, callback) {
         dyload({
-            name: "wilton_serial"
+            name: "wilton_usb"
         });
         var opts = utils.defaultObject(options);
         try {
-            var handleJson = wiltoncall("serial_open", opts);
+            var handleJson = wiltoncall("usb_open", opts);
             var handleParsed = JSON.parse(handleJson);
-            this.handle = handleParsed.serialHandle;
+            this.handle = handleParsed.usbHandle;
             utils.callOrIgnore(callback);
         } catch (e) {
             utils.callOrThrow(callback, e);
         }
     };
 
-    Serial.prototype = {
-
+    USB.prototype = {
         read: function(length, callback) {
             try {
-                var res = wiltoncall("serial_read", {
-                    serialHandle: this.handle,
+                var res = wiltoncall("usb_read", {
+                    usbHandle: this.handle,
                     length: length
                 });
                 utils.callOrIgnore(callback, res);
@@ -36,23 +35,11 @@ define([
                 utils.callOrThrow(callback, e);
             }
         },
-
-        readLine: function(callback) {
-            try {
-                var res = wiltoncall("serial_readline", {
-                    serialHandle: this.handle
-                });
-                utils.callOrIgnore(callback, res);
-                return res;
-            } catch (e) {
-                utils.callOrThrow(callback, e);
-            }
-        },
-
+        
         writePlain: function(data, callback) {
             try {
-                var resstr = wiltoncall("serial_write", {
-                    serialHandle: this.handle,
+                var resstr = wiltoncall("usb_write", {
+                    usbHandle: this.handle,
                     dataHex: hex.encodeBytes(data)
                 });
                 var resjson = JSON.parse(resstr);
@@ -66,8 +53,8 @@ define([
 
         writeHex: function(dataHex, callback) {
             try {
-                var resstr = wiltoncall("serial_write", {
-                    serialHandle: this.handle,
+                var resstr = wiltoncall("usb_write", {
+                    usbHandle: this.handle,
                     dataHex: hex.uglify(dataHex)
                 });
                 var resjson = JSON.parse(resstr);
@@ -79,10 +66,24 @@ define([
             }
         },
 
+        control: function(options, callback) {
+            var opts = utils.defaultObject(options);
+            try {
+                var res = wiltoncall("usb_control", {
+                    usbHandle: this.handle,
+                    options: opts
+                });
+                utils.callOrIgnore(callback, res);
+                return res;
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
+
         close: function(callback) {
             try {
-                wiltoncall("serial_close", {
-                    serialHandle: this.handle
+                wiltoncall("usb_close", {
+                    usbHandle: this.handle
                 });
                 utils.callOrIgnore(callback);
             } catch (e) {
@@ -91,5 +92,5 @@ define([
         }
     };
 
-    return Serial;
+    return USB;
 });
