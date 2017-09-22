@@ -7,13 +7,15 @@
 define(["assert", "wilton/thread", "wilton/shared"], function(assert, thread, shared) {
     "use strict";
 
+    print("test: wilton/thread");
+
     shared.put("threadTest", {
         val: 0
     });
 
     thread.run({
         callbackScript: {
-            "module": "wilton/test/core/helpers/threadHelper",
+            "module": "wilton/test/helpers/threadHelper",
             "func": "increment1"
         }
     });

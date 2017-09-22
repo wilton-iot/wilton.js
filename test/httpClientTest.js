@@ -14,15 +14,17 @@ define([
 ], function(assert, fs, http, Server, shared, thread) {
     "use strict";
 
+    print("test: wilton/httpClient");
+
     var server = new Server({
         tcpPort: 8080,
         views: [
-            "wilton/test/core/views/hi",
-            "wilton/test/core/views/postmirror"
+            "wilton/test/views/hi",
+            "wilton/test/views/postmirror"
         ]
     });
 
-    var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/core/views/hi", {
+    var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/views/hi", {
         meta: {
             forceHttp10: true,
             timeoutMillis: 60000
@@ -31,7 +33,7 @@ define([
     assert("Hi from wilton_test!" === resp.data);
     assert("close" === resp.headers.Connection);
     
-    var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/core/views/postmirror", {
+    var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/views/postmirror", {
         data: "foobar",
         meta: {
             timeoutMillis: 60000
@@ -48,7 +50,7 @@ define([
     for (var i = 0; i < num_workers; i++) {
         thread.run({
             callbackScript: {
-                "module": "wilton/test/core/helpers/httpClientHelper",
+                "module": "wilton/test/helpers/httpClientHelper",
                 "func": "postAndIncrement"
             }
         });
@@ -56,7 +58,7 @@ define([
 
     for(;;) {
         var count = shared.get("clientTest").length;
-        print("waiting, count: [" + count + "] of: [" + target + "]");
+        print("test: wilton/httpClient, waiting, count: [" + count + "] of: [" + target + "]");
         if (target === count) {
             break;
         }
@@ -65,7 +67,7 @@ define([
     shared.remove("clientTest");
 
     // response data to file
-    var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/core/views/postmirror", {
+    var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/views/postmirror", {
         data: "foobaz",
         meta: {
             timeoutMillis: 60000,
@@ -79,7 +81,7 @@ define([
 
     // send file
     fs.writeFile("clientTestSend.txt", "foobaf");
-    var respFile = http.sendFile("http://127.0.0.1:8080/wilton/test/core/views/postmirror", {
+    var respFile = http.sendFile("http://127.0.0.1:8080/wilton/test/views/postmirror", {
         filePath: "clientTestSend.txt",
         meta: {
             timeoutMillis: 60000

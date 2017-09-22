@@ -4,8 +4,16 @@
  * and open the template in the editor.
  */
 
-define(["../wiltoncall", "../utils"], function(wiltoncall, utils) {
+define([
+    "./dyload",
+    "./wiltoncall",
+    "./utils"
+], function(dyload, wiltoncall, utils) {
     "use strict";
+
+    dyload({
+        name: "wilton_db"
+    });
 
     var DBConnection = function(url, callback) {
         try {

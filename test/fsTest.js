@@ -7,6 +7,8 @@
 define(["assert", "wilton/fs", "wilton/utils"], function(assert, fs, utils) {
     "use strict";
 
+    print("test: wilton/fs");
+
     // mkdir
     fs.mkdir("fstest");
 

@@ -8,6 +8,8 @@ define(["assert", "wilton/fs", "wilton/utils"], function(assert, fs, utils) {
     "use strict";
     utils.promisifyAll(fs);
 
+    print("test: wilton/fs (promise)");
+
     // listDirectory promise
 
     var called = false;

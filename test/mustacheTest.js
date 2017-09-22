@@ -7,6 +7,8 @@
 define(["assert", "wilton/mustache"], function(assert, mustache) {
     "use strict";
 
+    print("test: wilton/mustache");
+
     var rendered = mustache.render("{{#names}}Hi {{name}}!\n{{/names}}", {
         names: [{name: "Chris"}, {name: "Mark"}, {name: "Scott"}]
     });

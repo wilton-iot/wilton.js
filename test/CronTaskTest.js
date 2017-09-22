@@ -11,6 +11,8 @@ define([
     "wilton/shared"
 ], function(assert, CronTask, thread, shared) {
     "use strict";
+
+    print("test: wilton/CronTask");
     
     shared.put("CronTaskTest", {
         val: 0
@@ -18,7 +20,7 @@ define([
     var cron = new CronTask({
         expression: "* * * * * *",
         callbackScript: {
-            "module": "wilton/test/core/helpers/cronHelper",
+            "module": "wilton/test/helpers/cronHelper",
             "func": "increment1"
         }
     });

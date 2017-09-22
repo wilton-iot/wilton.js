@@ -4,8 +4,16 @@
  * and open the template in the editor.
  */
 
-define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
+define([
+    "./dyload",
+    "./wiltoncall",
+    "./utils"
+], function(dyload, wiltoncall, utils) {
     "use strict";
+
+    dyload({
+        name: "wilton_thread"
+    });
 
     function run(options, callback) {
         var opts = utils.defaultObject(options);
@@ -31,18 +39,9 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
         }
     }
     
-    function waitForSignal(callback) {
-        try {
-            wiltoncall("thread_wait_for_signal");
-            utils.callOrIgnore(callback);
-        } catch (e) {
-            utils.callOrThrow(callback, e);
-        }
-    }
 
     return {
         run: run,
-        sleepMillis: sleepMillis,
-        waitForSignal: waitForSignal
+        sleepMillis: sleepMillis
     };
 });

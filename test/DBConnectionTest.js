@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-define(["assert", "wilton/db/DBConnection"], function(assert, DBConnection) {
+define(["assert", "wilton/DBConnection"], function(assert, DBConnection) {
     "use strict";
 
     var conn = new DBConnection("sqlite://test.db");

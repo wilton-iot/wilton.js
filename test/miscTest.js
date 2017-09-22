@@ -13,10 +13,12 @@ define([
 ], function(assert, fs, loader, misc, Server) {
     "use strict";
 
+    print("test: wilton/misc");
+
     var server = new Server({
         tcpPort: 8080,
         views: [
-            "wilton/test/core/views/hi"
+            "wilton/test/views/hi"
         ]
     });
 

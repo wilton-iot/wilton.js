@@ -48,11 +48,21 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
             utils.callOrThrow(callback, e);
         }
     }
+
+    function waitForSignal(callback) {
+        try {
+            wiltoncall("signal_await");
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
     
     return {
         tcpWaitForConnection: tcpWaitForConnection,
         spawnProcess: spawnProcess,
         getWiltonConfig: getWiltonConfig,
-        stdinReadline: stdinReadline
+        stdinReadline: stdinReadline,
+        waitForSignal: waitForSignal
     };
 });

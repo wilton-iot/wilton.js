@@ -10,9 +10,11 @@ define([
     "wilton/Server",
     "wilton/loader",
     "wilton/misc",
-    "wilton/test/core/helpers/httpClientHelper"
+    "wilton/test/helpers/httpClientHelper"
 ], function(assert, fs, Server, loader, misc, clientHelper) {
     "use strict";
+
+    print("test: wilton/Server");
 
     var certdir = loader.findModulePath("wilton/test/certificates/");
     // check path exists
@@ -28,12 +30,12 @@ define([
     var server = new Server({
         tcpPort: 8443,
         views: [
-            "wilton/test/core/views/hi",
-            "wilton/test/core/views/postmirror",
-            "wilton/test/core/views/reqheader",
-            "wilton/test/core/views/resperror",
-            "wilton/test/core/views/respfooheader",
-            "wilton/test/core/views/respjson"
+            "wilton/test/views/hi",
+            "wilton/test/views/postmirror",
+            "wilton/test/views/reqheader",
+            "wilton/test/views/resperror",
+            "wilton/test/views/respfooheader",
+            "wilton/test/views/respjson"
         ],
         ssl: {
             keyFile: certdir + "server/localhost.pem",
@@ -55,7 +57,7 @@ define([
         cainfoFilename: certdir + "client/staticlibs_test_ca.cer"
     };
 
-    var prefix = "https://localhost:8443/wilton/test/core/views/";
+    var prefix = "https://localhost:8443/wilton/test/views/";
     assert(404 === clientHelper.httpGetCode(prefix + "foo", meta));
     assert("Hi from wilton_test!" === clientHelper.httpGet(prefix + "hi", meta));
     var getjson = clientHelper.httpGet(prefix + "respjson", meta);

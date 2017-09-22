@@ -62,7 +62,7 @@ define([
 
     function postAndIncrement() {
         for (var i = 0; i < 10; i++) {
-            var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/core/views/postmirror", {
+            var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/views/postmirror", {
                 data: "foobar",
                 meta: {
                     timeoutMillis: 60000

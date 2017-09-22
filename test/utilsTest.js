@@ -7,6 +7,8 @@
 define(["assert", "wilton/utils"], function(assert, utils) {
     "use strict";
 
+    print("test: wilton/utils");
+
     assert(utils.undefinedOrNull(null));
     assert(!utils.undefinedOrNull(utils));
 

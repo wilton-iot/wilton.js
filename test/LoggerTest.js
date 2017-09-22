@@ -7,6 +7,8 @@
 define(["wilton/Logger"], function(Logger) {
     "use strict";
 
+    print("test: wilton/Logger");
+
     Logger.initialize({
         appenders: [{
                 appenderType: "CONSOLE",

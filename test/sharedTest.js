@@ -11,6 +11,8 @@ define([
 ], function(assert, shared, utils) {
     "use strict";
 
+    print("test: wilton/shared");
+
     shared.put("foo", {
         bar: 42
     });
