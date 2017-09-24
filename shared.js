@@ -77,21 +77,6 @@ define([
         }
     }
     
-    function listAppend(key, value, callback) {
-        try {
-            var val = utils.defaultJson(value);
-            var res = wiltoncall("shared_list_append", {
-                key: key,
-                value: val
-            });
-            var resout = JSON.parse(res);
-            utils.callOrIgnore(callback, resout);
-            return resout;
-        } catch (e) {
-            utils.callOrThrow(callback, e);
-        }
-    }    
-    
     function dump(callback) {
         try {
             return wiltoncall("shared_dump");
@@ -105,7 +90,6 @@ define([
         get: get,
         waitChange: waitChange,
         remove: remove,
-        listAppend: listAppend,
         dump: dump
     };
 

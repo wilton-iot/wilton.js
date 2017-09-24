@@ -21,14 +21,6 @@ define([
     assert(!utils.undefinedOrNull(out1.bar));
     assert(42 === out1.bar);
 
-    shared.listAppend("bar", 41);
-    shared.listAppend("bar", 42);
-    
-    var bar = shared.get("bar");
-    assert(2 === bar.length);
-    assert(41 === bar[0]);
-    assert(42 === bar[1]);
-
     // see wait for change test in threadTest
 
     shared.remove("foo");

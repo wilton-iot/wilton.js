@@ -14,9 +14,14 @@ define([
     var Serial = function(options, callback) {
         var opts = utils.defaultObject(options);
         try {
-            var handleJson = wiltoncall("serial_open", opts);
-            var handleParsed = JSON.parse(handleJson);
-            this.handle = handleParsed.serialHandle;
+            if (utils.hasPropertyWithType(opts, "handle", "number")) {
+                this.handle = opts.handle;
+            } else {
+                var handleJson = wiltoncall("serial_open", opts);
+                var handleObj = JSON.parse(handleJson);
+                utils.checkPropertyType(handleObj, "serialHandle", "number");
+                this.handle = handleObj.serialHandle;
+            }
             utils.callOrIgnore(callback);
         } catch (e) {
             utils.callOrThrow(callback, e);
@@ -52,12 +57,13 @@ define([
 
         writePlain: function(data, callback) {
             try {
-                var resstr = wiltoncall("serial_write", {
+                var resStr = wiltoncall("serial_write", {
                     serialHandle: this.handle,
                     dataHex: hex.encodeBytes(data)
                 });
-                var resjson = JSON.parse(resstr);
-                var res = resjson.bytesWritten;
+                var resObj = JSON.parse(resStr);
+                utils.checkPropertyType(resObj, "bytesWritten", "number");
+                var res = resObj.bytesWritten;
                 utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {
@@ -67,12 +73,13 @@ define([
 
         writeHex: function(dataHex, callback) {
             try {
-                var resstr = wiltoncall("serial_write", {
+                var resStr = wiltoncall("serial_write", {
                     serialHandle: this.handle,
                     dataHex: hex.uglify(dataHex)
                 });
-                var resjson = JSON.parse(resstr);
-                var res = resjson.bytesWritten;
+                var resObj = JSON.parse(resStr);
+                utils.checkPropertyType(resObj, "bytesWritten", "number");
+                var res = resObj.bytesWritten;
                 utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {

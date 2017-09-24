@@ -8,10 +8,10 @@ define([], function() {
     return {
         main: function() {
             require([
-                // core
                 "wilton/test/LoggerTest",
-                "wilton/test/DBConnectionTest",
+                "wilton/test/ChannelTest",
                 "wilton/test/CronTaskTest",
+                "wilton/test/DBConnectionTest",
                 "wilton/test/fsTest",
                 "wilton/test/fsPromiseTest",
                 "wilton/test/hexTest",

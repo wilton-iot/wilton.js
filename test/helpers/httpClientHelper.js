@@ -5,10 +5,10 @@
  */
 define([
     "assert",
+    "wilton/Channel",
     "wilton/httpClient",
-    "wilton/shared",
     "wilton/utils"
-], function(assert, http, shared, utils) {
+], function(assert, Channel, http, utils) {
     "use strict";
 
     function httpGet(url, meta) {
@@ -61,6 +61,7 @@ define([
     }
 
     function postAndIncrement() {
+        var chan = Channel.lookup("clientTest");
         for (var i = 0; i < 10; i++) {
             var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/views/postmirror", {
                 data: "foobar",
@@ -69,7 +70,9 @@ define([
                 }
             });
             assert("foobar" === resp.data);
-            shared.listAppend("clientTest", resp);
+            assert(chan.offer({
+                data: resp.data
+            }));
         }
     }
 

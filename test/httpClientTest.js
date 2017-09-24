@@ -6,12 +6,12 @@
 
 define([
     "assert",
+    "wilton/Channel",
     "wilton/fs",
     "wilton/httpClient",
     "wilton/Server",
-    "wilton/shared",
     "wilton/thread"
-], function(assert, fs, http, Server, shared, thread) {
+], function(assert, Channel, fs, http, Server, thread) {
     "use strict";
 
     print("test: wilton/httpClient");
@@ -42,7 +42,10 @@ define([
     assert("foobar" === resp.data);
 
     // threads
-    shared.put("clientTest", []);
+    var chan = new Channel({
+        name: "clientTest",
+        size: 64
+    });
     
     var num_workers = 2;
     var target = num_workers * 10;
@@ -56,15 +59,14 @@ define([
         });
     }
 
-    for(;;) {
-        var count = shared.get("clientTest").length;
+    for(var count = 0; count < target; count++) {
+        var msg = chan.receive();
+        assert.deepEqual(msg, {
+            data: "foobar"
+        });
         print("test: wilton/httpClient, waiting, count: [" + count + "] of: [" + target + "]");
-        if (target === count) {
-            break;
-        }
-        thread.sleepMillis(1000);
     }
-    shared.remove("clientTest");
+    chan.close();
 
     // response data to file
     var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/views/postmirror", {
