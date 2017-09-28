@@ -19,7 +19,7 @@ define([
     
     var out1 = shared.get("foo");
     assert(!utils.undefinedOrNull(out1.bar));
-    assert(42 === out1.bar);
+    assert.equal(out1.bar, 42);
 
     // see wait for change test in threadTest
 

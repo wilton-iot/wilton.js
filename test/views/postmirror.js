@@ -9,7 +9,7 @@ define(function() {
 
     return {
         POST: function(req) {
-            req.sendResponse(req.getData());
+            req.sendResponse(req.data());
         }
     };
 });

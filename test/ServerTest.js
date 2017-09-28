@@ -36,6 +36,7 @@ define([
             "wilton/test/views/resperror",
             "wilton/test/views/respfooheader",
             "wilton/test/views/respjson",
+            "wilton/test/views/respmustache",
             "wilton/test/views/filtered"
         ],
         filters: [
@@ -63,18 +64,22 @@ define([
     };
 
     var prefix = "https://localhost:8443/wilton/test/views/";
-    assert(404 === clientHelper.httpGetCode(prefix + "foo", meta));
-    assert("Hi from wilton_test!" === clientHelper.httpGet(prefix + "hi", meta));
+    assert.equal(clientHelper.httpGetCode(prefix + "foo", meta), 404);
+    assert.equal(clientHelper.httpGet(prefix + "hi", meta), "Hi from wilton_test!");
     var getjson = clientHelper.httpGet(prefix + "respjson", meta);
     var getresp = JSON.parse(getjson);
-    assert(1 === getresp.foo);
-    assert("baz" === getresp.bar);
-    assert("Error triggered" === clientHelper.httpGet(prefix + "resperror", meta));
-    assert("localhost:8443" === clientHelper.httpGet(prefix + "reqheader", meta));
-    assert("header set" === clientHelper.httpGet(prefix + "respfooheader", meta));
-    assert("foo" === clientHelper.httpGetHeader(prefix + "respfooheader", "X-Foo", meta));
-    assert("foobar" === clientHelper.httpPost(prefix + "postmirror", "foobar", meta));
-    assert("filtered OK" === clientHelper.httpGet(prefix + "filtered", meta));
+    assert.equal(getresp.foo, 1);
+    assert.equal(clientHelper.httpGetHeader(prefix + "respjson", "Content-Type", meta), "application/json");
+    var html = clientHelper.httpGet(prefix + "respmustache", meta);
+    assert(-1 !== html.indexOf("Hi Chris! Hi Mark! Hi Scott!"));
+    assert.equal(clientHelper.httpGetHeader(prefix + "respmustache", "Content-Type", meta), "text/html");
+    assert.equal(getresp.bar, "baz");
+    assert.equal(clientHelper.httpGet(prefix + "resperror", meta), "Error triggered");
+    assert.equal(clientHelper.httpGet(prefix + "reqheader", meta), "localhost:8443");
+    assert.equal(clientHelper.httpGet(prefix + "respfooheader", meta), "header set");
+    assert.equal(clientHelper.httpGetHeader(prefix + "respfooheader", "X-Foo", meta), "foo");
+    assert.equal(clientHelper.httpPost(prefix + "postmirror", "foobar", meta), "foobar");
+    assert.equal(clientHelper.httpGet(prefix + "filtered", meta), "filtered OK");
 
     // optional
     server.stop();

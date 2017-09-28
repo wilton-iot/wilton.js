@@ -20,44 +20,44 @@ define(["assert", "wilton/fs", "wilton/utils"], function(assert, fs, utils) {
     fs.appendFile(tf, "bar");
     
     // readFile
-    assert("foobar" === fs.readFile(tf));
+    assert.equal(fs.readFile(tf), "foobar");
     
     // exists
-    assert(true === fs.exists("fstest"));
-    assert(true === fs.exists(tf));
+    assert(fs.exists("fstest"));
+    assert(fs.exists(tf));
     
     // readdir
-    assert("appendFile_test.txt" === fs.readdir("fstest")[0]);
+    assert(fs.readdir("fstest")[0], "appendFile_test.txt");
     
     // stat
     var sdir = fs.stat("fstest");
-    assert(false === sdir.isFile);
-    assert(true === sdir.isDirectory);
+    assert(!sdir.isFile);
+    assert(sdir.isDirectory);
     var sfile = fs.stat(tf);
-    assert(true === sfile.isFile);
-    assert(false === sfile.isDirectory);
+    assert(sfile.isFile);
+    assert(!sfile.isDirectory);
     
     // copy
     var tfCopied = "fstest/appendFile_test_copied.txt";
     fs.copyFile(tf, tfCopied);
-    assert(true === fs.exists(tf));
-    assert(true === fs.exists(tfCopied));
-    assert("foobar" === fs.readFile(tfCopied));
+    assert(fs.exists(tf));
+    assert(fs.exists(tfCopied));
+    assert.equal(fs.readFile(tfCopied), "foobar");
     fs.unlink(tfCopied);
-    assert(false === fs.exists(tfCopied));
+    assert(!fs.exists(tfCopied));
     
     // rename
     var tfMoved = "fstest/appendFile_test_moved.txt";
     fs.rename(tf, tfMoved);
-    assert(false === fs.exists(tf));
-    assert(true === fs.exists(tfMoved));
+    assert(!fs.exists(tf));
+    assert(fs.exists(tfMoved));
     
     // unlink
     fs.unlink(tfMoved);
-    assert(false === fs.exists(tfMoved));
+    assert(!fs.exists(tfMoved));
     
     // rmdir
     fs.rmdir("fstest");
-    assert(false === fs.exists("fstest"));
+    assert(!fs.exists("fstest"));
 
 });

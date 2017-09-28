@@ -8,7 +8,7 @@ define(function() {
     "use strict";
 
     return {
-        GET: function(req) {            
+        GET: function(req) {
             req.sendResponse({
                 foo: 1,
                 bar: "baz"

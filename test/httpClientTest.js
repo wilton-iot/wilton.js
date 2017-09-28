@@ -30,8 +30,8 @@ define([
             timeoutMillis: 60000
         }
     });
-    assert("Hi from wilton_test!" === resp.data);
-    assert("close" === resp.headers.Connection);
+    assert.equal(resp.data, "Hi from wilton_test!");
+    assert.equal(resp.headers.Connection, "close");
     
     var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/views/postmirror", {
         data: "foobar",
@@ -39,7 +39,7 @@ define([
             timeoutMillis: 60000
         }
     });
-    assert("foobar" === resp.data);
+    assert.equal(resp.data, "foobar");
 
     // threads
     var chan = new Channel({
@@ -77,9 +77,9 @@ define([
         }
     });
     var data_obj = JSON.parse(resp.data);
-    assert("httpClientTest.response" === data_obj.responseDataFilePath);
+    assert.equal(data_obj.responseDataFilePath, "httpClientTest.response");
     var contents = fs.readFile("httpClientTest.response");
-    assert("foobaz" === contents);
+    assert.equal(contents, "foobaz");
 
     // send file
     fs.writeFile("clientTestSend.txt", "foobaf");
@@ -89,7 +89,7 @@ define([
             timeoutMillis: 60000
         }
     });
-    assert("foobaf" === respFile.data);
+    assert.equal(respFile.data, "foobaf");
     assert(fs.exists("clientTestSend.txt"));
     fs.unlink("clientTestSend.txt");
     assert(!fs.exists("clientTestSend.txt"));

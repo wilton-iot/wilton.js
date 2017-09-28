@@ -29,7 +29,7 @@ define(["assert", "wilton/thread", "wilton/shared"], function(assert, thread, sh
     });
     
     var loaded = shared.get("threadTest");
-    assert(1 === loaded.val);
+    assert.equal(loaded.val, 1);
 
     shared.remove("threadTest");
     

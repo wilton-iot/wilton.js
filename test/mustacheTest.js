@@ -12,6 +12,6 @@ define(["assert", "wilton/mustache"], function(assert, mustache) {
     var rendered = mustache.render("{{#names}}Hi {{name}}!\n{{/names}}", {
         names: [{name: "Chris"}, {name: "Mark"}, {name: "Scott"}]
     });
-    assert("Hi Chris!\nHi Mark!\nHi Scott!\n" === rendered);
+    assert.equal(rendered, "Hi Chris!\nHi Mark!\nHi Scott!\n");
 
 });
