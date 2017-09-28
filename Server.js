@@ -10,7 +10,7 @@ define(["./wiltoncall", "./Request", "./utils", "./Logger"], function(wiltoncall
     var logger = new Logger("wilton.server");
     var METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"];
 
-    function prepareViews(views) {
+    function prepareViews(filters, views) {
         if(utils.undefinedOrNull(views)) {
             throw new Error("Invalid null 'views'attribute specified");
         }
@@ -35,13 +35,15 @@ define(["./wiltoncall", "./Request", "./utils", "./Logger"], function(wiltoncall
                             method: me,
                             path: "/" + vi,
                             callbackScript: {
+                                // dispatched module to be called from native
                                 module: "wilton/Server",
                                 func: "dispatch",
                                 args: [{
+                                    // actual handled module to be called by dispatcher
                                     module: vi,
                                     func: me,
                                     args: []
-                                }]
+                                }, filters] // requestHandle will be appended here at native
                             }
                         });
                     }
@@ -62,11 +64,27 @@ define(["./wiltoncall", "./Request", "./utils", "./Logger"], function(wiltoncall
         return res;
     }
 
+    function prepareFilters(filters) {
+        if (utils.undefinedOrNull(filters)) {
+            return [];
+        }
+        if (!(filters instanceof Array)) {
+            throw new Error("Invalid non-array 'filters' element specified");
+        }
+        for (var i = 0; i < filters.length; i++) {
+            if ("string" !== typeof (filters[i])) {
+                throw new Error("Invalid non-string 'filter' module specified, index: [" + i + "]");
+            }
+        }
+        return filters;
+    }
+
     var Server = function(options, callback) {
         var opts = utils.defaultObject(options);
         try {
-            // in future use opts.gatewayModule for non-JVM engines
-            opts.views = prepareViews(opts.views);
+            var filters = prepareFilters(opts.filters);
+            delete opts.filters;
+            opts.views = prepareViews(filters, opts.views);
             var handleJson = wiltoncall("server_create", opts);
             var handleObj = JSON.parse(handleJson);
             this.handle = handleObj.serverHandle;
@@ -88,19 +106,30 @@ define(["./wiltoncall", "./Request", "./utils", "./Logger"], function(wiltoncall
             }
         }
     };
-    
-    Server.dispatch = function (callbackScriptJson, requestHandle) {
+
+    function dispatch(callbackScriptJson, filters, requestHandle) {
         var cs = callbackScriptJson;
-        if ("string" !== typeof (cs.module) || "string" !== typeof (cs.func) ||
-                "undefined" === typeof (cs.args) || !(cs.args instanceof Array)) {
-            throw new Error("Invalid 'callbackScriptJson' specified: [" + JSON.stringofy(cs) + "]");
-        }
+//        if ("string" !== typeof (cs.module) || "string" !== typeof (cs.func) ||
+//                "undefined" === typeof (cs.args) || !(cs.args instanceof Array)) {
+//            throw new Error("Invalid 'callbackScriptJson' specified: [" + JSON.stringofy(cs) + "]");
+//        }
         var module = WILTON_requiresync(cs.module);
         var req = new Request(requestHandle);
-        // target call
-        module[cs.func].call(module, req);
+        var idx = 0;
+        function doFilter(req) {
+            if (idx < filters.length) {
+                var filterFun = WILTON_requiresync(filters[idx]);
+                idx += 1;
+                filterFun.call(null, req, doFilter);
+                return;
+            }
+            // target call
+            module[cs.func].call(module, req);
+        }
+        doFilter(req);
         return null;
     };
+    Server.dispatch = dispatch;
     
     return Server;
 

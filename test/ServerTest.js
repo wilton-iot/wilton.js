@@ -35,7 +35,12 @@ define([
             "wilton/test/views/reqheader",
             "wilton/test/views/resperror",
             "wilton/test/views/respfooheader",
-            "wilton/test/views/respjson"
+            "wilton/test/views/respjson",
+            "wilton/test/views/filtered"
+        ],
+        filters: [
+            "wilton/test/helpers/serverFilter1Helper",
+            "wilton/test/helpers/serverFilter2Helper"
         ],
         ssl: {
             keyFile: certdir + "server/localhost.pem",
@@ -69,6 +74,7 @@ define([
     assert("header set" === clientHelper.httpGet(prefix + "respfooheader", meta));
     assert("foo" === clientHelper.httpGetHeader(prefix + "respfooheader", "X-Foo", meta));
     assert("foobar" === clientHelper.httpPost(prefix + "postmirror", "foobar", meta));
+    assert("filtered OK" === clientHelper.httpGet(prefix + "filtered", meta));
 
     // optional
     server.stop();
