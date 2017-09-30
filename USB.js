@@ -107,7 +107,7 @@ define([
         /**
          * @function read
          * 
-         * Reads data from device,
+         * Reads data from device.
          * 
          * Tries to read a specified amount of data from the device.
          * Returned result can conntains less data than requested.

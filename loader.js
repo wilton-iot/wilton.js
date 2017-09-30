@@ -5,7 +5,7 @@
  */
 define(["./misc", "./mustache", "./utils", "./wiltoncall"], function(misc, mustache, utils, wiltoncall) {
    
-    var conf = misc.getWiltonConfig();
+    var conf = misc.wiltonConfig();
     
     var fileProtocolPrefix = "file://";
     var zipProtocolPrefix = "zip://";
@@ -83,9 +83,8 @@ define(["./misc", "./mustache", "./utils", "./wiltoncall"], function(misc, musta
     }
     
     function loadAppConfig() {
-        var wconf = misc.getWiltonConfig();
-        var values = {"appdir": wconf.applicationDirectory};
-        var confPath = wconf.applicationDirectory + "conf/config.json";
+        var values = {"appdir": conf.applicationDirectory};
+        var confPath = conf.applicationDirectory + "conf/config.json";
         var confStr = mustache.renderFile(confPath, values);
         return JSON.parse(confStr);
     }

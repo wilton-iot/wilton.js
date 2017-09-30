@@ -21,7 +21,7 @@ define([
     var checkpath = certdir + "server/localhost.pem";
     if (!fs.exists(checkpath)) {
         // fallback for the case when tests are run from zip file
-        var zippath = misc.getWiltonConfig().requireJs.baseUrl;
+        var zippath = misc.wiltonConfig().requireJs.baseUrl;
         var parenturl = zippath.replace(/\/[^/]+$/g, "");
         var parentpath = parenturl.replace(/^\w+?\:\/\//g, "");
         certdir = parentpath + "/wilton_core/test/certificates/";

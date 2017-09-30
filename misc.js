@@ -28,7 +28,7 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
         }
     }
     
-    function getWiltonConfig(callback) {
+    function wiltonConfig(callback) {
         try {
             var resstr = wiltoncall("get_wiltoncall_config");
             var res = JSON.parse(resstr);
@@ -61,7 +61,7 @@ define(["./wiltoncall", "./utils"], function(wiltoncall, utils) {
     return {
         tcpWaitForConnection: tcpWaitForConnection,
         spawnProcess: spawnProcess,
-        getWiltonConfig: getWiltonConfig,
+        wiltonConfig: wiltonConfig,
         stdinReadline: stdinReadline,
         waitForSignal: waitForSignal
     };

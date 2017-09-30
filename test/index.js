@@ -18,6 +18,7 @@ define([], function() {
                 "wilton/test/httpClientTest",
                 "wilton/test/miscTest",
                 "wilton/test/mustacheTest",
+                "wilton/test/PDFDocumentTest",
                 "wilton/test/ServerTest",
                 "wilton/test/sharedTest",
                 "wilton/test/threadTest",
