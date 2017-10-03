@@ -69,7 +69,7 @@ define([
     });
 
     /**
-     * @function constructor
+     * @function USB
      * 
      * Creates USB instance.
      * 
@@ -86,7 +86,7 @@ define([
      *  - __inEndpoint__ `Number` number of input endpoint
      *  - __timeoutMillis__ `Number` max allowed duration of read/write/control operations (in milliseconds)
      */
-    var USB = function(options, callback) {
+    function USB(options, callback) {
         var opts = utils.defaultObject(options);
         try {
             if (utils.hasPropertyWithType(opts, "handle", "number")) {
@@ -101,7 +101,7 @@ define([
         } catch (e) {
             utils.callOrThrow(callback, e);
         }
-    };
+    }
 
     USB.prototype = {
         /**

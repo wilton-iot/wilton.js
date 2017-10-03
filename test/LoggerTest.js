@@ -4,7 +4,11 @@
  * and open the template in the editor.
  */
 
-define(["wilton/Logger"], function(Logger) {
+define([
+    "assert",
+    "wilton/Logger",
+    "wilton/utils"
+], function(assert, Logger, utils) {
     "use strict";
 
     print("test: wilton/Logger");
@@ -20,7 +24,30 @@ define(["wilton/Logger"], function(Logger) {
             }, {
                 name: "wilton",
                 level: "DEBUG"
+            }, {
+                name: "wilton.test",
+                level: "ERROR"
             }]
     });
+
+    var logger = new Logger("wilton.test");
+    var checker = function(expected) {
+        return function(err, actual) {
+            assert.equal(actual, expected);
+        };
+    };
+    logger.log("foo", checker("foo"));
+    logger.debug(null, checker("null"));
+    var e = new Error("ERR");
+    logger.info(e, checker(utils.formatError(e)));
+    var obj = {
+        foo: "bar",
+        baz: 42
+    };
+    logger.warn(obj, checker(JSON.stringify(obj)));
+    var arr = ["foo", "bar"];
+    logger.warn(arr, checker(JSON.stringify(arr)));
+    var fun = function(a) { return a; };
+    logger.log(fun, checker(String(fun)));
 
 });

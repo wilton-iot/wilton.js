@@ -86,7 +86,7 @@ define([
     });
 
     /**
-     * @function constructor
+     * @function PDFDocument
      * 
      * Creates PDFDocument instance.
      * 
@@ -96,7 +96,7 @@ define([
      * @param callback `Function|Undefined` callback to receive result or error
      * @returns `Object` PDFDocument instance
      */
-    var PDFDocument = function(callback) {
+    function PDFDocument(callback) {
         try {
             var handleJson = wiltoncall("pdf_create_document");
             var handleParsed = JSON.parse(handleJson);

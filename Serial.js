@@ -67,7 +67,7 @@ define([
     });
 
     /**
-     * @function constructor
+     * @function Serial
      * 
      * Creates Serial instance.
      * 
@@ -85,7 +85,7 @@ define([
      *  - __stopBitsCount__ `Number` number of stop bits
      *  - __timeoutMillis__ `Number` timeout for read and write operations (in milliseconds)
      */
-    var Serial = function(options, callback) {
+    function Serial(options, callback) {
         var opts = utils.defaultObject(options);
         try {
             if (utils.hasPropertyWithType(opts, "handle", "number")) {
@@ -100,7 +100,7 @@ define([
         } catch (e) {
             utils.callOrThrow(callback, e);
         }
-    };
+    }
 
     Serial.prototype = {
         /**
