@@ -72,18 +72,46 @@ define(["utf8", "./utils"], function(utf8, utils) {
         }
     }
 
+    function isPretty(hexstr, callback) {
+        try {
+            if ("string" !== typeof(hexstr)) {
+                throw new Error("Invalid non-string input specified");
+            }
+            var resp = true;
+            if (hexstr.length >= 3) {
+                for (var i = 2; i < hexstr.length; i+=3) {
+                    if (" " !== hexstr[i]) {
+                        resp = false;
+                        break;
+                    }
+                }
+            }
+            utils.callOrIgnore(callback, resp);
+            return resp;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
     function prettify(hexstr, callback) {
         try {
-            if ("string" !== typeof(hexstr) || 0 !== (hexstr.length % 2)) {
-                throw new Error("Invalid non-hexstring input specified");
+            if ("string" !== typeof(hexstr)) {
+                throw new Error("Invalid non-string input specified");
             }
             var resp = "";
-            for (var i = 0; i < hexstr.length; i += 2 ) {
-                if (resp.length > 0) {
-                    resp += " ";
+            if (isPretty(hexstr)) {
+                resp = hexstr;
+            } else {
+                if (0 !== (hexstr.length % 2)) {
+                    throw new Error("Invalid non-hexstring input specified");
                 }
-                resp += hexstr[i];
-                resp += hexstr[i + 1];
+                for (var i = 0; i < hexstr.length; i += 2 ) {
+                    if (resp.length > 0) {
+                        resp += " ";
+                    }
+                    resp += hexstr[i];
+                    resp += hexstr[i + 1];
+                }
             }
             utils.callOrIgnore(callback, resp);
             return resp;
@@ -101,7 +129,40 @@ define(["utf8", "./utils"], function(utf8, utils) {
             utils.callOrIgnore(callback, resp);
             return resp;
         } catch (e) {
-           utils.callOrThrow(callback, e);
+            utils.callOrThrow(callback, e);
+        }
+    }
+
+    function replaceNonPrintable(hexstr, callback) {
+        try {
+            if ("string" !== typeof(hexstr)) {
+                throw new Error("Invalid non-string input specified");
+            }
+            var pch = prettify(hexstr);
+            pch = pch.replace(/0[0-8] /g, "20 ");
+            pch = pch.replace(/ 0[0-8]/g, " 20");
+            var resp = uglify(pch);
+            utils.callOrIgnore(callback, resp);
+            return resp;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
+    function formatHexAndPlain(hexstr, callback) {
+        try {
+            if ("string" !== typeof(hexstr)) {
+                throw new Error("Invalid non-string input specified");
+            }
+            var prettyHex = prettify(hexstr);
+            var printableHex = replaceNonPrintable(hexstr);
+            var plain = decodeBytes(printableHex);
+            var plainSingleLine = plain.replace(/\s+/g, " ");
+            var resp = prettyHex + " [" + plainSingleLine + "]";
+            utils.callOrIgnore(callback, resp);
+            return resp;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
         }
     }
 
@@ -110,7 +171,10 @@ define(["utf8", "./utils"], function(utf8, utils) {
         encodeUTF8: encodeUTF8,
         decodeBytes: decodeBytes,
         decodeUTF8: decodeUTF8,
+        isPretty: isPretty,
         prettify: prettify,
-        uglify: uglify
+        uglify: uglify,
+        replaceNonPrintable: replaceNonPrintable,
+        formatHexAndPlain: formatHexAndPlain
     };
 });
