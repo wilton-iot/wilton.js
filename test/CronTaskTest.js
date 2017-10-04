@@ -20,8 +20,8 @@ define([
     var cron = new CronTask({
         expression: "* * * * * *",
         callbackScript: {
-            "module": "wilton/test/helpers/cronHelper",
-            "func": "increment1"
+            module: "wilton/test/helpers/cronHelper",
+            func: "increment1"
         }
     });
     // takes long, enable me for cron retest

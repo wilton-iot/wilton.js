@@ -88,13 +88,13 @@ define([
     /**
      * @function PDFDocument
      * 
-     * Create PDFDocument instance.
+     * Create `PDFDocument` instance.
      * 
-     * Creates PDFDocument instance, at least one page must be added
+     * Creates `PDFDocument` instance, at least one page must be added
      * to created document before writing content to it.
      * 
      * @param callback `Function|Undefined` callback to receive result or error
-     * @return `Object` PDFDocument instance
+     * @return `Object` `PDFDocument` instance
      */
     function PDFDocument(callback) {
         try {

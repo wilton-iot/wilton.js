@@ -30,7 +30,7 @@
  * are synchronous (blocking) within a specified timeout.
  * Empty response will be returned on timeout.
  * 
- * Underlying USB connection can be closed manually with `close()`
+ * Underlying USB connection can be closed manually using `close()` method
  * or it will be closed during the shutdown.
  * 
  * Usage example:
@@ -77,7 +77,7 @@ define([
      * 
      * @param options `Object` configuration object, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
-     * @return `Object` USB instance
+     * @return `Object` `USB` instance
      * 
      * __Options__
      *  - __vendorId__ `Number` USB Vendor ID number, see: http://www.linux-usb.org/usb.ids

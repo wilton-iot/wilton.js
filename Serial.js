@@ -18,13 +18,13 @@
  * @namespace Serial
  * 
  * __wilton/Serial__ \n
- * Connect to hardware devices using Serial protocol.
+ * Connect to hardware devices using serial protocol.
  * 
  * This module allows to intract with hardware devices using `RS232` protocol.
  * 
  * Responses from device are returned encoded in hexadecimal encoding, use `wilton/hex` for decoding.
  * 
- * Underlying Serial connection can be closed manually with `close()`
+ * Underlying serial connection can be closed manually using `close()` method
  * or it will be closed during the shutdown.
  * 
  * Usage example:
@@ -69,13 +69,13 @@ define([
     /**
      * @function Serial
      * 
-     * Create Serial instance.
+     * Create `Serial` instance.
      * 
-     * Creates Serial object instace and opens the underlying `RS232` connection.
+     * Creates `Serial` object instace and opens the underlying `RS232` connection.
      * 
      * @param options `Object` configuration object, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
-     * @return `Object` Serial instance
+     * @return `Object` `Serial` instance
      * 
      * __Options__
      *  - __port__ `String` serial port address (OS-dependent), examples: `/dev/ttyUSB1`, `COM4`
