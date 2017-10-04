@@ -8,6 +8,9 @@ define(["assert", "wilton/hex"], function(assert, hex) {
     var encoded = hex.encodeUTF8(str);
     var decoded = hex.decodeUTF8(encoded);
     assert.equal(decoded, str);
+    var pretty = hex.prettify(encoded);
+    var decodedPretty = hex.decodeUTF8(pretty);
+    assert.equal(decodedPretty, str);
 
     assert(hex.isPretty(""));
     assert(hex.isPretty("4f"));

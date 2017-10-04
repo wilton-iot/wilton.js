@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 /**
  * @namespace Logger
  * 
@@ -87,7 +86,7 @@ define([
     /**
      * @function Logger
      * 
-     * Creates Logger instance.
+     * Create Logger instance.
      * 
      * Creates Logger object instace with the specified name,
      * that will be used to select the filtering level for all messages
@@ -98,7 +97,7 @@ define([
      * 
      * @param name `String|Undefined` logger name, default value: `wilton`
      * @param callback `Function|Undefined` callback to receive result or error
-     * @returns `Object` Logger instance
+     * @return `Object` Logger instance
      */ 
     function Logger(name, callback) {
         this.name = utils.defaultString(name, "wilton");
@@ -108,7 +107,7 @@ define([
     /**
      * @static initialize
      * 
-     * Initializes process-wide logging.
+     * Initialize process-wide logging.
      * 
      * Initializes logging subsystem 
      * 
@@ -116,7 +115,7 @@ define([
      * 
      * @param options `Object` configuration object, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
-     * @returns `Undefined`
+     * @return `Undefined`
      * 
      * __Options__
      *  - __appenders__ `Array` list of appenders (log destinations) to configure
@@ -151,14 +150,14 @@ define([
     /**
      * @static shutdown
      * 
-     * Deinitializes logging subsystem.
+     * Deinitialize logging subsystem.
      * 
      * Deinitialization is an optional operation,
      * logging subsystem will be deinitilized automatically
      * during the shutdown.
      * 
      * @param callback `Function|Undefined` callback to receive result or error
-     * @returns `Undefined`
+     * @return `Undefined`
      */
     Logger.shutdown = function(callback) {
         try {
@@ -173,7 +172,7 @@ define([
         /**
          * @function log
          * 
-         * Logs specified message using `DEBUG` logging level.
+         * Log specified message using `DEBUG` logging level.
          * 
          * Logs specified message using `DEBUG` logging level.
          * 
@@ -182,7 +181,7 @@ define([
          * 
          * @param message `String|Object|Error` message to log
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Undefined`
+         * @return `Undefined`
          */
         log: function(message, callback) {
             this._append("DEBUG", message, callback);
@@ -191,7 +190,7 @@ define([
         /**
          * @function debug
          * 
-         * Logs specified message using `DEBUG` logging level.
+         * Log specified message using `DEBUG` logging level.
          * 
          * Logs specified message using `DEBUG` logging level.
          * 
@@ -200,7 +199,7 @@ define([
          * 
          * @param message `String|Object|Error` message to log
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Undefined`
+         * @return `Undefined`
          */
         debug: function(message, callback) {
             this._append("DEBUG", message, callback);
@@ -209,7 +208,7 @@ define([
         /**
          * @function info
          * 
-         * Logs specified message using `INFO` logging level.
+         * Log specified message using `INFO` logging level.
          * 
          * Logs specified message using `INFO` logging level.
          * 
@@ -218,7 +217,7 @@ define([
          * 
          * @param message `String|Object|Error` message to log
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Undefined`
+         * @return `Undefined`
          */
         info: function(message, callback) {
             this._append("INFO", message, callback);
@@ -227,7 +226,7 @@ define([
         /**
          * @function warn
          * 
-         * Logs specified message using `WARN` logging level.
+         * Log specified message using `WARN` logging level.
          * 
          * Logs specified message using `WARN` logging level.
          * 
@@ -236,7 +235,7 @@ define([
          * 
          * @param message `String|Object|Error` message to log
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Undefined`
+         * @return `Undefined`
          */
         warn: function(message, callback) {
             this._append("WARN", message, callback);
@@ -245,7 +244,7 @@ define([
         /**
          * @function error
          * 
-         * Logs specified message using `ERROR` logging level.
+         * Log specified message using `ERROR` logging level.
          * 
          * Logs specified message using `ERROR` logging level.
          * 
@@ -254,7 +253,7 @@ define([
          * 
          * @param message `String|Object|Error` message to log
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Undefined`
+         * @return `Undefined`
          */
         error: function(message, callback) {
             this._append("ERROR", message, callback);

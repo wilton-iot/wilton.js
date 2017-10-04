@@ -69,13 +69,13 @@ define([
     /**
      * @function Serial
      * 
-     * Creates Serial instance.
+     * Create Serial instance.
      * 
      * Creates Serial object instace and opens the underlying `RS232` connection.
      * 
      * @param options `Object` configuration object, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
-     * @returns `Object` Serial instance
+     * @return `Object` Serial instance
      * 
      * __Options__
      *  - __port__ `String` serial port address (OS-dependent), examples: `/dev/ttyUSB1`, `COM4`
@@ -106,7 +106,7 @@ define([
         /**
          * @function read
          * 
-         * Reads data from device.
+         * Read data from device.
          * 
          * Tries to read a specified amount of data from the device.
          * Returned result can conntains less data than requested.
@@ -116,7 +116,7 @@ define([
          * 
          * @param length `Number` amount of the data to read (in bytes)
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `String` device response data in hexadecimal encoding, empty string on timeout
+         * @return `String` device response data in hexadecimal encoding, empty string on timeout
          */
         read: function(length, callback) {
             try {
@@ -134,7 +134,7 @@ define([
         /**
          * @function readLine
          * 
-         * Reads single line of data from device.
+         * Read single line of data from device.
          * 
          * Tries to read a data from the device until line ending (`\n` or `\r\n`) will be
          * read or timeout happens. Line ending is not included into result.
@@ -145,7 +145,7 @@ define([
          * Uses `timeoutMillis` parameter (specified in constructor) as a timeout.
          * 
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `String` device response data in hexadecimal encoding, empty string on timeout
+         * @return `String` device response data in hexadecimal encoding, empty string on timeout
          */
         readLine: function(callback) {
             try {
@@ -162,7 +162,7 @@ define([
         /**
          * @function writePlain
          * 
-         * Writes specifed string to device.
+         * Write specifed string to device.
          * 
          * Writes specified string to device converting the bytes
          * of input string into hexadecimal encoding as-is without changing the UTF-16 encoding.
@@ -175,7 +175,7 @@ define([
          * 
          * @param data `String` string to write to device
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Number` number of bytes written to device
+         * @return `Number` number of bytes written to device
          */
         writePlain: function(data, callback) {
             try {
@@ -196,7 +196,7 @@ define([
         /**
          * @function writeHex
          * 
-         * Writes specifed string in hexadecimal encoding to device.
+         * Write specifed string in hexadecimal encoding to device.
          * 
          * Writes specified hex-string to device, unlike `writePlain()` this
          * function may be used to write abritrary (possibly binary) data.
@@ -205,7 +205,7 @@ define([
          * 
          * @param dataHex `String` string encoded as hexadecimal to write to device
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Number` number of bytes written to device
+         * @return `Number` number of bytes written to device
          */
         writeHex: function(dataHex, callback) {
             try {
@@ -226,13 +226,13 @@ define([
         /**
          * @function close
          * 
-         * Closes connection to device
+         * Close connection to device
          * 
          * Closes Serial connection releases system resources.
          * Devices not closed manually, will be closed automatically during the shutdown.
          *
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Undefined`
+         * @return `Undefined`
          */
         close: function(callback) {
             try {

@@ -71,13 +71,13 @@ define([
     /**
      * @function USB
      * 
-     * Creates USB instance.
+     * Create USB instance.
      * 
      * Creates USB object instace and opens the underlying USB connection.
      * 
      * @param options `Object` configuration object, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
-     * @returns `Object` USB instance
+     * @return `Object` USB instance
      * 
      * __Options__
      *  - __vendorId__ `Number` USB Vendor ID number, see: http://www.linux-usb.org/usb.ids
@@ -107,7 +107,7 @@ define([
         /**
          * @function read
          * 
-         * Reads data from device.
+         * Read data from device.
          * 
          * Tries to read a specified amount of data from the device.
          * Returned result can conntains less data than requested.
@@ -119,7 +119,7 @@ define([
          * 
          * @param length `Number` amount of the data to read (in bytes)
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `String` device response data in hexadecimal encoding, empty string on timeout
+         * @return `String` device response data in hexadecimal encoding, empty string on timeout
          */
         read: function(length, callback) {
             try {
@@ -137,7 +137,7 @@ define([
         /**
          * @function writePlain
          * 
-         * Writes specifed string to device.
+         * Write specifed string to device.
          * 
          * Writes specified string to device converting the bytes
          * of input string into hexadecimal encoding as-is without changing the UTF-16 encoding.
@@ -152,7 +152,7 @@ define([
          * 
          * @param data `String` string to write to device
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Number` number of bytes written to device
+         * @return `Number` number of bytes written to device
          */
         writePlain: function(data, callback) {
             try {
@@ -173,7 +173,7 @@ define([
         /**
          * @function writeHex
          * 
-         * Writes specifed string in hexadecimal encoding to device.
+         * Write specifed string in hexadecimal encoding to device.
          * 
          * Writes specified hex-string to device, unlike `writePlain()` this
          * function may be used to write abritrary (possibly binary) data.
@@ -184,7 +184,7 @@ define([
          * 
          * @param dataHex `String` string encoded as hexadecimal to write to device
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Number` number of bytes written to device
+         * @return `Number` number of bytes written to device
          */
         writeHex: function(dataHex, callback) {
             try {
@@ -205,7 +205,7 @@ define([
         /**
          * @function control
          * 
-         * Communicates with USB device using control transfer.
+         * Communicate with USB device using control transfer.
          * 
          * Performs IO (write and read) with device using USB control transfer.
          * 
@@ -218,7 +218,7 @@ define([
          * 
          * @param options `Object` configuration object, see possible options below
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `String` device response data in hexadecimal encoding, empty string on timeout
+         * @return `String` device response data in hexadecimal encoding, empty string on timeout
          * 
          * __Options__
          *  - __requestType__ `Number` request type field for the setup packet
@@ -245,13 +245,13 @@ define([
         /**
          * @function close
          * 
-         * Closes connection to device
+         * Close connection to device
          * 
          * Closes USB connection releases system resources.
          * Devices not closed manually, will be closed automatically during the shutdown.
          *
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Undefined`
+         * @return `Undefined`
          */
         close: function(callback) {
             try {

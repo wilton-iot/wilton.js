@@ -88,13 +88,13 @@ define([
     /**
      * @function PDFDocument
      * 
-     * Creates PDFDocument instance.
+     * Create PDFDocument instance.
      * 
      * Creates PDFDocument instance, at least one page must be added
      * to created document before writing content to it.
      * 
      * @param callback `Function|Undefined` callback to receive result or error
-     * @returns `Object` PDFDocument instance
+     * @return `Object` PDFDocument instance
      */
     function PDFDocument(callback) {
         try {
@@ -111,7 +111,7 @@ define([
         /**
          * @function loadFont
          * 
-         * Loads TrueType font from the specified TTF file.
+         * Load TrueType font from the specified TTF file.
          * 
          * Loads TrueType font from the specified TTF file.
          * Loaded font will be added to the current document.
@@ -123,7 +123,7 @@ define([
          * 
          * @param ttfPath `String` path to TTF file
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `String` loaded font name
+         * @return `String` loaded font name
          */
         loadFont: function(ttfPath, callback) {
             try {
@@ -143,7 +143,7 @@ define([
         /**
          * @function addPage
          * 
-         * Appends page to the document.
+         * Append page to the document.
          * 
          * Appends new page to the document and moves internal "write cursor"
          * to this page. All subsequent content-related operation will be
@@ -151,7 +151,7 @@ define([
          * 
          * @param options `Object` configuration object, see possible options below
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Undefined`
+         * @return `Undefined`
          * 
          * __Options__
          *  - __format__ `String` Paper format, supported values: `A3`, `A4`, `A5`, `B4`, `B5`
@@ -164,7 +164,7 @@ define([
         /**
          * @function writeText
          * 
-         * Writes text to document.
+         * Write text to document.
          * 
          * Writes specified text to the current (last added) page of the document
          * at the specified coordinates.
@@ -175,7 +175,7 @@ define([
          * 
          * @param options `Object` configuration object, see possible options below
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Undefined`
+         * @return `Undefined`
          * 
          * __Options__
          *  - __text__ `String` Text contents to write
@@ -197,7 +197,7 @@ define([
         /**
          * @function writeTextInsideRectangle
          * 
-         * Writes text to document inside rectangle.
+         * Write text to document inside rectangle.
          * 
          * Writes specified text to the current (last added) page of the document
          * placing it inside the specified rectangle. Text lines that do not fit inside
@@ -209,7 +209,7 @@ define([
          * 
          * @param options `Object` configuration object, see possible options below
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Undefined`
+         * @return `Undefined`
          * 
          * __Options__
          *  - __text__ `String` Text contents to write
@@ -235,7 +235,7 @@ define([
         /**
          * @function drawLine
          * 
-         * Draws straight line.
+         * Draw straight line.
          * 
          * Draws the straigth line with the specified `lineWidth` and `color`
          * at the current (last added) page of the document.
@@ -244,7 +244,7 @@ define([
          * 
          * @param options `Object` configuration object, see possible options below
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Undefined`
+         * @return `Undefined`
          * 
          * __Options__
          *  - __beginX__ `Number` `x` coordinate of the beginning of the line
@@ -264,7 +264,7 @@ define([
         /**
          * @function drawRectangle
          * 
-         * Draws rectangle.
+         * Draw rectangle.
          * 
          * Draws the rectangle with the specified `lineWidth` and `color`
          * at the current (last added) page of the document.
@@ -273,7 +273,7 @@ define([
          * 
          * @param options `Object` configuration object, see possible options below
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Undefined`
+         * @return `Undefined`
          * 
          * __Options__
          *  - __x__ `Number` `x` coordinate of the lower-left corner of the rectangle
@@ -293,13 +293,13 @@ define([
         /**
          * @function saveToFile
          * 
-         * Writes this document contents into PDF file.
+         * Write this document contents into PDF file.
          * 
          * Writes this document contents into PDF file on the specified path.
          * 
          * @param path `String` File system path for the PDF file to write
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Undefined`
+         * @return `Undefined`
          */
         saveToFile: function(path, callback) {
             try {
@@ -316,12 +316,12 @@ define([
         /**
          * @function destroy
          * 
-         * Releases memory allocated for this document.
+         * Release memory allocated for this document.
          * 
          * Releases memory allocated for this document.
          * 
          * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `Undefined`
+         * @return `Undefined`
          */
         destroy: function(callback) {
             try {
