@@ -1,9 +1,32 @@
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/*
+ * Copyright 2017, alex at staticlibs.net
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
+/**
+ * @namespace utils
+ * 
+ * __wilton/utils__ \n
+ * Utility functions.
+ * 
+ * This module contains a set of utility function that are used
+ * by `wilton.js` internally.
+ * 
+ * It is suggested to use [Lodash library](https://lodash.com/docs/)
+ * (that is shipped with `wilton` distribution) instead of this module
+ * for the general-use utilities.
+ */
 define([], function() {
     "use strict";
    
@@ -17,10 +40,33 @@ define([], function() {
         return obj.defaultScriptEngine;
     } ();
    
+    /**
+     * @function undefinedOrNull
+     * 
+     * Check whether specifed value is `undefined` or `null`.
+     * 
+     * Checks whether specifed value is `undefined` or `null`.
+     * 
+     * @param obj `Any`
+     * @returns `Boolean` `true` if specifed value is `undefined` or `null`,
+     *          `false` otherwise
+     */
     function undefinedOrNull(obj) {
         return "undefined" === typeof (obj) || null === obj;
     }
 
+    /**
+     * @function startsWith
+     * 
+     * Check whether specified string starts with specified prefix.
+     * 
+     * Checks whether specified string starts with specified prefix.
+     * 
+     * @param str `String` string to check
+     * @param prefix `String` prefix to check
+     * @returns `Boolean` `true` if specified string starts with specified prefix,
+     *          `false` otherwise
+     */
     function startsWith(str, prefix) {
         if (undefinedOrNull(str) || undefinedOrNull(prefix)) {
             return false;
@@ -28,35 +74,77 @@ define([], function() {
         return 0 === str.lastIndexOf(prefix, 0);
     }
 
-    function endsWith(str, suffix) {
-        if (undefinedOrNull(str) || undefinedOrNull(suffix)) {
+    /**
+     * @function endsWith
+     * 
+     * Check whether specified string ends with specified postfix.
+     * 
+     * Checks whether specified string ends with specified postfix.
+     * 
+     * @param str `String` string to check
+     * @param postfix `String` postfix to check
+     * @returns `Boolean` `true` if specified string ends with specified postfix,
+     *          `false` otherwise
+     */
+    function endsWith(str, postfix) {
+        if (undefinedOrNull(str) || undefinedOrNull(postfix)) {
             return false;
         }
-        return str.indexOf(suffix, str.length - suffix.length) !== -1;
+        return str.indexOf(postfix, str.length - postfix.length) !== -1;
     }
 
-    function defaultObject(options) {
-        var opts = {};
-        if ("object" === typeof (options) && null !== options) {
-            opts = options;
+    /**
+     * @function defaultObject
+     * 
+     * Return object on any input.
+     * 
+     * Returns specified object, if it is not-null,
+     * returns emtpy object otherwise
+     * 
+     * @param obj `Object` object to check
+     * @returns `Object` specified object, if it is not-null, emtpy object otherwise
+     */
+    function defaultObject(obj) {
+        var res = {};
+        if ("object" === typeof (obj) && null !== obj) {
+            res = obj;
         }
-        return opts;
+        return obj;
     }
 
-    function defaultString(str, value) {
+    /**
+     * @function defaultString
+     * 
+     * Return string on any input.
+     * 
+     * Converts specified value to string.
+     * 
+     * @param str `Any` input value
+     * @returns `String` specified value, if it is a string,
+     *          value converted to string otherwise; empty string
+     *          on `null`input
+     */
+    function defaultString(str) {
         if ("string" === typeof (str)) {
             return str;
         } else if (!undefinedOrNull(str)) {
             return String(str);
         } else {
-            if ("undefined" !== typeof (value)) {
-                return value;
-            } else {
-                return "";
-            }
+            return "";
         }
     }
 
+    /**
+     * @function defaultJson
+     * 
+     * Convert specified value to JSON.
+     * 
+     * If specified value is an object - converts it to JSON,
+     * if it is a string - returns it unchanged
+     * 
+     * @param data `Any` input value
+     * @returns `String` JSON string, empty JSON object (as a string) on `null` input
+     */
     function defaultJson(data) {
         var json = "{}";
         if (!undefinedOrNull(data)) {
@@ -69,6 +157,20 @@ define([], function() {
         return json;
     }
 
+    /**
+     * @function callOrThrow
+     * 
+     * Call specified callback or throw specified `Error` if callback is `Undefined`.
+     * 
+     * If function callback is specified, calls it providing
+     * specified `Error` as argument. Otherewise throws specified `Error`.
+     * 
+     * @param onFailure `Function|Undefined` callback to handle the specified `Error`
+     * @param e `Error` error to pass to callback or throw
+     * @param res `Any|Undefined` result value to return from this function if callback
+     *            call was successfull
+     * @returns `Any` `res` parameter
+     */
     function callOrThrow(onFailure, e, res) {
         if ("function" === typeof (onFailure)) {
             onFailure(e);
@@ -84,6 +186,19 @@ define([], function() {
         }
     }
     
+    /**
+     * @function callOrIgnore
+     * 
+     * Call specified function (if it is not `Undefined`).
+     * 
+     * If callback function is specified - calls it passing
+     * `null` as a first argument (to adhere with Node's callback conventions)
+     * and specified `params` value as a second argument.
+     * 
+     * @param onSuccess `Function|Undefined` callback
+     * @param params `Any|Undefined` callback argument
+     * @returns `Undefined`
+     */
     function callOrIgnore(onSuccess, params) {
         if ("function" === typeof (onSuccess)) {
             if ("undefined" !== typeof (params)) {
@@ -94,6 +209,16 @@ define([], function() {
         }
     }
 
+    /**
+     * @function listProperties
+     * 
+     * List properties names of the specified object.
+     * 
+     * Lists the names of object's own properties.
+     * 
+     * @param obj `Object` input object
+     * @returns `Array` list of properties names
+     */
     function listProperties(obj) {
         var res = [];
         if (!undefinedOrNull(obj)) {
@@ -106,6 +231,17 @@ define([], function() {
         return res;
     }
 
+    /**
+     * @function checkProperties
+     * 
+     * Check whether object has all specified properties.
+     * 
+     * Checks whether specified object has all specified properties.
+     * 
+     * @param obj `Object` input object
+     * @param props `Array` list of properties names
+     * @returns `Undefined` throws `Error` on check fail
+     */
     function checkProperties(obj, props) {
         if (undefinedOrNull(obj)) {
             throw new Error("'checkProperties' error: specified object is invalid");
@@ -126,6 +262,17 @@ define([], function() {
         }
     }
     
+    /**
+     * @function hasProperties
+     * 
+     * Check whether object has all specified properties.
+     * 
+     * Checks whether specified object has all specified properties.
+     * 
+     * @param obj `Object` input object
+     * @param props `Array` list of properties names
+     * @returns `Boolean` `true` on successful check, `false` otherwise
+     */
     function hasProperties(obj, props) {
         if (undefinedOrNull(obj)) {
             throw new Error("'hasProperties' error: specified object is invalid");
@@ -146,6 +293,18 @@ define([], function() {
         return true;
     }
 
+    /**
+     * @function checkPropertyType
+     * 
+     * Check whether object has a specified property with a specified type.
+     * 
+     * Checks whether object has a specified property with a specified type.
+     * 
+     * @param obj `Object` input object
+     * @param prop `String` property name
+     * @param type `String` property type name
+     * @returns `Undefined` throws `Error` on check fail
+     */
     function checkPropertyType(obj, prop, type) {
         if (undefinedOrNull(obj)) {
             throw new Error("'checkPropertyType' error: specified object is invalid");
@@ -164,17 +323,18 @@ define([], function() {
         }
     }
     
-    function checkEmptyObject(obj) {
-        if (undefinedOrNull(obj)) {
-            throw new Error("'checkEmptyObject' error: specified object is invalid");
-        }
-        var props = listProperties(obj);
-        if (0 !== props.length) {
-            throw new Error("'checkEmptyObject' error: specified object is not empty," +
-                    " object: [" + props + "]");
-        }
-    }
-    
+    /**
+     * @function hasPropertyWithType
+     * 
+     * Check whether object has a specified property with a specified type.
+     * 
+     * Checks whether object has a specified property with a specified type.
+     * 
+     * @param obj `Object` input object
+     * @param prop `String` property name
+     * @param type `String` property type name
+     * @returns `Boolean` `true` on successful check, `false` otherwise
+     */
     function hasPropertyWithType(obj, prop, type) {
         if (!undefinedOrNull(obj) && "string" === typeof (prop) && "string" === typeof (type)) {
             var actual = typeof (obj[prop]);
@@ -183,6 +343,17 @@ define([], function() {
         return false;
     }
     
+    /**
+     * @function formatError
+     * 
+     * Format specifed error.
+     * 
+     * Formats specified `Error` object into string,
+     * including error message and a stack trace.
+     * 
+     * @param e `Error` error object
+     * @return `String` formatted error
+     */
     function formatError(e) {
         if (e instanceof Error) {
             if ("duktape" === engineName) {
@@ -195,6 +366,17 @@ define([], function() {
         }
     }
     
+    /**
+     * @function promisifyAll
+     * 
+     * Convert all function in the specified module object to use `Promise`s.
+     * 
+     * Applies [bluebird promisifyAll](http://bluebirdjs.com/docs/api/promise.promisifyall.html)
+     * to the specified object using `Promise` as a postfix for "promisified" functions.
+     * 
+     * @param obj `Object` module object that has `Function` properties
+     * @returns `Object` input object with additionally added "promisified" functions.
+     */
     function promisifyAll(obj) {
         var bluebird = WILTON_requiresync("bluebird");
         return bluebird.promisifyAll(obj, {
@@ -202,8 +384,22 @@ define([], function() {
         });
     }
     
+    /**
+     * @function cloneObject
+     * 
+     * Deep clone object.
+     * 
+     * Permforms deep clone of the "plain" object
+     * converting it to JSON and returning the parsed result.
+     * 
+     * @param obj `Object` object to clone
+     * @returns `Object` cloned object
+     */
     // https://stackoverflow.com/a/5344074/314015
-    function clone(obj) {
+    function cloneObject(obj) {
+        if ("object" !== typeof(obj) || undefinedOrNull(obj)) {
+            throw new Error("Invalid object specified");
+        }
         return JSON.parse(JSON.stringify(obj));
     }
     
@@ -220,11 +416,10 @@ define([], function() {
         checkProperties:checkProperties,
         hasProperties:hasProperties,
         checkPropertyType: checkPropertyType,
-        checkEmptyObject: checkEmptyObject,
         hasPropertyWithType: hasPropertyWithType,
         formatError: formatError,
         promisifyAll: promisifyAll,
-        clone: clone
+        cloneObject: cloneObject
     };
     
 });
