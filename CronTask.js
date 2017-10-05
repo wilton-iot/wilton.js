@@ -78,7 +78,7 @@ define([
      *  - __expression__ `String` Cron expression, see [expression format](https://en.wikipedia.org/wiki/Cron#Overview)
      *  - __callbackScript__ `Object` module path and function name to run from background thread
      *    - __module__ `String` full name of JavaScript module to load
-     *    - __func__ `String|Undefined` name of the function contained in specified module,
+     *    - __func__ `String|Undefined` name of the function contained in the specified module,
      *               if function is not specified, only module will be loaded
      *               (its top-level code will be executed)
      *    - __args__ `Array|Undefined` optional list of arguments, that will be passed to specified function
