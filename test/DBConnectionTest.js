@@ -21,7 +21,7 @@ define(["assert", "wilton/DBConnection"], function(assert, DBConnection) {
     });
     conn.execute("insert into t1 values(:foo, :bar)", ["ccc", 43]);
     // select
-    var rs = conn.query("select foo, bar from t1 where foo = :foo or bar = :bar order by bar", {
+    var rs = conn.queryList("select foo, bar from t1 where foo = :foo or bar = :bar order by bar", {
         foo: "ccc",
         bar: 42
     });
@@ -30,12 +30,15 @@ define(["assert", "wilton/DBConnection"], function(assert, DBConnection) {
     assert.equal(rs[0].bar, 42);
     assert.equal(rs[1].foo, "ccc");
     assert.equal(rs[1].bar, 43);
-    var el = conn.query("select foo, bar from t1 where foo = :foo or bar = :bar order by bar", {
+    var el = conn.queryObject("select foo, bar from t1 where foo = :foo or bar = :bar order by bar", {
         foo: "bbb",
         bar: 42
     });
     assert.equal(el.foo, "bbb");
     assert.equal(el.bar, 42);
+
+    assert.throws(function() { conn.query("select foo, bar from t1 where foo = 'fail'"); });
+    assert.throws(function() { conn.query("select foo, bar from t1"); });
 
     conn.doInTransaction(function() {/* some db actions */});
 

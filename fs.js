@@ -25,6 +25,24 @@
  * 
  * It provides wrappers around standard posix functions.
  * 
+ * Usage example:
+ * 
+ * @code
+ * 
+ * // make directory
+ * fs.mkdir("fstest");
+ * 
+ * // write data to file
+ * fs.writeFile("fstest/test.txt", "foo");
+ * fs.appendFile("fstest/test.txt", "bar");
+ * 
+ * // read file
+ * fs.readFile("fstest/test.txt"); // "foobar"
+ * 
+ * // get file status
+ * var props = fs.stat("fstest/test.txt");
+ * 
+ * @endcode
  */
 define([
     "./dyload",

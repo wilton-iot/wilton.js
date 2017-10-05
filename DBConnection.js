@@ -1,20 +1,94 @@
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/*
+ * Copyright 2017, alex at staticlibs.net
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @namespace DBConnection
+ * 
+ * __wilton/DBConnection__ \n
+ * Connect to relational databases.
+ * 
+ * This module allows to work with relational databases.
+ * 
+ * It implementa a lightweight ORM - object-relational mapping,
+ * allows to map JavaScript objects to query parameters and to map
+ * query results to JavaScript objects.
+ * 
+ * [SQLite](https://www.sqlite.org/) and [PostgreSQL](https://www.postgresql.org/)
+ * databases are supported out of the box. 
+ * 
+ * Support for Oracle, MSSQL (through ODBC), MySQL
+ * and Firebird can be added in custom builds.
+ * 
+ * DB connection can be closed manually to release system resource, otherwise
+ * it will be closed during the shutdown.
+ * 
+ * Usage example:
+ * 
+ * @code
+ * 
+ * // open connection
+ * var conn = new DBConnection("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
+ *
+ * // execute DDL
+ * conn.execute("create table t1 (foo varchar, bar int)");
+ * 
+ * // execute DQL
+ * var res = conn.query("select foo, bar from t1 where foo = :foo or bar = :bar order by bar", {
+ *     foo: "ccc",
+ *     bar: 42
+ * });
+ * 
+ * // execute DML in transaction
+ * conn.doInTransaction(function() {
+ *     conn.execute("insert into t1 values(:foo, :bar)", {
+ *         foo: "bbb",
+ *         bar: 42
+ *     });
+ * });
+ * 
+ * // close connection
+ * conn.close();
+ * 
+ * @endcode
  */
 
 define([
     "./dyload",
-    "./wiltoncall",
-    "./utils"
-], function(dyload, wiltoncall, utils) {
+    "./utils",
+    "./wiltoncall"
+], function(dyload, utils, wiltoncall) {
     "use strict";
 
     dyload({
         name: "wilton_db"
     });
 
+    /**
+     * @function DBConnection
+     * 
+     * Open connection to database.
+     * 
+     * Opens connection to database.
+     * 
+     * @param url `String` backend-specific connection URL,
+     *            postgres example: `postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test`,
+     *            sqlite example: `sqlite://test.db`
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Object` `DBConnection` instance
+     */
     var DBConnection = function(url, callback) {
         try {
             var handleJson = wiltoncall("db_connection_open", url);
@@ -27,6 +101,16 @@ define([
     };
 
     DBConnection.prototype = {
+        /**
+         * @function execute
+         * 
+         * Execute DML (`insert` or `update`) or DDL (`create` or `drop`) query
+         * 
+         * @param sql `String` SQL query
+         * @param params `Object|Undefined` query parameters object
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Undefined`
+         */
         execute: function(sql, params, callback) {
             try {
                 var sqlstr = utils.defaultString(sql);
@@ -42,6 +126,18 @@ define([
             }
         },
         
+        /**
+         * @function queryList
+         * 
+         * Execute `select` query returning result as a list.
+         * 
+         * Executes `select` query and returns its result as a list.
+         * 
+         * @param sql `String` SQL query
+         * @param params `Object|Undefined` query parameters object
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Array` list of objects, one object per returned row
+         */
         queryList: function(sql, params, callback) {
             try {
                 var sqlstr = utils.defaultString(sql);
@@ -55,32 +151,52 @@ define([
                 utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {
-                utils.callOrThrow(callback, e, []);
+                utils.callOrThrow(callback, e);
             }
         },
-        
-        query: function(sql, params, callback) {
-            var list = this.queryList(sql, params, {
-                onFailure: function(err) {
-                    if (!utils.undefinedOrNull(err)) {
-                        callback(err);
-                    }
+
+        /**
+         * @function queryObject
+         * 
+         * Execute `select` query returning result as an object.
+         * 
+         * Executes `select` query and returns its result as an object.
+         * 
+         * Query must return exactly one row, otherwise `Error` will be thrown.
+         * 
+         * @param sql `String` SQL query
+         * @param params `Object|Undefined` query parameters object
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Object` object converted from the single row returned
+         */
+        queryObject: function(sql, params, callback) {
+            try {
+                var list = this.queryList(sql, params);
+                if (1 !== list.length) {
+                    throw new Error("Invalid number of records returned, expected 1 record," +
+                            " query: [" + sql + "], params: [" + JSON.stringify(params) + "]," +
+                            " number of records: [" + list.length +  "]");
                 }
-            });
-            if (list instanceof Array) {
-                var res = null;
-                if (list.length > 1) {
-                    return list;
-                } else if (1 === list.length) {
-                    res = list[0];
-                }
+                var res = list[0];
                 utils.callOrIgnore(callback, res);
                 return res;
+            } catch (e) {
+                utils.callOrThrow(callback, e);
             }
-            // else error happened
-            return {};
         },
         
+        /**
+         * @function doInTransaction
+         * 
+         * Perform a set of DB operations inside the transaction.
+         * 
+         * Performs a set of DB operations inside the transaction.
+         * Trnsaction will be committed on success and rolled back on error.
+         * 
+         * @param operations `Function` function performing DB operations
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Undefined`
+         */
         doInTransaction: function(operations, callback) {
             try {
                 var tranJson = wiltoncall("db_transaction_start", {
@@ -103,7 +219,18 @@ define([
                 utils.callOrThrow(callback, e);
             }
         },
-        
+
+        /**
+         * @function close
+         * 
+         * Close database connection.
+         * 
+         * Closes DB connection releasing system resources.
+         * Connections left open will be closed on shutdown.
+         * 
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Undefined`
+         */
         close: function(callback) {
             try {
                 wiltoncall("db_connection_close", {
