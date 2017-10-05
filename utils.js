@@ -109,7 +109,7 @@ define([], function() {
         if ("object" === typeof (obj) && null !== obj) {
             res = obj;
         }
-        return obj;
+        return res;
     }
 
     /**
