@@ -1,4 +1,100 @@
+/*
+ * Copyright 2017, alex at staticlibs.net
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
+/**
+ * @namespace Channel
+ * 
+ * __wilton/Channel__ \n
+ * Pipes that connect concurrent threads.
+ * 
+ * This module provides "pipes" - FIFO queues - that can be used to transfer data between
+ * differrent threads of execution. Data is transfered in JSON format.
+ * 
+ * Data can be send and received in blocking (`send()` and `receive()` methods) 
+ * or non-blocking (`offer()` and `poll()` methods) modes.
+ * 
+ * Multiple threads can write to and read from the same `Channel`
+ * at the same time.
+ * 
+ * `Channel`s can be "bufferred" (with some amount of intemediate storage),
+ * or synchronous (without intermediate storage). Only blocking methods can be used on synchronous
+ * channels.
+ * 
+ * Readers can wait for the data on multiple channels simultaneously using 
+ * `select()` function.
+ * 
+ * `Channel`s are similar in nature with [golang Channels](https://tour.golang.org/concurrency/2).
+ * 
+ * Underlying system resources can be released manually using `close()` method,
+ * open channels will be closed during the shutdown.
+ * 
+ * Usage example:
+ * 
+ * @code
+ * 
+ * // thread 1
+ * 
+ * // create buffered channel
+ * var chan = new Channel({
+ *     name: "channel1",
+ *     size: 1024
+ * });
+ * 
+ * // create sync channel
+ * var sync = new Channel({
+ *     name: "channel2",
+ *     size: 0
+ * });
+ * 
+ * // send message, blocks is channel is full
+ * chan.send({
+ *     foo: 42
+ * });
+ * 
+ * // offer message, returns false if channel is full
+ * chan.offer({
+ *     bar: 43
+ * });
+ * 
+ * 
+ * // thread 2
+ * 
+ * // lookup existing channels from other thread
+ * var chan = Channel.lookup("channel1");
+ * var sync = Channel.lookup("channel2");
+ * 
+ * // receive message, blocks if channel is empty
+ * var obj1 = chan.receive();
+ * 
+ * // poll for message, returns null if channel is empty
+ * var obj2 = chan.poll();
+ * 
+ * // wait on multiple channels, returns the index of channel that has data ready
+ *  var idx = Channel.select({
+ *      channels: [chan, sync],
+ *      timeoutMillis: 10000
+ *  });
+ * 
+ * // close channels
+ * chan.close();
+ * sync.close();
+ * 
+ * @endcode
+ * 
+ */
 define([
     "./dyload",
     "./wiltoncall",
@@ -10,6 +106,26 @@ define([
         name: "wilton_channel"
     });
 
+    /**
+     * @function Channel
+     * 
+     * Create `Channel`instance.
+     * 
+     * Creates channel instance allocating resources for intermediate storage.
+     * 
+     * Created channel can be accessed in other threads using `lookup()` function.
+     * 
+     * @param options `Object` configuration object, see possible options below
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Object` `Channel` instance
+     * 
+     * __Options__
+     *  - __name__ `String` unique name to identify this channel
+     *  - __size__ `Number` maximum number of elements allowed in the intermediate storage
+     *             (storage is not pre-allocated, grows until this number as needed);
+     *             specify `size: 0` to create a synchronous channel
+     * 
+     */
     function Channel(options, callback) {
         var opts = utils.defaultObject(options);
         try {
@@ -27,6 +143,24 @@ define([
         }
     }
 
+    /**
+     * @static lookup
+     * 
+     * Look for the existing channel.
+     * 
+     * Look for the existing channel that may be created in this or other thread.
+     * 
+     * Returned channel instance is different from the original one
+     * (as different threads cannot share live JavaScript objects),
+     * but is linked (through `handle`) to the same native instance 
+     * (that holds intermediate storage for this channel).
+     * 
+     * @param name `String` channel name
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Object` `Channel` instance that corresponds to native channel with
+     *         a specified name; throws `Error` if channel not found
+     * 
+     */
     Channel.lookup = function(name, callback) {
         try {
             var handleJson = wiltoncall("channel_lookup", {
@@ -43,7 +177,28 @@ define([
             utils.callOrThrow(callback, e);
         }
     };
-
+    
+    /**
+     * @static select
+     * 
+     * Wait for input data on multiple channels simultaneously.
+     * 
+     * Blocks current thread until one of the specified channels won't become
+     * ready for reading data from it.
+     * 
+     * This function is similar in nature to [POSIX select](http://pubs.opengroup.org/onlinepubs/009695399/functions/pselect.html)
+     * and [golang's select](https://gobyexample.com/select),
+     * but it support only "ready for read" logic ("ready for write" is not supported).
+     * 
+     * @param options `Object` configuration object, see possible options below
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Number` index of the channel in specified list, that is ready for reading,
+     *         `-1` on timeout
+     * 
+     * __Options__
+     *  - __channels__ `Array` list of channels to wait on
+     *  - __timeoutMillis__ `Number` max timeout for waiting, in milliseconds
+     */
     Channel.select = function(options, callback) {
         var opts = utils.defaultObject(options);
         try {
@@ -65,6 +220,16 @@ define([
         }
     };
 
+    /**
+     * @static dumpRegistry
+     * 
+     * Dump a registry of currently active channels.
+     * 
+     * Dumps a registry of currently active channels as a string.
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `String` registry dump
+     */
     Channel.dumpRegistry = function(callback) {
         try {
             var res = wiltoncall("channel_dump_registry");
@@ -77,6 +242,18 @@ define([
 
     Channel.prototype = {
 
+        /**
+         * @function send
+         * 
+         * Send a message to the channel, blocks if channel is full.
+         * 
+         * Sends JSON message to the channel in blocking mode.
+         * 
+         * @param msg `Object|String` message to send
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Boolean` `true` if message was sent successfully, `false` if
+         *         channel was closed (manually with `close()` or automatically on shutdown)
+         */
         send: function(msg, callback) {
             try {
                 var message = utils.defaultJson(msg);
@@ -94,6 +271,17 @@ define([
             }
         },
 
+        /**
+         * @function receive
+         * 
+         * Receive a message from the channel, blocks if channel is empty.
+         * 
+         * Receives JSON messages from the channel in blocking mode.
+         * 
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Object` received message parsed from JSON, `null` if
+         *         channel was closed (manually with `close()` or automatically on shutdown)
+         */
         receive: function(callback) {
             try {
                 var resStr = wiltoncall("channel_receive", {
@@ -107,6 +295,18 @@ define([
             }
         },
 
+        /**
+         * @function offer
+         * 
+         * Send a message to the channel, return `false` if channel is full.
+         * 
+         * Sends a message to the channel in non-blocking mode returning immediately.
+         * 
+         * @param msg `Object|String` message to send
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Boolean` `true` if message was sent successfully, `false` if channel is full or
+         *         channel was closed (manually with `close()` or automatically on shutdown)
+         */
         offer: function(msg, callback) {
             try {
                 var message = utils.defaultJson(msg);
@@ -124,6 +324,18 @@ define([
             }
         },
 
+        /**
+         * @function poll
+         * 
+         * Poll channel for buffered messages.
+         * 
+         * Tries to receive a message from the channel in a non-blocking mode,
+         * returns `null` if channel is empty.
+         * 
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Object` received message parsed from JSON, `null` if channel is empty or
+         *         channel was closed (manually with `close()` or automatically on shutdown)
+         */
         poll: function(callback) {
             try {
                 var resStr = wiltoncall("channel_poll", {
@@ -137,6 +349,17 @@ define([
             }
         }, 
 
+        /**
+         * @function close
+         * 
+         * Close the channel releasing native resources.
+         * 
+         * Closes the channel, all waiting threads are unblocked
+         * with negative (for write) and null (for read) result.
+         * 
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Undefined`
+         */
         close: function(callback) {
             try {
                 wiltoncall("channel_close", {
