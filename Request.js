@@ -54,7 +54,7 @@
 define([
     "./utils",
     "./wiltoncall"
-], function(wiltoncall, utils) {
+], function(utils, wiltoncall) {
     "use strict";
     
     var Request = function(requestHandle) {
@@ -87,7 +87,7 @@ define([
          *  - __query__ `String` "query" part of the URL (after the first `?`)
          *  - __queries__ `Object` mapping of request parameters parsed from
          *                `query` field
-         *  - __headers__ `Object` request headers `"Header-Name": "value"` format,
+         *  - __headers__ `Object` request headers in `"Header-Name": "value"` format,
          *                duplicates in client-specified headers
          *                are handled in the following ways, depending on the header name:
          *                duplicates of `age`, `authorization`, `content-length`, 

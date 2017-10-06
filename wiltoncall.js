@@ -48,11 +48,13 @@ define(["./utils"], function(utils) {
      * @param data `String|Object|Undefined` input data for native function
      * @returns `String` output of the native function
      */
-    return function(name, data) {
+    function wiltoncall(name, data) {
         if ("string" !== typeof (name) || !(name.length > 0)) {
             throw new Error("Invalid 'wiltoncall' parameters specified, name: [" + name + "]");
         }
         var json = utils.defaultJson(data);
         return WILTON_wiltoncall(name, json);
-    };
+    }
+
+    return wiltoncall;
 });
