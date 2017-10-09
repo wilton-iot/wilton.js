@@ -61,6 +61,7 @@ define([
         this.handle = requestHandle;
         this.metaCached = null;
         this.dataCached = null;
+        this.formCached = null;
         this.jsonCached = null;
         this.dataFilenameCached = null;
     };
@@ -140,6 +141,39 @@ define([
                 }
                 utils.callOrIgnore(callback, this.dataCached);
                 return this.dataCached;
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
+
+        /**
+         * @function form
+         * 
+         * Access `application/x-www-form-urlencoded` request body.
+         * 
+         * Returns request body as a JSON object.
+         * 
+         * If input request data was saved into temporary file
+         * (due to `requestPayload.memoryLimitBytes` server config parameter
+         * exceeded), that file will be read into memory on the first call to this
+         * method.
+         * 
+         * Form data is fetched once using a native call and
+         * is cached locally inside `Request` object after that.
+         * 
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `String` request body
+         */
+        form: function(callback) {
+            try {
+                if (null === this.formCached) {
+                    var json = wiltoncall("request_get_form_data", {
+                        requestHandle: this.handle
+                    });
+                    this.formCached = JSON.parse(json);
+                }
+                utils.callOrIgnore(callback, this.formCached);
+                return this.formCached;
             } catch (e) {
                 utils.callOrThrow(callback, e);
             }

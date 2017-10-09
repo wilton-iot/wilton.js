@@ -33,6 +33,7 @@ define([
             "wilton/test/views/hi",
             "wilton/test/views/postmirror",
             "wilton/test/views/reqheader",
+            "wilton/test/views/reqform",
             "wilton/test/views/resperror",
             "wilton/test/views/respfooheader",
             "wilton/test/views/respjson",
@@ -76,6 +77,11 @@ define([
     assert.equal(getresp.bar, "baz");
     assert.equal(clientHelper.httpGet(prefix + "resperror", meta), "Error triggered");
     assert.equal(clientHelper.httpGet(prefix + "reqheader", meta), "localhost:8443");
+    var formObj = {
+        foo: "bar",
+        baz: "42"
+    };
+    assert.deepEqual(JSON.parse(clientHelper.httpPost(prefix + "reqform", "foo=bar&baz=42", meta)), formObj);
     assert.equal(clientHelper.httpGet(prefix + "respfooheader", meta), "header set");
     assert.equal(clientHelper.httpGetHeader(prefix + "respfooheader", "X-Foo", meta), "foo");
     assert.equal(clientHelper.httpPost(prefix + "postmirror", "foobar", meta), "foobar");
