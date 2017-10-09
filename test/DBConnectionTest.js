@@ -4,7 +4,11 @@
  * and open the template in the editor.
  */
 
-define(["assert", "wilton/DBConnection"], function(assert, DBConnection) {
+define([
+    "assert",
+    "wilton/DBConnection",
+    "wilton/loader"
+], function(assert, DBConnection, loader) {
     "use strict";
 
     print("test: wilton/DBConnection");
@@ -44,4 +48,9 @@ define(["assert", "wilton/DBConnection"], function(assert, DBConnection) {
 
     conn.doInTransaction(function() {/* some db actions */});
 
+    // loadQueryFile
+    var queries = DBConnection.loadQueryFile(loader.findModulePath("wilton/test/data/test.sql"));
+    assert.equal(queries.myTestSelect, "select foo from bar\n    where baz = 1\n    and 1 > 0 -- stupid condidion\n    limit 42\n");
+    assert.equal(queries.myTestSelect2, "-- slow query\ndelete from foo\n    where baz = 1\n");
+    assert.equal(queries.myTestSelect3, "drop table foo\n");
 });

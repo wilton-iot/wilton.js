@@ -242,6 +242,73 @@ define([
             }
         }
     };
+
+    /**
+     * @static loadQueryFile
+     * 
+     * Load queries froma an SQL file.
+     * 
+     * Parses a file with SQL queries as `query_name: sql` object.
+     * 
+     * Each query must start with `/** myQuery STAR/` header.
+     * 
+     * Lines with comments are preserved, empty lines are ignored.
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Object` loaded queries.
+     */
+    // https://github.com/alexkasko/springjdbc-typed-queries/blob/master/typed-queries-common/src/main/java/com/alexkasko/springjdbc/typedqueries/common/PlainSqlQueriesParser.java
+    DBConnection.loadQueryFile = function(path, callback) {
+        // lazy-loading for fs lib
+        var fs = WILTON_requiresync("wilton/fs");
+        try {
+            var lines = fs.readLines(path);
+            var nameRegex = new RegExp("^\\s*/\\*{2}\\s*(.*?)\\s*\\*/\\s*$");
+            var trimRegex = /^\s+|\s+$/g;
+            var res = {};
+            var state = "STARTED";
+            var name = null;
+            var sql = "";
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i];
+                var trimmed = line.replace(trimRegex, "");
+                if (0 === trimmed.length) continue;
+                if ("STARTED" === state) { // search for first query name
+                    if (utils.startsWith(trimmed, "--")) continue;
+                    var startedMatch = nameRegex.exec(line);
+                    if (null === startedMatch || 2 !== startedMatch.length) throw new Error(
+                            "Query name not found on start, file: [" + path + "], line: [" + i + "]");
+                    name = startedMatch[1];
+                    state = "COLLECTING";
+                } else if ("COLLECTING" == state) {
+                    var nameMatch = nameRegex.exec(line);
+                    if (null !== nameMatch && 2 == nameMatch.length) { // next query name found
+                        if (0 === sql.length) throw new Error(
+                                "No SQL found for query name: [" + name + "], file: [" + path + "], line: [" + i + "]");
+                        if (res.hasOwnProperty(name)) throw new Error(
+                                "Duplicate SQL query name: [" + name + "], file: [" + path + "], line: [" + i + "]");
+                        // save collected sql string
+                        res[name] = sql;
+                        // clean collected sql string
+                        sql = "";
+                        name = nameMatch[1];
+                    } else {
+                        sql += line;
+                        sql += "\n";
+                    }
+                } else throw new Error("Invalid state: [" + state + "]");
+            }
+            // tail
+            if (null === name) throw new Error("No queries found, file: [" + path + "]");
+            if (res.hasOwnProperty(name)) throw new Error(
+                    "Duplicate SQL query name: [" + name + "], file: [" + path + "], line: [" + i + "]");
+            res[name] = sql;
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
     
     return DBConnection;
 });
