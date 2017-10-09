@@ -4,7 +4,11 @@
  * and open the template in the editor.
  */
 
-define(["assert", "wilton/fs", "wilton/utils"], function(assert, fs, utils) {
+define([
+    "assert",
+    "wilton/fs",
+    "wilton/utils"
+], function(assert, fs, utils) {
     "use strict";
 
     print("test: wilton/fs");
@@ -21,7 +25,7 @@ define(["assert", "wilton/fs", "wilton/utils"], function(assert, fs, utils) {
     
     // readFile
     assert.equal(fs.readFile(tf), "foobar");
-    
+
     // exists
     assert(fs.exists("fstest"));
     assert(fs.exists(tf));
@@ -55,9 +59,24 @@ define(["assert", "wilton/fs", "wilton/utils"], function(assert, fs, utils) {
     // unlink
     fs.unlink(tfMoved);
     assert(!fs.exists(tfMoved));
+
+    // readLines
+    var tflines = "fstest/readLines_test.txt";
+    
+    // writeFile
+    fs.writeFile(tflines, "foo\n");
+    fs.appendFile(tflines, "bar\r\n");
+    fs.appendFile(tflines, "42\n");
+    var li = fs.readLines(tflines);
+    assert.equal(li.length, 3);
+    assert.equal(li[0], "foo");
+    assert.equal(li[1], "bar");
+    assert.equal(li[2], "42");
+    fs.unlink(tflines);
+    assert(!fs.exists(tflines));
     
     // rmdir
     fs.rmdir("fstest");
-    assert(!fs.exists("fstest"));
+    assert(!fs.exists("fstest"));   
 
 });

@@ -25,6 +25,9 @@
  * 
  * It provides wrappers around standard posix functions.
  * 
+ * Every function in this module has an alias with a `Sync` postfix
+ * (to match Node.js convention), example: `readFile()` is the same as `readFileSync`.
+ * 
  * Usage example:
  * 
  * @code
@@ -181,6 +184,32 @@ define([
             var res = wiltoncall("fs_read_file", {
                 path: path
             });
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
+     * @function readLines
+     * 
+     * Reads all lines from a file.
+     * 
+     * Reads the entire contents of a text file and return them as an array of lines.
+     * 
+     * Empty strings are ignored.
+     * 
+     * @param path `String`
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Array` file contents as an array of lines
+     */
+    function readLines(path, callback) {
+        try {
+            var json = wiltoncall("fs_read_lines", {
+                path: path
+            });
+            var res = JSON.parse(json);
             utils.callOrIgnore(callback, res);
             return res;
         } catch (e) {
@@ -346,6 +375,8 @@ define([
         readdir: readdir,
         readdirSync: readdir,
         readFile: readFile,
+        readLines: readLines,
+        readLinesSync: readLines,
         readFileSync: readFile,
         rename: rename,
         renameSync: rename,
