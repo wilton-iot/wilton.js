@@ -148,6 +148,34 @@ define([
     };
 
     /**
+     * @static initConsole
+     * 
+     * Shotcut function for console-only logging initialization.
+     * 
+     * Initializes logging subsystem using only `CONSOLE` appender
+     * and without using specific settings for separate logger.
+     * 
+     * @param threshold `String` threshold logging level for `CONSOLE` appender, must be
+     *                  one of `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Undefined`
+     * 
+     */
+    Logger.initConsole = function(threshold, callback) {
+        try {
+            Logger.initialize({
+                appenders: [{
+                        appenderType: "CONSOLE",
+                        thresholdLevel: threshold 
+                }]
+            });
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
      * @static shutdown
      * 
      * Deinitialize logging subsystem.

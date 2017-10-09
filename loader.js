@@ -76,7 +76,7 @@ define([
                         if (utils.startsWith(modname, modshort)) {
                             var modpath = paths[mod];
                             if (modname.length > mod.length) {
-                                var tail = modname.substr(mod.lenght);
+                                var tail = modname.substr(mod.length);
                                 modpath = modpath + tail;
                             }
                             res = modpath;

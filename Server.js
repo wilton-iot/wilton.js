@@ -208,7 +208,7 @@ define([
                                  allowed to process in-memory without dumping it into file,
                                  in bytes, default value: `1048576`
      *  - __mustache__ `Object` configuration for [mustache](https://mustache.github.io/) responses
-     *    - __partialDirs__ `Array` list of directories to use for loading mustache partial
+     *    - __partialsDirs__ `Array` list of directories to use for loading mustache partial
      *                      templates when returning rendered mustache templates using
      *                      `Request.sendMustache()`
      *  

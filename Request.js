@@ -305,7 +305,9 @@ define([
          * Mustache partials are loaded automatically from directories, specified
          * using `mustache.partialDirs` `Server` configuration parameter.
          * 
-         * @param filePath `String` path to mustache template file
+         * @param filePath `String` path to mustache template file; if specified file
+         *                 ends with `.js`, this extension will be stripped and
+         *                 `.html` extension will be appended
          * @param values `Object` input values to render the template with
          * @param options `Object|Undefined` configuration object, see possible options below
          * @param callback `Function|Undefined` callback to receive result or error
@@ -320,6 +322,13 @@ define([
         sendMustache: function(filePath, values, options, callback) {
             var opts = utils.defaultObject(options);
             try {
+                if ("string" !== typeof(filePath)) {
+                    throw new Error("Invalid non-string 'filePath' parameter specified");
+                }
+                var fpath = filePath;
+                if (utils.endsWith(fpath, ".js")) {
+                    fpath = fpath.substring(0, fpath.length - 3) + ".html";
+                }
                 // metatada, sending html
                 opts.meta = utils.defaultObject(opts.meta);
                 opts.meta.headers = utils.defaultObject(opts.meta.headers);
@@ -331,7 +340,7 @@ define([
                 var vals = utils.defaultObject(values);
                 wiltoncall("request_send_mustache", {
                     requestHandle: this.handle,
-                    mustacheFilePath: filePath,
+                    mustacheFilePath: fpath,
                     values: vals
                 });
                 utils.callOrIgnore(callback);
