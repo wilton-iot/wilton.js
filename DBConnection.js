@@ -67,9 +67,10 @@
 
 define([
     "./dyload",
+    "./fs",
     "./utils",
     "./wiltoncall"
-], function(dyload, utils, wiltoncall) {
+], function(dyload, fs, utils, wiltoncall) {
     "use strict";
 
     dyload({
@@ -106,6 +107,8 @@ define([
          * 
          * Execute DML (`insert` or `update`) or DDL (`create` or `drop`) query
          * 
+         * Executes DML (`insert` or `update`) or DDL (`create` or `drop`) query
+         * 
          * @param sql `String` SQL query
          * @param params `Object|Undefined` query parameters object
          * @param callback `Function|Undefined` callback to receive result or error
@@ -121,6 +124,50 @@ define([
                     params: pars
                 });
                 utils.callOrIgnore(callback);
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
+
+        /**
+         * @function executeFile
+         * 
+         * Execute all queries from file.
+         * 
+         * Queries are parsed from file splitting it by `;` symbols
+         * and then executed one by one.
+         * 
+         * Comment-only lines are ignored;
+         * 
+         * @param filePath `String` path to SQL file
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Number` number of queries executed
+         */
+        executeFile: function(filePath, callback) {
+            try {
+                var contents = fs.readFile(filePath);
+                var queries = contents.split(";");
+                var commentRegexp = /^\s*--.*$/;
+                var trimRegex = /^\s+|\s+$/g;
+                var count = 0;
+                for (var i = 0; i < queries.length; i++) {
+                    var lines = queries[i].split("\n");
+                    var flines = [];
+                    for (var j = 0; j < lines.length; j++) {
+                        var li = lines[j];
+                        var trimmed = li.replace(trimRegex, "");
+                        if (trimmed.length > 0 && !commentRegexp.test(li)) {
+                            flines.push(li);
+                        }
+                    }
+                    if (flines.length > 0) {
+                        var query = flines.join("\n");
+                        this.execute(query, {});
+                        count += 1;
+                    }
+                }
+                utils.callOrIgnore(callback, count);
+                return count;
             } catch (e) {
                 utils.callOrThrow(callback, e);
             }
@@ -261,8 +308,6 @@ define([
      */
     // https://github.com/alexkasko/springjdbc-typed-queries/blob/master/typed-queries-common/src/main/java/com/alexkasko/springjdbc/typedqueries/common/PlainSqlQueriesParser.java
     DBConnection.loadQueryFile = function(path, callback) {
-        // lazy-loading for fs lib
-        var fs = WILTON_requiresync("wilton/fs");
         try {
             var lines = fs.readLines(path);
             var nameRegex = new RegExp("^\\s*/\\*{2}\\s*(.*?)\\s*\\*/\\s*$");
