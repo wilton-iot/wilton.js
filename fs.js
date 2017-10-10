@@ -246,7 +246,7 @@ define([
      * 
      * Delete directory.
      * 
-     * Deletes directory that must be empty.
+     * Deletes directory recursively.
      * 
      * @param path `String` path to directory
      * @param callback `Function|Undefined` callback to receive result or error

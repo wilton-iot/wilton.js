@@ -72,8 +72,10 @@ define([
     assert.equal(li[0], "foo");
     assert.equal(li[1], "bar");
     assert.equal(li[2], "42");
-    fs.unlink(tflines);
-    assert(!fs.exists(tflines));
+    
+    // not needed - rmdir is recursive
+    //fs.unlink(tflines);
+    //assert(!fs.exists(tflines));
     
     // rmdir
     fs.rmdir("fstest");
