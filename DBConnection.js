@@ -195,7 +195,7 @@ define([
          * 
          * @param operations `Function` function performing DB operations
          * @param callback `Function|Undefined` callback to receive result or error
-         * @return `Undefined`
+         * @return `Any` value returned by `operations` function
          */
         doInTransaction: function(operations, callback) {
             try {
@@ -203,8 +203,9 @@ define([
                     connectionHandle: this.handle
                 });
                 var tran = JSON.parse(tranJson);
+                var res = null;
                 try {
-                    operations();
+                    res = operations();
                     wiltoncall("db_transaction_commit", {
                         transactionHandle: tran.transactionHandle
                     });
@@ -214,7 +215,8 @@ define([
                     });
                     utils.callOrThrow(callback, e);
                 }
-                utils.callOrIgnore(callback);
+                utils.callOrIgnore(callback, res);
+                return res;
             } catch (e) {
                 utils.callOrThrow(callback, e);
             }

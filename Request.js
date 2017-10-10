@@ -382,6 +382,39 @@ define([
                 utils.callOrThrow(callback, e);
             }
         },
+
+        /**
+         * @function sendRedirect
+         * 
+         * Redirect client to the specified URL
+         * 
+         * Sends `303 See Other` with the specified location
+         * 
+         * @param location `String` URL to redirect clien to
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Undefined`
+         */
+        sendRedirect: function(location, callback) {
+            try {
+                wiltoncall("request_set_response_metadata", {
+                    requestHandle: this.handle,
+                    metadata: {
+                        statusCode: 303,
+                        statusMessage: "See Other",
+                        headers: {
+                            Location: location
+                        }
+                    }
+                });
+                wiltoncall("request_send_response", {
+                    requestHandle: this.handle,
+                    data: ""
+                });
+                utils.callOrIgnore(callback);
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
         
         _setMeta: function(opts) {
             if ("object" === typeof (opts.meta) && null !== opts.meta) {
