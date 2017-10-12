@@ -76,9 +76,21 @@ define([
     // not needed - rmdir is recursive
     //fs.unlink(tflines);
     //assert(!fs.exists(tflines));
-    
+
+    // copyDirectory
+    fs.mkdir("fstest/dir1");
+    fs.mkdir("fstest/dir1/dir11");
+    fs.mkdir("fstest/dir1/dir12");
+    fs.writeFile("fstest/dir1/foo.txt", "foo");
+    fs.writeFile("fstest/dir1/dir12/bar.txt", "bar");
+    fs.copyDirectory("fstest", "fstest1");
+    assert.deepEqual(fs.readdir("fstest1"), fs.readdir("fstest"));
+    assert.deepEqual(fs.readdir("fstest1/dir1"), fs.readdir("fstest/dir1"));
+    assert.deepEqual(fs.readdir("fstest1/dir1/dir12"), fs.readdir("fstest/dir1/dir12"));
+
     // rmdir
     fs.rmdir("fstest");
-    assert(!fs.exists("fstest"));   
-
+    assert(!fs.exists("fstest"));
+    fs.rmdir("fstest1");
+    assert(!fs.exists("fstest1"));
 });

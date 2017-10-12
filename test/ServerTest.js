@@ -49,8 +49,9 @@ define([
             keyPassword: "test",
             verifyFile: certdir + "server/staticlibs_test_ca.cer",
             verifySubjectSubstr: "CN=testclient"
-        }
-    });      
+        },
+        rootRedirectLocation: "/wilton/test/views/hi"
+    });
     
     var meta = {
         sslcertFilename: certdir + "client/testclient.pem",
@@ -67,6 +68,7 @@ define([
     var prefix = "https://localhost:8443/wilton/test/views/";
     assert.equal(clientHelper.httpGetCode(prefix + "foo", meta), 404);
     assert.equal(clientHelper.httpGet(prefix + "hi", meta), "Hi from wilton_test!");
+    assert.equal(clientHelper.httpGet("https://localhost:8443/", meta), "Hi from wilton_test!");
     var getjson = clientHelper.httpGet(prefix + "respjson", meta);
     var getresp = JSON.parse(getjson);
     assert.equal(getresp.foo, 1);

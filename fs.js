@@ -364,6 +364,43 @@ define([
             utils.callOrThrow(callback, e);
         }
     }
+
+    /**
+     * @function copyDirectory
+     * 
+     * Copy a directory.
+     * 
+     * Copies specified directory recursively.
+     * 
+     * @param oldPath `String` existing path
+     * @param newPath `String` desired path
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Undefined`
+     */
+    function copyDirectory(oldPath, newPath, callback) {
+        try {
+            if (!(exists(oldPath) && stat(oldPath).isDirectory)) {
+                throw new Error("Invalid source directory, path: [" + oldPath + "]");
+            }
+            if (exists(newPath)) {
+                throw new Error("Target directory exists, path: [" + oldPath + "]");
+            }
+            mkdir(newPath);
+            var contents = readdir(oldPath);
+            for(var i = 0; i < contents.length; i++) {
+                var src = oldPath + "/" + contents[i];
+                var target = newPath + "/" + contents[i];
+                if (stat(src).isDirectory) {
+                    copyDirectory(src, target);
+                } else {
+                    copyFile(src, target);
+                }
+            }
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
     
     return {
         appendFile: appendFile,
@@ -389,6 +426,8 @@ define([
         writeFile: writeFile,
         writeFileSync: writeFile,
         copyFile: copyFile,
-        copyFileSync: copyFile
+        copyFileSync: copyFile,
+        copyDirectory: copyDirectory,
+        copyDirectorySync: copyDirectory
     };
 });

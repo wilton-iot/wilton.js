@@ -11,9 +11,9 @@ define([
 
     var appdir = misc.wiltonConfig().applicationDirectory;
     var doc = new PDFDocument();
-    var font = doc.loadFont(appdir + "../../../modules/wilton_pdf/test/fonts/DejaVuSans.ttf");
+    var font = doc.loadFont(appdir + "../../modules/wilton_pdf/test/fonts/DejaVuSans.ttf");
     assert.equal(font, "DejaVuSans,Book");
-    var fontBold = doc.loadFont(appdir + "../../../modules/wilton_pdf/test/fonts/DejaVuSans-Bold.ttf");
+    var fontBold = doc.loadFont(appdir + "../../modules/wilton_pdf/test/fonts/DejaVuSans-Bold.ttf");
     assert.equal(fontBold, "DejaVuSans-Bold,Bold");
     doc.addPage({
         format: "A4",

@@ -122,7 +122,8 @@ define([
      *    - __appenderType__ `String` type of the appender, supported values:
      *                      `NULL`, `CONSOLE`, `FILE`, `DAILY_ROLLING_FILE`
      *    - __filePath__ `String|Undefined` path to the log file, relative path
-     *                   is resolved against current executable directory path
+     *                   is resolved against current application directory path
+     *                   (that is one level above the executable directory path).
      *    - __layout__ `String|Undefined` formatting layout for log messages,
      *                 see [log4cplus docs](http://log4cplus.sourceforge.net/docs/html/classlog4cplus_1_1PatternLayout.html#details) for details,
      *                 default value: `%d{%Y-%m-%d %H:%M:%S,%q} [%-5p %-5.5t %-20.20c] %m%n`
