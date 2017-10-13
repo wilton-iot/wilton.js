@@ -73,7 +73,7 @@ define([
     function encodeBytes(str, callback) {
         try {
             if ("string" !== typeof(str)) {
-                throw new Error("Invalid non-string input specified");
+                throw new Error("Invalid non-string input specified: [" + str + "]");
             }
             var resp = "";
             for (var i = 0; i < str.length; i++) {
@@ -105,7 +105,7 @@ define([
     function encodeUTF8(str, callback) {
         try {
             if ("string" !== typeof(str)) {
-                throw new Error("Invalid non-string input specified");
+                throw new Error("Invalid non-string input specified: [" + str + "]");
             }
             var ustr = utf8.encode(str);
             var resp = encodeBytes(ustr);
@@ -131,7 +131,7 @@ define([
     function isPretty(hexstr, callback) {
         try {
             if ("string" !== typeof(hexstr)) {
-                throw new Error("Invalid non-string input specified");
+                throw new Error("Invalid non-string input specified: [" + str + "]");
             }
             var resp = true;
             if (hexstr.length >= 3) {
@@ -165,14 +165,14 @@ define([
     function prettify(hexstr, callback) {
         try {
             if ("string" !== typeof(hexstr)) {
-                throw new Error("Invalid non-string input specified");
+                throw new Error("Invalid non-string input specified: [" + str + "]");
             }
             var resp = "";
             if (isPretty(hexstr)) {
                 resp = hexstr;
             } else {
                 if (0 !== (hexstr.length % 2)) {
-                    throw new Error("Invalid non-hexstring input specified");
+                    throw new Error("Invalid non-hexstring input specified: [" + hexstr + "]");
                 }
                 for (var i = 0; i < hexstr.length; i += 2 ) {
                     if (resp.length > 0) {
@@ -292,10 +292,13 @@ define([
             if ("string" !== typeof(hexstr)) {
                 throw new Error("Invalid non-string input specified");
             }
-            var pch = prettify(hexstr);
-            pch = pch.replace(/0[0-8] /g, "20 ");
-            pch = pch.replace(/ 0[0-8]/g, " 20");
-            var resp = uglify(pch);
+            var st = decodeBytes(hexstr);
+            var target = "";
+            for (var i = 0; i < st.length; i++) {
+                var code = st.charCodeAt(i);
+                target += code >= 32 ? st[i] : " ";
+            }
+            var resp = encodeBytes(target);
             utils.callOrIgnore(callback, resp);
             return resp;
         } catch (e) {

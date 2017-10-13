@@ -93,4 +93,7 @@ define([
     assert(!fs.exists("fstest"));
     fs.rmdir("fstest1");
     assert(!fs.exists("fstest1"));
+
+    // realpath
+    assert(fs.realpath(".").length > 1);
 });

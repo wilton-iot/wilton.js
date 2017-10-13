@@ -171,7 +171,7 @@ define([
      * 
      * Reads the entire contents of a file.
      * 
-     * @param path `String`
+     * @param path `String` path to file
      * @param options `Undefined` placeholder parameter, added for compatibility with Node API
      * @param callback `Function|Undefined` callback to receive result or error
      * @returns `String` file contents
@@ -200,7 +200,7 @@ define([
      * 
      * Empty strings are ignored.
      * 
-     * @param path `String`
+     * @param path `String` path to file
      * @param callback `Function|Undefined` callback to receive result or error
      * @returns `Array` file contents as an array of lines
      */
@@ -217,6 +217,33 @@ define([
         }
     }
  
+    /**
+     * @function realpath
+     * 
+     * Convert relative path into absolute one.
+     * 
+     * Converts relative path into absolute one calling FS.
+     * 
+     * @param path `String` relative path
+     * @param options `Undefined` placeholder parameter, added for compatibility with Node API
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `String` absolute path
+     */
+    function realpath(path, options, callback) {
+        if ("undefined" === typeof (callback)) {
+            callback = options;
+        }
+        try {
+            var res = wiltoncall("fs_realpath", {
+                path: path
+            });
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+    
     /**
      * @function rename
      * 
@@ -412,9 +439,11 @@ define([
         readdir: readdir,
         readdirSync: readdir,
         readFile: readFile,
+        readFileSync: readFile,
         readLines: readLines,
         readLinesSync: readLines,
-        readFileSync: readFile,
+        realpath: realpath,
+        realpathSync: realpath,
         rename: rename,
         renameSync: rename,
         rmdir: rmdir,

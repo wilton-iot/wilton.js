@@ -100,7 +100,8 @@ define([
      * @return `Object` Logger instance
      */ 
     function Logger(name, callback) {
-        this.name = utils.defaultString(name, "wilton");
+        var lnm = utils.defaultString(name, "wilton");
+        this.name = lnm.replace(/\//g, ".");
         utils.callOrIgnore(callback);
     }
 
