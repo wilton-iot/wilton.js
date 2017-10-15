@@ -3,15 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-define(["wilton/shared"], function(shared) {
+define(["wilton/Channel"], function(Channel) {
     "use strict";
+    
     return {
         increment1: function() {
-            var stored = shared.get("CronTaskTest");
-            if (null !== stored) {
-                stored.val += 1;
-                shared.put("CronTaskTest", stored);
-            }
+            var msg = Channel.lookup("cronTestOut").receive();
+            Channel.lookup("cronTestIn").send(msg + 1);
         }
     };
 });

@@ -4,14 +4,25 @@
  * and open the template in the editor.
  */
 
-define(["assert", "wilton/thread", "wilton/shared"], function(assert, thread, shared) {
+define([
+    "assert",
+    "wilton/Channel",
+    "wilton/thread"
+], function(assert, Channel, thread) {
     "use strict";
 
     print("test: wilton/thread");
 
-    shared.put("threadTest", {
-        val: 0
+    var chanOut = new Channel({
+        name: "threadTestOut",
+        size: 1
     });
+    var chanIn = new Channel({
+        name: "threadTestIn",
+        size: 0
+    });
+
+    chanOut.send(42);
 
     thread.run({
         callbackScript: {
@@ -20,18 +31,11 @@ define(["assert", "wilton/thread", "wilton/shared"], function(assert, thread, sh
         }
     });
 
-    shared.waitChange({
-        timeoutMillis: 15000,
-        key: "threadTest",
-        currentValue: {
-            val: 0
-        }
-    });
-    
-    var loaded = shared.get("threadTest");
-    assert.equal(loaded.val, 1);
+    assert.equal(chanIn.receive(), 43);
 
-    shared.remove("threadTest");
+    chanOut.close();
+    chanIn.close();
     
+    // wait for thread to die
     thread.sleepMillis(100);
 });

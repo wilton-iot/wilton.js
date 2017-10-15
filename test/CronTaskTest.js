@@ -6,17 +6,25 @@
 
 define([
     "assert",
-    "wilton/CronTask",
-    "wilton/thread",
-    "wilton/shared"
-], function(assert, CronTask, thread, shared) {
+    "wilton/Channel",
+    "wilton/CronTask"
+], function(assert, Channel, CronTask) {
     "use strict";
 
     print("test: wilton/CronTask");
     
-    shared.put("CronTaskTest", {
-        val: 0
+    var chanOut = new Channel({
+        name: "cronTestOut",
+        size: 2
     });
+    var chanIn = new Channel({
+        name: "cronTestIn",
+        size: 0
+    });
+
+    chanOut.send(42);
+    chanOut.send(44);
+
     var cron = new CronTask({
         expression: "* * * * * *",
         callbackScript: {
@@ -24,18 +32,22 @@ define([
             func: "increment1"
         }
     });
-    // takes long, enable me for cron retest
-//    thread.sleepMillis(1500);
-//    var sh1 = shared.get("CronTaskTest");
-//    assert(1 === sh1.val || 2 === sh1.val);
+
+    var start = Date.now();
+    assert.equal(chanIn.receive(), 43);
+    assert(Date.now() - start > 1000);
+
+    assert.equal(chanIn.receive(), 45);
+    assert(Date.now() - start > 2000);
+
     // check handle construction
     var cron2 = new CronTask({
         handle: cron.handle
     });
-    // optional
+    assert.equal(cron2.handle, cron.handle);
+
     cron2.stop();
-//    thread.sleepMillis(1000);
-//    var sh2 = shared.get("CronTaskTest");
-//    assert(1 === sh2.val || 2 === sh2.val);
-    shared.remove("CronTaskTest");
+
+    chanOut.close();
+    chanIn.close();
 });
