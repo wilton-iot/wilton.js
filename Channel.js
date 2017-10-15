@@ -82,6 +82,9 @@
  * // poll for message, returns null if channel is empty
  * var obj2 = chan.poll();
  * 
+ * // copy pending message without removing it from channel
+ * var obj3 = chan.peek();
+ * 
  * // wait on multiple channels, returns the index of channel that has data ready
  *  var idx = Channel.select({
  *      channels: [chan, sync],
@@ -302,6 +305,8 @@ define([
          * 
          * Sends a message to the channel in non-blocking mode returning immediately.
          * 
+         * Always returns `false` on synchronous channel.
+         * 
          * @param msg `Object|String` message to send
          * @param callback `Function|Undefined` callback to receive result or error
          * @return `Boolean` `true` if message was sent successfully, `false` if channel is full or
@@ -332,6 +337,8 @@ define([
          * Tries to receive a message from the channel in a non-blocking mode,
          * returns `null` if channel is empty.
          * 
+         * Always returns `null` on synchronous channel.
+         * 
          * @param callback `Function|Undefined` callback to receive result or error
          * @return `Object` received message parsed from JSON, `null` if channel is empty or
          *         channel was closed (manually with `close()` or automatically on shutdown)
@@ -339,6 +346,33 @@ define([
         poll: function(callback) {
             try {
                 var resStr = wiltoncall("channel_poll", {
+                    channelHandle: this.handle
+                });
+                var res = null !== resStr ? JSON.parse(resStr) : null;
+                utils.callOrIgnore(callback, res);
+                return res;
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        }, 
+
+        /**
+         * @function peek
+         * 
+         * Copy pending message without removing it from channel.
+         * 
+         * Tries to copy a pending buffered message from the channel
+         * in a non-blocking mode, returns `null` if channel is empty.
+         * 
+         * Can be used on synchronous channels (producer thread will NOT be unblocked on `peek()`).
+         * 
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Object` pending message parsed from JSON, `null` if channel is empty or
+         *         channel was closed (manually with `close()` or automatically on shutdown)
+         */
+        peek: function(callback) {
+            try {
+                var resStr = wiltoncall("channel_peek", {
                     channelHandle: this.handle
                 });
                 var res = null !== resStr ? JSON.parse(resStr) : null;

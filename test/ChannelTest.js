@@ -54,6 +54,7 @@ define([
     }));
     assert(!chan.offer(msg));
 
+    assert(null === retChan.peek());
     assert(null === retChan.poll());
     assert(traceChan.offer({
         msg: "test:empty"
@@ -69,10 +70,12 @@ define([
     assert(traceChan.offer({
         msg: "test:receive:pre"
     }));
+    assert.deepEqual(retChan.peek(), msg);
     assert.deepEqual(retChan.poll(), msg);
     assert(traceChan.offer({
         msg: "test:receive:post"
     }));
+    assert(null === retChan.peek());
     assert(null === retChan.poll());
     assert(traceChan.offer({
         msg: "test:empty"
@@ -125,7 +128,8 @@ define([
     assert(traceChan.offer({
         msg: "test:send:post"
     }));
-    assert(!retChan.poll());
+    assert.equal(retChan.peek(), null);
+    assert.equal(retChan.poll(), null);
     assert(traceChan.offer({
         msg: "test:receive:pre"
     }));
@@ -195,6 +199,7 @@ define([
         timeoutMillis: 200
     });
     assert.equal(1, idx2);
+    assert.deepEqual(retChan.peek(), msg);
     assert.deepEqual(retChan.poll(), msg);
 
     // shutdown conduit
@@ -206,6 +211,7 @@ define([
         timeoutMillis: 100
     });
     assert.equal(-1, idx3);
+    assert.equal(retChan.peek(), null);
     assert.equal(retChan.poll(), null);
     
     chan.close();
