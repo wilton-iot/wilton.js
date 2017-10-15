@@ -128,7 +128,6 @@ define([
     assert(traceChan.offer({
         msg: "test:send:post"
     }));
-    assert.equal(retChan.peek(), null);
     assert.equal(retChan.poll(), null);
     assert(traceChan.offer({
         msg: "test:receive:pre"
