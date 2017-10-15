@@ -13,22 +13,13 @@ define([
     };
 
     // trace
-    var traceChan = new Channel({
-        name: "ChannelTest.trace",
-        size: 64
-    });
+    var traceChan = new Channel("ChannelTest.trace", 64);
 
 
     // buffered
 
-    var chan = new Channel({
-        name: "ChannelTest.buffered.in",
-        size: 2
-    });
-    var retChan = new Channel({
-        name: "ChannelTest.buffered.out",
-        size: 2
-    });
+    var chan = new Channel("ChannelTest.buffered.in", 2);
+    var retChan = new Channel("ChannelTest.buffered.out", 2);
 
     thread.run({
         callbackScript: {
@@ -103,14 +94,8 @@ define([
 
     print("test: wilton/ChannelTest sync");
 
-    var chan = new Channel({
-        name: "ChannelTest.sync.in",
-        size: 0
-    });
-    var retChan = new Channel({
-        name: "ChannelTest.sync.out",
-        size: 0
-    });
+    var chan = new Channel("ChannelTest.sync.in");
+    var retChan = new Channel("ChannelTest.sync.out");
 
     thread.run({
         callbackScript: {
@@ -158,22 +143,10 @@ define([
 
     print("test: wilton/ChannelTest select");
 
-    var chan = new Channel({
-        name: "ChannelTest.selector.in",
-        size: 0
-    });
-    var retChan = new Channel({
-        name: "ChannelTest.selector.out",
-        size: 2
-    });
-    var dummyChan1 = new Channel({
-        name: "ChannelTest.selector.dummy1",
-        size: 1
-    });
-    var dummyChan2 = new Channel({
-        name: "ChannelTest.selector.dummy2",
-        size: 0
-    });
+    var chan = new Channel("ChannelTest.selector.in");
+    var retChan = new Channel("ChannelTest.selector.out", 2);
+    var dummyChan1 = new Channel("ChannelTest.selector.dummy1", 1);
+    var dummyChan2 = new Channel("ChannelTest.selector.dummy2");
 
     thread.run({
         callbackScript: {

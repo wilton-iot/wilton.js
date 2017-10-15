@@ -13,16 +13,8 @@ define([
 
     print("test: wilton/thread");
 
-    var chanOut = new Channel({
-        name: "threadTestOut",
-        size: 1
-    });
-    var chanIn = new Channel({
-        name: "threadTestIn",
-        size: 0
-    });
-
-    chanOut.send(42);
+    var chanOut = new Channel("threadTestOut");
+    var chanIn = new Channel("threadTestIn");
 
     thread.run({
         callbackScript: {
@@ -31,11 +23,12 @@ define([
         }
     });
 
+    chanOut.send(42);
     assert.equal(chanIn.receive(), 43);
-
-    chanOut.close();
-    chanIn.close();
     
     // wait for thread to die
     thread.sleepMillis(100);
+
+    chanOut.close();
+    chanIn.close();
 });

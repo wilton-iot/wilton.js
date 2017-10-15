@@ -410,7 +410,7 @@ define([
                 throw new Error("Invalid source directory, path: [" + oldPath + "]");
             }
             if (exists(newPath)) {
-                throw new Error("Target directory exists, path: [" + oldPath + "]");
+                throw new Error("Target directory exists, path: [" + newPath + "]");
             }
             mkdir(newPath);
             var contents = readdir(oldPath);

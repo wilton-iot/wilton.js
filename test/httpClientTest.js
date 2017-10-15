@@ -42,10 +42,8 @@ define([
     assert.equal(resp.data, "foobar");
 
     // threads
-    var chan = new Channel({
-        name: "clientTest",
-        size: 64
-    });
+
+    var chan = new Channel("clientTest", 64);
     
     var num_workers = 2;
     var target = num_workers * 10;

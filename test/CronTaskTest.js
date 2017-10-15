@@ -13,17 +13,8 @@ define([
 
     print("test: wilton/CronTask");
     
-    var chanOut = new Channel({
-        name: "cronTestOut",
-        size: 2
-    });
-    var chanIn = new Channel({
-        name: "cronTestIn",
-        size: 0
-    });
-
-    chanOut.send(42);
-    chanOut.send(44);
+    var chanOut = new Channel("cronTestOut");
+    var chanIn = new Channel("cronTestIn");
 
     var cron = new CronTask({
         expression: "* * * * * *",
@@ -34,9 +25,11 @@ define([
     });
 
     var start = Date.now();
+    chanOut.send(42);
     assert.equal(chanIn.receive(), 43);
     assert(Date.now() - start > 1000);
 
+    chanOut.send(44);
     assert.equal(chanIn.receive(), 45);
     assert(Date.now() - start > 2000);
 

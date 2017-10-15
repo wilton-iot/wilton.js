@@ -48,16 +48,10 @@
  * // thread 1
  * 
  * // create buffered channel
- * var chan = new Channel({
- *     name: "channel1",
- *     size: 1024
- * });
+ * var chan = new Channel("channel1", 1024);
  * 
  * // create sync channel
- * var sync = new Channel({
- *     name: "channel2",
- *     size: 0
- * });
+ * var sync = new Channel("channel2");
  * 
  * // send message, blocks is channel is full
  * chan.send({
@@ -115,27 +109,27 @@ define([
      * Create `Channel`instance.
      * 
      * Creates channel instance allocating resources for intermediate storage.
+     * If `size` parameter is not specified - created synchronous channel.
      * 
      * Created channel can be accessed in other threads using `lookup()` function.
      * 
-     * @param options `Object` configuration object, see possible options below
+     * @param name `String` unique name to identify this channel
+     * @param size `Number|Undefined` maximum number of elements allowed for the intermediate storage;
+     *             storage is not pre-allocated, grows until this number as needed;
+     *             value `0` creates synchronous channel, default value: `0`
      * @param callback `Function|Undefined` callback to receive result or error
      * @return `Object` `Channel` instance
      * 
-     * __Options__
-     *  - __name__ `String` unique name to identify this channel
-     *  - __size__ `Number` maximum number of elements allowed in the intermediate storage
-     *             (storage is not pre-allocated, grows until this number as needed);
-     *             specify `size: 0` to create a synchronous channel
-     * 
      */
-    function Channel(options, callback) {
-        var opts = utils.defaultObject(options);
+    function Channel(name, size, callback) {
         try {
-            if (utils.hasPropertyWithType(opts, "handle", "number")) {
-                this.handle = opts.handle;
+            if ("number" === typeof(name)) {
+                this.handle = name;
             } else {
-                var handleJson = wiltoncall("channel_create", opts);
+                var handleJson = wiltoncall("channel_create", {
+                    name: name,
+                    size: "undefined" !== typeof(size) ? size : 0
+                });
                 var handleObj = JSON.parse(handleJson);
                 utils.checkPropertyType(handleObj, "channelHandle", "number");
                 this.handle = handleObj.channelHandle;
@@ -171,9 +165,7 @@ define([
             });
             var handleObj = JSON.parse(handleJson);
             utils.checkPropertyType(handleObj, "channelHandle", "number");
-            var res = new Channel({
-                handle: handleObj.channelHandle
-            });
+            var res = new Channel(handleObj.channelHandle);
             utils.callOrIgnore(callback, res);
             return res;
         } catch (e) {

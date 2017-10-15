@@ -66,12 +66,15 @@
  */
 
 define([
+    "module",
     "./dyload",
     "./fs",
+    "./Logger",
     "./utils",
     "./wiltoncall"
-], function(dyload, fs, utils, wiltoncall) {
+], function(module, dyload, fs, Logger, utils, wiltoncall) {
     "use strict";
+    var logger = new Logger(module.id)
 
     dyload({
         name: "wilton_db"
@@ -161,7 +164,7 @@ define([
                         }
                     }
                     if (flines.length > 0) {
-                        var query = flines.join("\n");
+                        var query = flines.join("\n").replace(trimRegex, "");
                         this.execute(query, {});
                         count += 1;
                     }
@@ -260,6 +263,7 @@ define([
                     wiltoncall("db_transaction_rollback", {
                         transactionHandle: tran.transactionHandle
                     });
+                    logger.warn("Transaction rolled back, error: [" + utils.formatError(e) + "]");
                     utils.callOrThrow(callback, e);
                 }
                 utils.callOrIgnore(callback, res);
@@ -335,7 +339,7 @@ define([
                         if (res.hasOwnProperty(name)) throw new Error(
                                 "Duplicate SQL query name: [" + name + "], file: [" + path + "], line: [" + i + "]");
                         // save collected sql string
-                        res[name] = sql;
+                        res[name] = sql.replace(trimRegex,"");
                         // clean collected sql string
                         sql = "";
                         name = nameMatch[1];
@@ -349,7 +353,7 @@ define([
             if (null === name) throw new Error("No queries found, file: [" + path + "]");
             if (res.hasOwnProperty(name)) throw new Error(
                     "Duplicate SQL query name: [" + name + "], file: [" + path + "], line: [" + i + "]");
-            res[name] = sql;
+            res[name] = sql.replace(trimRegex,"");
             utils.callOrIgnore(callback, res);
             return res;
         } catch (e) {
