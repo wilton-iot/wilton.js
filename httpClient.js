@@ -104,61 +104,62 @@ define([
      * 
      *  - __data__ `String|Object|Undefined` data to send in request body, specified object
      *             will be converted to JSON
-     *  - __headers__ `Object|Undefined` request headers in `"Header-Name": "value"` format
-     *  - __method__ `String|Undefined` HTTP method to use for this request, default value
-     *               is `GET`, if request `data` is not specified, `POST` otherwise
-     *  - __abortOnConnectError__ `Boolean|Undefined` whether to throw an `Error` on connection fail,
-     *                            default value: `true`
-     *  - __abortOnResponseError__ `Boolean|Undefined` whether to throw an `Error`, if response status
-     *                             code `>=400` is returned, default value: `true`
-     *  - __maxNumberOfResponseHeaders__ `Number|Undefined` maximum number of response headers to receive,
-     *                                   subsequent headers will be ignored, default value: `128`
-     *  - __consumerThreadWakeupTimeoutMillis__ `Number|Undefined` consumer threads wakeup timeout,
-     *                                          in milliseconds, default value: `100`
-     *  - __responseDataFilePath__ `String|Undefined` path to file where to write the response body
-     *  - __forceHttp10__ `Boolean|Undefined` whether to use HTTP `1.0` protocol closing the connection
-     *                    after the request, default value: `false`
-     *  - __noprogress__ `Boolean|Undefined` whether to swith off the progress meter, default value `true`
-     *  - __nosignal__ `Boolean|Undefined` whether to disable OS-signals handling, default value: `true`
-     *  - __failonerror__ `Boolean|Undefined` whether to close the connection and throw an `Error` on
-     *                    response code `>=400`,default value: `false`
-     *  - __pathAsIs__ `Boolean|Undefined` whether to not handle "dot sequences" in request URL,
-     *                 default value: `true`
-     *  - __tcpNodelay__ `Boolean|Undefined` whether to set the `TCP_NODELAY` connection option,
-     *                   default value: `false`
-     *  - __tcpKeepalive__ `Boolean|Undefined` whether to use TCK keep-alive probing, default value: `false`
-     *  - __tcpKeepidleSecs__ `Number|Undefined` TCP keep-alive idle time wait, in seconds, default value: `300`
-     *  - __tcpKeepintvlSecs__ `Number|Undefined` TCP keep-alive interval, in seconds, default value: `300`
-     *  - __connecttimeoutMillis__ `Number|Undefined` timeout for the connect phase, in milliseconds,
-     *                             default value: `10000`
-     *  - __timeoutMillis__ `Number|Undefined` maximum time the request is allowed to take, in milliseconds,
-     *                      default value: `15000`
-     *  - __buffersizeBytes__ `Number|Undefined` preferred receive buffer size, in bytes, default value: `16384`
-     *  - __acceptEncoding__ `String|Undefined` enables automatic decompression of HTTP downloads,
-     *                       default value: `gzip`
-     *  - __followlocation__ `Boolean|Undefined` whether to follow HTTP `3xx` redirects, default value: `true`
-     *  - __maxredirs__ `Number|Undefined` maximum number of redirects allowed, default value: `32`
-     *  - __useragent__ `String|Undefined` user-agent string to send, default value: empty string
-     *  - __maxSentSpeedLargeBytesPerSecond__ `Number|Undefined` rate limit data upload speed, in bytes per second,
-     *                                        default value: `0` (disabled)
-     *  - __maxRecvSpeedLargeBytesPerSecond__ `Number|Undefined` rate limit data download speed, in bytes per second,
-     *                                        default value: `0` (disabled)
-     *  - __sslcertFilename__ `String|Undefined` path to SSL client certificate file
-     *  - __sslcertype__ `String|Undefined` type of the client SSL certificate
-     *  - __sslkeyFilename__ `String|Undefined` path to private keyfile for TLS and SSL client certificate
-     *  - __sslKeyType__ `String|Undefined` type of the private key file
-     *  - __sslKeypasswd__ `String|Undefined` passphrase to private key
-     *  - __requireTls__ `Boolean|Undefined` whether to require TLS connection rejectin older SSL algorithms,
-     *                   default value: `false`
-     *  - __sslVerifyhost__ `Boolean|Undefined` whether to verify the certificate's name against host,
-     *                      default value: `false`
-     *  - __sslVerifypeer__ `Boolean|Undefined` whether to verify the peer's SSL certificate,
-     *                      default value: `false`
-     *  - __sslVerifystatus__ `Boolean|Undefined` whether to verify the peer certificate's status,
+     *  - __meta__: `Object|Undefined` request metadata
+     *    - __headers__ `Object|Undefined` request headers in `"Header-Name": "value"` format
+     *    - __method__ `String|Undefined` HTTP method to use for this request, default value
+     *                 is `GET`, if request `data` is not specified, `POST` otherwise
+     *    - __abortOnConnectError__ `Boolean|Undefined` whether to throw an `Error` on connection fail,
+     *                              default value: `true`
+     *    - __abortOnResponseError__ `Boolean|Undefined` whether to throw an `Error`, if response status
+     *                               code `>=400` is returned, default value: `true`
+     *    - __maxNumberOfResponseHeaders__ `Number|Undefined` maximum number of response headers to receive,
+     *                                     subsequent headers will be ignored, default value: `128`
+     *    - __consumerThreadWakeupTimeoutMillis__ `Number|Undefined` consumer threads wakeup timeout,
+     *                                            in milliseconds, default value: `100`
+     *    - __responseDataFilePath__ `String|Undefined` path to file where to write the response body
+     *    - __forceHttp10__ `Boolean|Undefined` whether to use HTTP `1.0` protocol closing the connection
+     *                      after the request, default value: `false`
+     *    - __noprogress__ `Boolean|Undefined` whether to swith off the progress meter, default value `true`
+     *    - __nosignal__ `Boolean|Undefined` whether to disable OS-signals handling, default value: `true`
+     *    - __failonerror__ `Boolean|Undefined` whether to close the connection and throw an `Error` on
+     *                      response code `>=400`,default value: `false`
+     *    - __pathAsIs__ `Boolean|Undefined` whether to not handle "dot sequences" in request URL,
+     *                   default value: `true`
+     *    - __tcpNodelay__ `Boolean|Undefined` whether to set the `TCP_NODELAY` connection option,
+     *                     default value: `false`
+     *    - __tcpKeepalive__ `Boolean|Undefined` whether to use TCK keep-alive probing, default value: `false`
+     *    - __tcpKeepidleSecs__ `Number|Undefined` TCP keep-alive idle time wait, in seconds, default value: `300`
+     *    - __tcpKeepintvlSecs__ `Number|Undefined` TCP keep-alive interval, in seconds, default value: `300`
+     *    - __connecttimeoutMillis__ `Number|Undefined` timeout for the connect phase, in milliseconds,
+     *                               default value: `10000`
+     *    - __timeoutMillis__ `Number|Undefined` maximum time the request is allowed to take, in milliseconds,
+     *                        default value: `15000`
+     *    - __buffersizeBytes__ `Number|Undefined` preferred receive buffer size, in bytes, default value: `16384`
+     *    - __acceptEncoding__ `String|Undefined` enables automatic decompression of HTTP downloads,
+     *                         default value: `gzip`
+     *    - __followlocation__ `Boolean|Undefined` whether to follow HTTP `3xx` redirects, default value: `true`
+     *    - __maxredirs__ `Number|Undefined` maximum number of redirects allowed, default value: `32`
+     *    - __useragent__ `String|Undefined` user-agent string to send, default value: empty string
+     *    - __maxSentSpeedLargeBytesPerSecond__ `Number|Undefined` rate limit data upload speed, in bytes per second,
+     *                                          default value: `0` (disabled)
+     *    - __maxRecvSpeedLargeBytesPerSecond__ `Number|Undefined` rate limit data download speed, in bytes per second,
+     *                                          default value: `0` (disabled)
+     *    - __sslcertFilename__ `String|Undefined` path to SSL client certificate file
+     *    - __sslcertype__ `String|Undefined` type of the client SSL certificate
+     *    - __sslkeyFilename__ `String|Undefined` path to private keyfile for TLS and SSL client certificate
+     *    - __sslKeyType__ `String|Undefined` type of the private key file
+     *    - __sslKeypasswd__ `String|Undefined` passphrase to private key
+     *    - __requireTls__ `Boolean|Undefined` whether to require TLS connection rejectin older SSL algorithms,
+     *                     default value: `false`
+     *    - __sslVerifyhost__ `Boolean|Undefined` whether to verify the certificate's name against host,
      *                        default value: `false`
-     *  - __cainfoFilename__ `String|Undefined` path to Certificate Authority (CA) bundle
-     *  - __crlfileFilename__ `String|Undefined` path to CRL file
-     *  - __sslCipherList__ `String|Undefined` ciphers to use for TLS
+     *    - __sslVerifypeer__ `Boolean|Undefined` whether to verify the peer's SSL certificate,
+     *                        default value: `false`
+     *    - __sslVerifystatus__ `Boolean|Undefined` whether to verify the peer certificate's status,
+     *                          default value: `false`
+     *    - __cainfoFilename__ `String|Undefined` path to Certificate Authority (CA) bundle
+     *    - __crlfileFilename__ `String|Undefined` path to CRL file
+     *    - __sslCipherList__ `String|Undefined` ciphers to use for TLS
      */
     function sendRequest(url, options, callback) {
         var opts = utils.defaultObject(options);
