@@ -30,35 +30,6 @@ define([
     "use strict";
 
     /**
-     * @function tcpWaitForConnection
-     * 
-     * Wait for the remote TCP endpoint to become accessible.
-     * 
-     * Tries to connect to the specified TCP endpoint. Throws `Error` on timeout.
-     * 
-     * Intended to be used to check the state of the started HTTP server in
-     * spawned process.
-     * 
-     * @param options `Object` configuration object, see possible options below
-     * @param callback `Function|Undefined` callback to receive result or error
-     * @return `Undefined`
-     * 
-     * __Options__
-     *  - __ipAddress__ `String` IPv4 network address
-     *  - __tcpPort__ `Number` TCP port
-     *  - __timeoutMillis__ `Number` max wait time, in milliseconds
-     */
-    function tcpWaitForConnection(options, callback) {
-        var opts = utils.defaultObject(options);
-        try {
-            wiltoncall("tcp_wait_for_connection", opts);
-            utils.callOrIgnore(callback);
-        } catch (e) {
-            utils.callOrThrow(callback, e);
-        }
-    }
-    
-    /**
      * @function spawnProcess
      * 
      * Spawn new OS-level process.
@@ -171,7 +142,6 @@ define([
     }
     
     return {
-        tcpWaitForConnection: tcpWaitForConnection,
         spawnProcess: spawnProcess,
         wiltonConfig: wiltonConfig,
         stdinReadline: stdinReadline,
