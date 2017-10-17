@@ -20,6 +20,7 @@ define([], function() {
                 "wilton/test/mustacheTest",
                 "wilton/test/netTest",
                 "wilton/test/PDFDocumentTest",
+                "wilton/test/processTest",
                 "wilton/test/ServerTest",
                 "wilton/test/threadTest",
                 "wilton/test/utilsTest"

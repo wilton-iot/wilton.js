@@ -29,45 +29,6 @@ define([
 ], function(utils, wiltoncall) {
     "use strict";
 
-    /**
-     * @function spawnProcess
-     * 
-     * Spawn new OS-level process.
-     * 
-     * Spawns an OS-level process launching specified executable
-     * with the specified arguments.
-     * 
-     * Spawned process does not have `STDIN` connected.
-     * `STDOUT` and `STDERR` are redirected to (the same) specified file.
-     * 
-     * If `awaitExit` flag is enabled - waits for the spawned process to
-     * exit and returs its exit code.
-     * 
-     * Otherwise (default behaviour) returns immediately returning
-     * a `pid` of the spawned process.
-     * 
-     * @param options `Object` configuration object, see possible options below
-     * @param callback `Function|Undefined` callback to receive result or error
-     * @return `Undefined`
-     * 
-     * __Options__
-     *  - __executable__ `String` path to the executable file
-     *  - __args__ `Array` list of the arguments to provide to the executable
-     *  - __outputFile__ `String` path to the file for the combined `STDOUT` and
-     *                   `STDERR`output
-     *  - __awaitExit__ `Boolean` whether to wait for the spawned process to exit,
-     *                  `false` by default
-     */
-    function spawnProcess(options, callback) {
-        var opts = utils.defaultObject(options);
-        try {
-            var res = wiltoncall("process_spawn", opts);
-            utils.callOrIgnore(callback,res);
-            return res;
-        } catch (e) {
-            utils.callOrThrow(callback, e);
-        }
-    }
     
     /**
      * @function wiltonConfig
@@ -142,7 +103,6 @@ define([
     }
     
     return {
-        spawnProcess: spawnProcess,
         wiltonConfig: wiltonConfig,
         stdinReadline: stdinReadline,
         waitForSignal: waitForSignal

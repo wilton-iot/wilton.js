@@ -6,25 +6,12 @@
 
 define([
     "assert",
-    "wilton/fs",
-    "wilton/loader",
     "wilton/misc"
-], function(assert, fs, loader, misc) {
+], function(assert, misc) {
     "use strict";
 
     print("test: wilton/misc");
 
-    var executable = loader.findModulePath("") + "/../build/bin/wilton_cli";
-    if (!fs.exists(executable)) {
-        executable += ".exe";
-    }
-    
-    var pid = misc.spawnProcess({
-        executable: executable, 
-        args: ["-h"], 
-        outputFile: "miscTest_out.txt",
-        awaitExit: false
-    });
-    assert(pid > 0);
+    // todo
     
 });

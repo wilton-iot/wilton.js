@@ -18,7 +18,7 @@
  * @namespace net
  * 
  * __wilton/net__ \n
- * Networking operations
+ * Networking operations.
  * 
  * This module currently provides only one function: `waitForTcpConnection()` .
  * 
@@ -27,7 +27,6 @@
  * @code
  * 
  * // wait for the TCP endpoint to become available
- * 
  * net.waitForTcpConnection({
  *     ipAddress: "127.0.0.1",
  *     tcpPort: 8080,
