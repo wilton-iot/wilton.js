@@ -78,10 +78,15 @@
  * 
  */
 define([
+    "./dyload",
     "./utils",
     "./wiltoncall"
-], function(utils, wiltoncall) {
+], function(dyload, utils, wiltoncall) {
     "use strict";
+
+    dyload({
+        name: "wilton_logging"
+    });
 
     /**
      * @function Logger
