@@ -81,11 +81,16 @@
  * 
  */
 define([
+    "./dyload",
     "./Request",
     "./utils",
     "./wiltoncall"
-], function(Request, utils, wiltoncall) {
+], function(dyload, Request, utils, wiltoncall) {
     "use strict";
+
+    dyload({
+        name: "wilton_http"
+    });
 
     var METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"];
 

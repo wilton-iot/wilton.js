@@ -52,11 +52,16 @@
  */
 define([
     "utf8",
+    "./dyload",
     "./hex",
     "./utils",
     "./wiltoncall"
-], function(utf8, hex, utils, wiltoncall) {
+], function(utf8, dyload, hex, utils, wiltoncall) {
     "use strict";
+
+    dyload({
+        name: "wilton_http"
+    });
 
     /**
      * @function sendRequest
