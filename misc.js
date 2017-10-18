@@ -24,12 +24,16 @@
  * belong to separate modules.
  */
 define([
+    "./dyload",
     "./utils",
     "./wiltoncall"
-], function(utils, wiltoncall) {
+], function(dyload, utils, wiltoncall) {
     "use strict";
 
-    
+    dyload({
+        name: "wilton_signal"
+    });
+
     /**
      * @function wiltonConfig
      * 
