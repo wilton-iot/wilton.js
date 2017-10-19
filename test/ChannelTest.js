@@ -157,19 +157,13 @@ define([
     });
 
     // not selected
-    var idx = Channel.select({
-        channels: [dummyChan1, retChan, dummyChan2],
-        timeoutMillis: 100
-    });
+    var idx = Channel.select([dummyChan1, retChan, dummyChan2], 100);
     assert.equal(-1, idx);
 
     assert(chan.send(msg));
 
     // selected
-    var idx2 = Channel.select({
-        channels: [dummyChan1, retChan, dummyChan2],
-        timeoutMillis: 200
-    });
+    var idx2 = Channel.select([dummyChan1, retChan, dummyChan2]);
     assert.equal(1, idx2);
     assert.deepEqual(retChan.peek(), msg);
     assert.deepEqual(retChan.poll(), msg);
@@ -178,10 +172,7 @@ define([
     assert(chan.send(false));
 
     // no more selected
-    var idx3 = Channel.select({
-        channels: [dummyChan1, retChan, dummyChan2],
-        timeoutMillis: 100
-    });
+    var idx3 = Channel.select([dummyChan1, retChan, dummyChan2], 100);
     assert.equal(-1, idx3);
     assert.equal(retChan.peek(), null);
     assert.equal(retChan.poll(), null);

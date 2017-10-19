@@ -80,10 +80,7 @@
  * var obj3 = chan.peek();
  * 
  * // wait on multiple channels, returns the index of channel that has data ready
- *  var idx = Channel.select({
- *      channels: [chan, sync],
- *      timeoutMillis: 10000
- *  });
+ *  var idx = Channel.select([chan, sync], 10000);
  * 
  * // close channels
  * chan.close();
@@ -185,25 +182,26 @@ define([
      * and [golang's select](https://gobyexample.com/select),
      * but it support only "ready for read" logic ("ready for write" is not supported).
      * 
-     * @param options `Object` configuration object, see possible options below
+     * @param channels `Array` list of channels to wait on
+     * @param timeoutMillis `Number|Undefined` max timeout for waiting, in milliseconds,
+     *                      default value: `0` - inifinite timeout
      * @param callback `Function|Undefined` callback to receive result or error
      * @return `Number` index of the channel in specified list, that is ready for reading,
      *         `-1` on timeout
-     * 
-     * __Options__
-     *  - __channels__ `Array` list of channels to wait on
-     *  - __timeoutMillis__ `Number` max timeout for waiting, in milliseconds
      */
-    Channel.select = function(options, callback) {
-        var opts = utils.defaultObject(options);
+    Channel.select = function(channels, timeoutMillis, callback) {
         try {
+            if (!(channels instanceof Array)) {
+                throw new Error("Invalid non-array 'channels' parameter specified," +
+                        " channels: [" + JSON.stringify(channels, null, 4) + "]");
+            }
             var handles = [];
-            for (var i = 0; i < opts.channels.length; i++) {
-                handles.push(opts.channels[i].handle);
+            for (var i = 0; i < channels.length; i++) {
+                handles.push(channels[i].handle);
             }
             var resStr = wiltoncall("channel_select", {
                 channels: handles,
-                timeoutMillis: opts.timeoutMillis
+                timeoutMillis: "undefined" != typeof(timeoutMillis) ? timeoutMillis : 0
             });
             var resObj = JSON.parse(resStr);
             utils.checkPropertyType(resObj, "selectedChannelIndex", "number");
