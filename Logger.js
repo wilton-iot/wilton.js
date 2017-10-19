@@ -52,18 +52,11 @@
  *             thresholdLevel: "WARN"
  *         }
  *     ],
- *     loggers: [
- *         {
- *             name: "wilton",
- *             level: "WARN"
- *         }, {
- *             name: "myapp",
- *             level: "INFO"
- *         }, {
- *             name: "myapp.somemodule.submodule",
- *             level: "DEBUG"
- *         }
- *     ]
+ *     loggers: {
+ *         "wilton": "WARN",
+ *         "myapp": "INFO",
+ *         "myapp.somemodule.submodule": "DEBUG"
+ *     }
  * });
  * 
  * // create logger instance
@@ -139,9 +132,10 @@ define([
      *                      default value: `false`
      *    - __maxBackupIndex__ `Integer|Undefined` max number of old (rolled over) log files for
      *                         `DAILY_ROLLING_FILE` appender, default value: `16`
-     *  - __loggers__ `Array` list of loggers to configure minimal allowed logging levels
-     *    - __name__ `String` logger name
-     *    - __level__ `String` minimal allowed logging level for this logger,
+     *  - __loggers__ `Array|Object` list of loggers to configure minimal allowed logging levels
+     *    - __name__ `String` logger name (`Object` key can be used instead)
+     *    - __level__ `String` minimal allowed logging level for this logger
+     *                         (`Object` value can be used instead),
      *                         supported values: `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`
      */
     Logger.initialize = function(options, callback) {

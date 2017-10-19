@@ -18,16 +18,11 @@ define([
                 appenderType: "CONSOLE",
                 thresholdLevel: "WARN" // lower me for debugging
             }],
-        loggers: [{
-                name: "staticlib.pion",
-                level: "INFO"
-            }, {
-                name: "wilton",
-                level: "DEBUG"
-            }, {
-                name: "wilton.test",
-                level: "ERROR"
-            }]
+        loggers: {
+            "staticlib.pion": "INFO",
+            "wilton": "DEBUG",
+            "wilton.test": "ERROR"
+        }
     });
 
     var logger = new Logger("wilton.test");
