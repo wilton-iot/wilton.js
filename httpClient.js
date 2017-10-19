@@ -63,6 +63,14 @@ define([
         name: "wilton_http"
     });
 
+    function _checkStrayOpts(opts) {
+        for (var pr in opts) {
+            if ("data" !== pr && "meta" !== pr && "filePath" !== pr) {
+                throw new Error("Invalid option specified: [" + pr + "]");
+            }
+        }
+    }
+
     /**
      * @function sendRequest
      * 
@@ -169,6 +177,7 @@ define([
     function sendRequest(url, options, callback) {
         var opts = utils.defaultObject(options);
         try {
+            _checkStrayOpts(opts);
             var urlstr = utils.defaultString(url);
             var dt = "";
             if (!utils.undefinedOrNull(opts.data)) {
@@ -208,6 +217,7 @@ define([
     function sendFile(url, options, callback) {
         var opts = utils.defaultObject(options);
         try {
+            _checkStrayOpts(opts);
             var urlstr = utils.defaultString(url);
             var fp = utils.defaultString(opts.filePath);
             var meta = utils.defaultObject(opts.meta);
