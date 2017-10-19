@@ -243,16 +243,19 @@ define([
          * Sends JSON message to the channel in blocking mode.
          * 
          * @param msg `Object|String` message to send
+         * @param timeoutMillis `Number|Undefined` max timeout for waiting, in milliseconds,
+         *                      default value: `0` - inifinite timeout
          * @param callback `Function|Undefined` callback to receive result or error
          * @return `Boolean` `true` if message was sent successfully, `false` if
          *         channel was closed (manually with `close()` or automatically on shutdown)
          */
-        send: function(msg, callback) {
+        send: function(msg, timeoutMillis, callback) {
             try {
                 var message = utils.defaultJson(msg);
                 var resStr = wiltoncall("channel_send", {
                     channelHandle: this.handle,
-                    message: message 
+                    message: message,
+                    timeoutMillis: "undefined" != typeof(timeoutMillis) ? timeoutMillis : 0
                 });
                 var resObj = JSON.parse(resStr);
                 utils.checkPropertyType(resObj, "success", "boolean");
@@ -271,14 +274,17 @@ define([
          * 
          * Receives JSON messages from the channel in blocking mode.
          * 
+         * @param timeoutMillis `Number|Undefined` max timeout for waiting, in milliseconds,
+         *                      default value: `0` - inifinite timeout
          * @param callback `Function|Undefined` callback to receive result or error
          * @return `Object` received message parsed from JSON, `null` if
          *         channel was closed (manually with `close()` or automatically on shutdown)
          */
-        receive: function(callback) {
+        receive: function(timeoutMillis, callback) {
             try {
                 var resStr = wiltoncall("channel_receive", {
-                    channelHandle: this.handle
+                    channelHandle: this.handle,
+                    timeoutMillis: "undefined" != typeof(timeoutMillis) ? timeoutMillis : 0
                 });
                 var res = null !== resStr ? JSON.parse(resStr) : null;
                 utils.callOrIgnore(callback, res);

@@ -44,9 +44,11 @@ define([
         msg: "test:send:post"
     }));
     assert(!chan.offer(msg));
+    assert(!chan.send(msg, 10));
 
     assert(null === retChan.peek());
     assert(null === retChan.poll());
+    assert(null === retChan.receive(10));
     assert(traceChan.offer({
         msg: "test:empty"
     }));
@@ -106,6 +108,8 @@ define([
     });
 
     assert(!chan.offer(msg));
+    
+    // no timeout
     assert(traceChan.offer({
         msg: "test:send:pre"
     }));
@@ -121,6 +125,28 @@ define([
     assert(traceChan.offer({
         msg: "test:receive:post"
     }));
+
+    // timeout
+    assert(traceChan.offer({
+        msg: "test:send:timeout:pre"
+    }));
+    assert(chan.send(msg, 10000));
+    assert(traceChan.offer({
+        msg: "test:send:timeout:post"
+    }));
+    assert(traceChan.offer({
+        msg: "test:receive:timeout:pre"
+    }));
+    assert.deepEqual(retChan.receive(10000), msg);
+    assert(traceChan.offer({
+        msg: "test:receive:timeout:post"
+    }));
+    // timeout exhausted
+    var nowhere = new Channel("ChannelTest.sync.nowhere");
+    assert(!nowhere.send(false, 10));
+    nowhere.close();
+
+    // shutdown
     assert(chan.send(false));
     assert(traceChan.offer({
         msg: "test:sent_shutdown"
