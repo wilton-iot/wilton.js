@@ -86,8 +86,8 @@ define([
          *  - __url__ `String` request URL, as specified by client
          *  - __pathname__ `String` "path" part of the URL (before the first `?`)
          *  - __query__ `String` "query" part of the URL (after the first `?`)
-         *  - __queries__ `Object` mapping of request parameters parsed from
-         *                `query` field
+         *  - __queries__ `Object` dictionary of request parameters parsed from URL
+         *                `query` fields
          *  - __headers__ `Object` request headers in `"Header-Name": "value"` format,
          *                duplicates in client-specified headers
          *                are handled in the following ways, depending on the header name:
@@ -108,6 +108,27 @@ define([
                 }
                 utils.callOrIgnore(callback, this.metaCached);
                 return this.metaCached;
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
+
+        /**
+         * @function queries
+         * 
+         * Access request query string parameters.
+         * 
+         * Returns dictionary of request parameters parsed from URL
+         * query fields. The same as `meta().queries`.
+         * 
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Object` dictionary of request parameters parsed from URL query fields
+         */
+        queries: function(callback) {
+            try {
+                var res = this.meta().queries;
+                utils.callOrIgnore(callback, this.metaCached);
+                return res;
             } catch (e) {
                 utils.callOrThrow(callback, e);
             }
