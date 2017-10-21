@@ -86,8 +86,8 @@ define([
         lineWidth: 4.5
     });
     doc.addPage({
-        format: "A3",
-        orientation: "LANDSCAPE"
+        width: 400,
+        height: 400
     });
     doc.drawRectangle({
         x: 150,

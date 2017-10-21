@@ -71,6 +71,19 @@ define([
         }
     }
 
+    function _jsonParse(callback) {
+        try {
+            if (null === this.jsonCached) {
+                var json = this.data;
+                this.jsonCached = JSON.parse(json);
+            }
+            utils.callOrIgnore(callback, this.jsonCached);
+            return this.jsonCached;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
     /**
      * @function sendRequest
      * 
@@ -192,6 +205,8 @@ define([
             var resp = JSON.parse(resp_json);
             var dataBytes = hex.decodeBytes(resp.dataHex);
             resp.data = utf8.decode(dataBytes, /* lenient */ true);
+            resp.jsonCached = null;
+            resp.json = _jsonParse;
             utils.callOrIgnore(callback, resp);
             return resp;
         } catch (e) {
@@ -230,6 +245,8 @@ define([
             var resp = JSON.parse(resp_json);
             var dataBytes = hex.decodeBytes(resp.dataHex);
             resp.data = utf8.decode(dataBytes, /* lenient */ true);
+            resp.jsonCached = null;
+            resp.json = _jsonParse;
             utils.callOrIgnore(callback, resp);
             return resp;
         } catch (e) {

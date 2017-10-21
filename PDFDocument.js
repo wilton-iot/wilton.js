@@ -154,8 +154,11 @@ define([
          * @return `Undefined`
          * 
          * __Options__
-         *  - __format__ `String` Paper format, supported values: `A3`, `A4`, `A5`, `B4`, `B5`
-         *  - __orientation__ `String` Paper orientation, supported values: `PORTRAIT`, `LANDSCAPE`
+         *  - __format__ `String|Undefined` Paper format, supported values: `A3`, `A4`, `A5`, `B4`, `B5`;
+         *               either both `format` and `orientation`, or both `width` and `height` must be specified.
+         *  - __orientation__ `String|Undefined` Paper orientation, supported values: `PORTRAIT`, `LANDSCAPE`
+         *  - __width__ `Number|Undefined` Page width.
+         *  - __height__ `Number|Undefined` Page height.
          */
         addPage: function(options, callback) {
             this._callWithOpts("pdf_add_page", options, callback);
