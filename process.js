@@ -74,7 +74,7 @@ define([
      * 
      * @param options `Object` configuration object, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
-     * @return `Undefined`
+     * @return `Number` `pid` of started process or its exit code, if `awaitExit` is used
      * 
      * __Options__
      *  - __executable__ `String` path to the executable file
@@ -88,8 +88,9 @@ define([
         var opts = utils.defaultObject(options);
         try {
             var res = wiltoncall("process_spawn", opts);
-            utils.callOrIgnore(callback,res);
-            return res;
+            var resnum = parseInt(res, 10);
+            utils.callOrIgnore(callback, resnum);
+            return resnum;
         } catch (e) {
             utils.callOrThrow(callback, e);
         }
