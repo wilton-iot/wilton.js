@@ -19,7 +19,7 @@ define([
                 thresholdLevel: "WARN" // lower me for debugging
             }],
         loggers: {
-            "staticlib.pion": "INFO",
+            "staticlib": "INFO",
             "wilton": "DEBUG",
             "wilton.test": "ERROR"
         }
