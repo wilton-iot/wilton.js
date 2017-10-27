@@ -273,6 +273,21 @@ define([
             }
         },
 
+        doInSyncTransaction: function(lockChannelName, operations, callback) {
+            try {
+                var Channel = WILTON_requiresync("wilton/Channel");
+                var lock = Channel.lookup(lockChannelName);
+                var self = this;
+                var res = lock.synchronize(function() {
+                    return self.doInTransaction(operations);
+                });
+                utils.callOrIgnore(callback, res);
+                return res;
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
+
         /**
          * @function close
          * 

@@ -103,9 +103,4 @@ define([
     assert(stat.size > 0);
     doc.destroy();
 
-    // todo: removeme
-    return {
-        main: function() {
-        }
-    };
 });

@@ -13,8 +13,7 @@ define([], function() {
                 "wilton/test/CronTaskTest",
                 "wilton/test/DBConnectionTest",
                 "wilton/test/fsTest",
-                // todo: fixme on jsc
-                //"wilton/test/fsPromiseTest",
+                "wilton/test/fsPromiseTest",
                 "wilton/test/hexTest",
                 "wilton/test/httpClientTest",
                 "wilton/test/miscTest",

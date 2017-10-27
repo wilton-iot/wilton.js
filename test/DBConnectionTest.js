@@ -6,9 +6,10 @@
 
 define([
     "assert",
+    "wilton/Channel",
     "wilton/DBConnection",
     "wilton/loader"
-], function(assert, DBConnection, loader) {
+], function(assert, Channel, DBConnection, loader) {
     "use strict";
 
     print("test: wilton/DBConnection");
@@ -46,7 +47,10 @@ define([
     assert.throws(function() { conn.query("select foo, bar from t1 where foo = 'fail'"); });
     assert.throws(function() { conn.query("select foo, bar from t1"); });
 
-    conn.doInTransaction(function() {/* some db actions */});
+    assert.equal(conn.doInTransaction(function() { return 42; }), 42);
+    var lock = new Channel("DBConnectionTest.lock", 1);
+    assert.equal(conn.doInSyncTransaction("DBConnectionTest.lock", function() { return 42; }), 42);
+    lock.close();
 
     // loadQueryFile
     var queries = DBConnection.loadQueryFile(loader.findModulePath("wilton/test/data/test.sql"));

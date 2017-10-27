@@ -19,6 +19,7 @@ define([
     // buffered
 
     var chan = new Channel("ChannelTest.buffered.in", 2);
+    assert.equal(chan.maxSize(), 2);
     var retChan = new Channel("ChannelTest.buffered.out", 2);
 
     thread.run({
@@ -102,6 +103,7 @@ define([
     print("test: wilton/ChannelTest sync");
 
     var chan = new Channel("ChannelTest.sync.in");
+    assert.equal(chan.maxSize(), 0);
     var retChan = new Channel("ChannelTest.sync.out");
 
     thread.run({
@@ -211,11 +213,18 @@ define([
     // todo
     //assert.equal(retChan.peek(), null);
     //assert.equal(retChan.poll(), null);
+
+    var lockChan = new Channel("ChannelTest.lock", 1);
+
+    // synchronize
+    print("test: wilton/ChannelTest synchronize");
+    assert.equal(lockChan.synchronize(function() { return 42; }), 42);
     
     chan.close();
     retChan.close();
     dummyChan1.close();
     dummyChan2.close();
+    lockChan.close();
     traceChan.close();
-    
+
 });

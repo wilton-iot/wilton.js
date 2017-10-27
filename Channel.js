@@ -379,6 +379,48 @@ define([
             }
         }, 
 
+        synchronize: function(operations, callback) {
+            try {
+                var ms = this.maxSize();
+                if (1 !== ms) {
+                    throw new Error("Invalid channel max size: [" + ms + "],"+
+                            " only channels with max size '1' can be used for synchronization");
+                }
+                var locked = this.send(true);
+                if (locked) {
+                    var res = null;
+                    try {
+                        res = operations();
+                    } finally {
+                        this.receive();
+                    }
+                } else {
+                    // destruction in progress, lets be silent
+                }
+                utils.callOrIgnore(callback, res);
+                return res;
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
+
+        /**
+         * @function 
+         */
+        maxSize: function(callback) {
+            try {
+                var str = wiltoncall("channel_get_max_size", {
+                    channelHandle: this.handle
+                });
+                var obj = JSON.parse(str);
+                var res = obj.maxSize;
+                utils.callOrIgnore(callback, res);
+                return res;
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
+
         /**
          * @function close
          * 

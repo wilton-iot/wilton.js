@@ -12,6 +12,6 @@ define([
 
     print("test: wilton/misc");
 
-    // todo
+    assert("object" === typeof(misc.wiltonConfig()));
     
 });
