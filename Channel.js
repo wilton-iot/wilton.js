@@ -435,7 +435,7 @@ define([
          * `0` for sycnhronous.
          * 
          * @param callback `Function|Undefined` callback to receive result or error
-         * @return buffer size for buffered `Channel` and `0` for sycnhronous
+         * @return `Number` buffer size for buffered `Channel` and `0` for sycnhronous
          */
         maxSize: function(callback) {
             try {
@@ -444,6 +444,28 @@ define([
                 });
                 var obj = JSON.parse(str);
                 var res = obj.maxSize;
+                utils.callOrIgnore(callback, res);
+                return res;
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
+
+        /**
+         * @function name
+         * 
+         * Name of this channel.
+         * 
+         * Returns name of this channel, channel must be alive (not closed).
+         * 
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `String` channel name
+         */
+        name: function(callback) {
+            try {
+                var res = wiltoncall("channel_get_name", {
+                    channelHandle: this.handle
+                });
                 utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {

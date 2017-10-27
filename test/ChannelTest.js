@@ -20,6 +20,7 @@ define([
 
     var chan = new Channel("ChannelTest.buffered.in", 2);
     assert.equal(chan.maxSize(), 2);
+    assert.equal(chan.name(), "ChannelTest.buffered.in");
     var retChan = new Channel("ChannelTest.buffered.out", 2);
 
     thread.run({
@@ -89,9 +90,7 @@ define([
 
     var traceBuffered = [];
     for(;;) {
-        // todo
-        // var envelope = traceChan.poll();
-        var envelope = null;
+        var envelope = traceChan.poll();
         if (null === envelope) break;
         traceBuffered.push(envelope.msg);
     }
@@ -161,9 +160,7 @@ define([
     }));
     var traceSync = [];
     for(;;) {
-        // todo
-//        var envelope = traceChan.poll();
-        var envelope = null;
+        var envelope = traceChan.poll();
         if (null === envelope) break;
         traceSync.push(envelope.msg);
     }
@@ -210,15 +207,16 @@ define([
     // no more selected
     var idx3 = Channel.select([dummyChan1, retChan, dummyChan2], 100);
     assert.equal(-1, idx3);
-    // todo
-    //assert.equal(retChan.peek(), null);
-    //assert.equal(retChan.poll(), null);
+    assert.equal(retChan.peek(), null);
+    assert.equal(retChan.poll(), null);
 
     var lockChan = new Channel("ChannelTest.lock", 1);
 
     // synchronize
     print("test: wilton/ChannelTest synchronize");
     assert.equal(lockChan.synchronize(function() { return 42; }), 42);
+    
+    assert(Channel.dumpRegistry().length > 0);
     
     chan.close();
     retChan.close();
