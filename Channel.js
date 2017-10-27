@@ -379,6 +379,28 @@ define([
             }
         }, 
 
+        /**
+         * @function synchronize
+         * 
+         * Run specified operations in syncronized mode.
+         * 
+         * Run specified operations taking the mutual exclusive lock,
+         * making  it is impossible for two concurrent invocations 
+         * (from different threads) of synchronized operations 
+         * on the same channel to interleave.
+         * 
+         * Channel instance must be a buffered channel with `maxSize`=`1`
+         * and must be empty.
+         * 
+         * If Channel is being destroyed (e.g. during shutdown),
+         * this method exits without running the `operations` function
+         * and without throwing an error.
+         * 
+         * @param operations `Function` function to run in synchronized mode
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Any` return value from `operations` function
+         * 
+         */
         synchronize: function(operations, callback) {
             try {
                 var ms = this.maxSize();
@@ -405,7 +427,15 @@ define([
         },
 
         /**
-         * @function 
+         * @function maxSize
+         * 
+         * Max number of buffered messages.
+         * 
+         * Returns buffer size for buffered `Channel` and 
+         * `0` for sycnhronous.
+         * 
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return buffer size for buffered `Channel` and `0` for sycnhronous
          */
         maxSize: function(callback) {
             try {

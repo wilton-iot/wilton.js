@@ -273,6 +273,21 @@ define([
             }
         },
 
+        /**
+         * @function doInSyncTransaction
+         * 
+         * Perform a set of DB operations inside the synchronized transaction.
+         * 
+         * This method runs specified operations inside the transaactional
+         * block (using `doInTransaction`) additionally wrapping it with
+         * synchroinized block (using `Channel.synchronize()`).
+         * 
+         * @param lockChannelName `String` name of the channel to use for synchronization
+         *                        it must be existing empty channel with `maxSize` = `1`
+         * @param operations `Function` function performing DB operations
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Any` value returned by `operations` function
+         */
         doInSyncTransaction: function(lockChannelName, operations, callback) {
             try {
                 var Channel = WILTON_requiresync("wilton/Channel");
