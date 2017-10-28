@@ -65,7 +65,7 @@ define([
         this.jsonCached = null;
         this.dataFilenameCached = null;
     };
-    
+ 
     Request.prototype = {
         /**
          * @function meta
@@ -127,13 +127,38 @@ define([
         queries: function(callback) {
             try {
                 var res = this.meta().queries;
-                utils.callOrIgnore(callback, this.metaCached);
+                utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {
                 utils.callOrThrow(callback, e);
             }
         },
-        
+
+        /**
+         * @function query
+         * 
+         * Access request quesry string parameter by name.
+         * 
+         * Returns the value of the specified parameter from request string,
+         * or specified `defaultValue` if parameter not found.
+         * 
+         * @param name `String` parameter name
+         * @param defaultValue `String` default value
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `String` parameter value or default value
+         */
+        query: function(name, defaultValue, callback) {
+            try {
+                var qrs = this.meta().queries;
+                var dv = "undefined" !== defaultValue ? defaultValue : null;
+                var res = qrs.hasOwnProperty(name) ? qrs[name] : dv;
+                utils.callOrIgnore(callback, res);
+                return res;
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
+
         /**
          * @function data
          * 
@@ -199,7 +224,7 @@ define([
                 utils.callOrThrow(callback, e);
             }
         },
-        
+
         /**
          * @function json
          * 
@@ -230,7 +255,7 @@ define([
                 utils.callOrThrow(callback, e);
             }
         },
-        
+
         /**
          * @function dataFilename
          * 
@@ -266,7 +291,7 @@ define([
                 utils.callOrThrow(callback, e);
             }
         },
-        
+
         /**
          * @function sendResponse
          * 
@@ -311,7 +336,7 @@ define([
                 utils.callOrThrow(callback, e);
             }
         },
-        
+
         /**
          * @function sendTempFile
          * 
@@ -347,7 +372,7 @@ define([
                 utils.callOrThrow(callback, e);
             }
         },
-        
+
         /**
          * @function sendMustache
          * 
@@ -436,7 +461,7 @@ define([
                 utils.callOrThrow(callback, e);
             }
         },
-        
+ 
         _setMeta: function(opts) {
             if ("object" === typeof (opts.meta) && null !== opts.meta) {
                 wiltoncall("request_set_response_metadata", {
