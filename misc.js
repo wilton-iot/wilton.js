@@ -30,9 +30,11 @@ define([
 ], function(dyload, utils, wiltoncall) {
     "use strict";
 
-    dyload({
-        name: "wilton_signal"
-    });
+    if (true !== process.env.ANDROID) {
+        dyload({
+            name: "wilton_signal"
+        });
+    }
 
     /**
      * @function wiltonConfig
@@ -99,7 +101,12 @@ define([
      */
     function waitForSignal(callback) {
         try {
-            wiltoncall("signal_await");
+            if (true === process.env.ANDROID) {
+                var Channel = WILTON_requiresync("wilton/Channel");
+                Channel.lookup("signal").receive();
+            } else {
+                wiltoncall("signal_await");
+            }
             utils.callOrIgnore(callback);
         } catch (e) {
             utils.callOrThrow(callback, e);

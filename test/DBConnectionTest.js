@@ -8,13 +8,16 @@ define([
     "assert",
     "wilton/Channel",
     "wilton/DBConnection",
-    "wilton/loader"
-], function(assert, Channel, DBConnection, loader) {
+    "wilton/loader",
+    "wilton/misc"
+], function(assert, Channel, DBConnection, loader, misc) {
     "use strict";
 
     print("test: wilton/DBConnection");
 
-    var conn = new DBConnection("sqlite://test.db");
+    var appdir = misc.wiltonConfig().applicationDirectory;
+
+    var conn = new DBConnection("sqlite://" + appdir + "test.db");
 //    var conn = new DBConnection("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
 
     conn.execute("drop table if exists t1");

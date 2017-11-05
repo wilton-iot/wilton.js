@@ -9,12 +9,15 @@ define([
     "wilton/Channel",
     "wilton/fs",
     "wilton/httpClient",
+    "wilton/misc",
     "wilton/Server",
     "wilton/thread"
-], function(assert, Channel, fs, http, Server, thread) {
+], function(assert, Channel, fs, http, misc, Server, thread) {
     "use strict";
 
     print("test: wilton/httpClient");
+
+    var appdir = misc.wiltonConfig().applicationDirectory;
 
     var server = new Server({
         tcpPort: 8080,
@@ -71,26 +74,26 @@ define([
         data: "foobaz",
         meta: {
             timeoutMillis: 60000,
-            responseDataFilePath: "httpClientTest.response"
+            responseDataFilePath: appdir + "httpClientTest.response"
         }
     });
     var data_obj = JSON.parse(resp.data);
-    assert.equal(data_obj.responseDataFilePath, "httpClientTest.response");
-    var contents = fs.readFile("httpClientTest.response");
+    assert.equal(data_obj.responseDataFilePath, appdir + "httpClientTest.response");
+    var contents = fs.readFile(appdir + "httpClientTest.response");
     assert.equal(contents, "foobaz");
 
     // send file
-    fs.writeFile("clientTestSend.txt", "foobaf");
+    fs.writeFile(appdir + "clientTestSend.txt", "foobaf");
     var respFile = http.sendFile("http://127.0.0.1:8080/wilton/test/views/postmirror", {
-        filePath: "clientTestSend.txt",
+        filePath: appdir + "clientTestSend.txt",
         meta: {
             timeoutMillis: 60000
         }
     });
     assert.equal(respFile.data, "foobaf");
-    assert(fs.exists("clientTestSend.txt"));
-    fs.unlink("clientTestSend.txt");
-    assert(!fs.exists("clientTestSend.txt"));
+    assert(fs.exists(appdir + "clientTestSend.txt"));
+    fs.unlink(appdir + "clientTestSend.txt");
+    assert(!fs.exists(appdir + "clientTestSend.txt"));
     
     server.stop();
 

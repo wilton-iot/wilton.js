@@ -7,17 +7,21 @@
 define([
     "assert",
     "wilton/fs",
-    "wilton/utils"
-], function(assert, fs, utils) {
+    "wilton/misc"
+], function(assert, fs, misc) {
     "use strict";
 
     print("test: wilton/fs");
+    
+    var appdir = misc.wiltonConfig().applicationDirectory;
+
+    var fstest = appdir + "fstest";
 
     // mkdir
-    fs.mkdir("fstest");
+    fs.mkdir(fstest);
 
     // appendFile
-    var tf = "fstest/appendFile_test.txt";
+    var tf = fstest + "/appendFile_test.txt";
     
     // writeFile
     fs.writeFile(tf, "foo");
@@ -27,14 +31,14 @@ define([
     assert.equal(fs.readFile(tf), "foobar");
 
     // exists
-    assert(fs.exists("fstest"));
+    assert(fs.exists(fstest));
     assert(fs.exists(tf));
     
     // readdir
-    assert(fs.readdir("fstest")[0], "appendFile_test.txt");
+    assert(fs.readdir(fstest)[0], "appendFile_test.txt");
     
     // stat
-    var sdir = fs.stat("fstest");
+    var sdir = fs.stat(fstest);
     assert(!sdir.isFile);
     assert(sdir.isDirectory);
     var sfile = fs.stat(tf);
@@ -42,7 +46,7 @@ define([
     assert(!sfile.isDirectory);
     
     // copy
-    var tfCopied = "fstest/appendFile_test_copied.txt";
+    var tfCopied = fstest + "/appendFile_test_copied.txt";
     fs.copyFile(tf, tfCopied);
     assert(fs.exists(tf));
     assert(fs.exists(tfCopied));
@@ -51,7 +55,7 @@ define([
     assert(!fs.exists(tfCopied));
     
     // rename
-    var tfMoved = "fstest/appendFile_test_moved.txt";
+    var tfMoved = fstest + "/appendFile_test_moved.txt";
     fs.rename(tf, tfMoved);
     assert(!fs.exists(tf));
     assert(fs.exists(tfMoved));
@@ -61,7 +65,7 @@ define([
     assert(!fs.exists(tfMoved));
 
     // readLines
-    var tflines = "fstest/readLines_test.txt";
+    var tflines = fstest + "/readLines_test.txt";
     
     // writeFile
     fs.writeFile(tflines, "foo\n");
@@ -78,22 +82,23 @@ define([
     //assert(!fs.exists(tflines));
 
     // copyDirectory
-    fs.mkdir("fstest/dir1");
-    fs.mkdir("fstest/dir1/dir11");
-    fs.mkdir("fstest/dir1/dir12");
-    fs.writeFile("fstest/dir1/foo.txt", "foo");
-    fs.writeFile("fstest/dir1/dir12/bar.txt", "bar");
-    fs.copyDirectory("fstest", "fstest1");
-    assert.deepEqual(fs.readdir("fstest1"), fs.readdir("fstest"));
-    assert.deepEqual(fs.readdir("fstest1/dir1"), fs.readdir("fstest/dir1"));
-    assert.deepEqual(fs.readdir("fstest1/dir1/dir12"), fs.readdir("fstest/dir1/dir12"));
+    fs.mkdir(fstest + "/dir1");
+    fs.mkdir(fstest + "/dir1/dir11");
+    fs.mkdir(fstest + "/dir1/dir12");
+    fs.writeFile(fstest + "/dir1/foo.txt", "foo");
+    fs.writeFile(fstest + "/dir1/dir12/bar.txt", "bar");
+    var fstest1 = appdir + "fstest1";
+    fs.copyDirectory(fstest, fstest1);
+    assert.deepEqual(fs.readdir(fstest1), fs.readdir(fstest));
+    assert.deepEqual(fs.readdir(fstest1 + "/dir1"), fs.readdir(fstest + "/dir1"));
+    assert.deepEqual(fs.readdir(fstest1 + "/dir1/dir12"), fs.readdir(fstest + "/dir1/dir12"));
 
     // rmdir
-    fs.rmdir("fstest");
-    assert(!fs.exists("fstest"));
-    fs.rmdir("fstest1");
-    assert(!fs.exists("fstest1"));
+    fs.rmdir(fstest);
+    assert(!fs.exists(fstest));
+    fs.rmdir(fstest1);
+    assert(!fs.exists(fstest1));
 
     // realpath
-    assert(fs.realpath(".").length > 1);
+    assert(fs.realpath(appdir + "..").length > 1);
 });
