@@ -402,6 +402,29 @@ define([], function() {
         }
         return JSON.parse(JSON.stringify(obj));
     }
+
+    /**
+     * @function localeComparator
+     * 
+     * Compares two strings using `String.prototype.localeCompare()`
+     * 
+     * Compares two strings using `String.prototype.localeCompare()`.
+     * 
+     * Non-string input values are coalesced to strings.
+     * 
+     * Null and undefined input values are colalesced to empty string.
+     * 
+     * @param str1 `String` first string to compare
+     * @param str2 `String` second string to compare
+     * @returns `Number` a negative number if the `str1` occurs before `str2`;
+     *                   positive if the `str1` occurs after `str2`;
+     *                   0 if `str1` and `str2` are equivalent
+     */
+    function localeComparator(str1, str2) {
+        var a = defaultString(str1);
+        var b = defaultString(str2);
+        return a.localeCompare(b);
+    }
     
     return {
         undefinedOrNull: undefinedOrNull,
@@ -419,7 +442,8 @@ define([], function() {
         hasPropertyWithType: hasPropertyWithType,
         formatError: formatError,
         promisifyAll: promisifyAll,
-        cloneObject: cloneObject
+        cloneObject: cloneObject,
+        localeComparator: localeComparator
     };
     
 });

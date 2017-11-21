@@ -94,6 +94,42 @@ define([
 
     var METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"];
 
+    function createMethodEntries(filters, vi) {
+        var mod = null;
+        try {
+            mod = WILTON_requiresync(vi);
+        } catch(e) {
+            throw new Error("Error loading Server view, module: [" + vi + "]\n" + utils.formatError(e));
+        }
+        var methodEntries = [];
+        for (var j = 0; j < METHODS.length; j++) {
+            var me = METHODS[j];
+            if ("function" === typeof(mod[me])) {
+                methodEntries.push({
+                    method: me,
+                    path: "/" + vi,
+                    callbackScript: {
+                        // dispatched module to be called from native
+                        module: "wilton/Server",
+                        func: "dispatch",
+                        args: [{
+                            // actual handled module to be called by dispatcher
+                            module: vi,
+                            func: me,
+                            args: []
+                        }, filters] // requestHandle will be appended here at native
+                    }
+                });
+            }
+        }
+        if (0 === methodEntries.length) {
+            throw new Error("Invalid 'views' element: must have one or more" +
+                    " function attrs: GET, POST, PUT, DELETE, OPTIONS," +
+                    " index: [" + i + "]");
+        }
+        return methodEntries;
+    }
+
     function prepareViews(filters, views) {
         if(utils.undefinedOrNull(views)) {
             throw new Error("Invalid null 'views'attribute specified");
@@ -110,33 +146,7 @@ define([
             if (utils.undefinedOrNull(vi)) {
                 throw new Error("Invalid null 'views' element, index: [" + i + "]");
             } else if ("string" === typeof(vi)) {
-                var mod = WILTON_requiresync(vi);
-                var methodEntries = [];
-                for (var j = 0; j < METHODS.length; j++) {
-                    var me = METHODS[j];
-                    if ("function" === typeof(mod[me])) {
-                        methodEntries.push({
-                            method: me,
-                            path: "/" + vi,
-                            callbackScript: {
-                                // dispatched module to be called from native
-                                module: "wilton/Server",
-                                func: "dispatch",
-                                args: [{
-                                    // actual handled module to be called by dispatcher
-                                    module: vi,
-                                    func: me,
-                                    args: []
-                                }, filters] // requestHandle will be appended here at native
-                            }
-                        });
-                    }
-                }
-                if (0 === methodEntries.length) {
-                    throw new Error("Invalid 'views' element: must have one or more" +
-                            " function attrs: GET, POST, PUT, DELETE, OPTIONS," +
-                            " index: [" + i + "]");
-                }
+                var methodEntries = createMethodEntries(filters, vi);
                 for (var j = 0; j < methodEntries.length; j++) {
                     res.push(methodEntries[j]);
                 }
