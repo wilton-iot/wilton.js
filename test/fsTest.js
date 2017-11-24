@@ -7,8 +7,9 @@
 define([
     "assert",
     "wilton/fs",
-    "wilton/misc"
-], function(assert, fs, misc) {
+    "wilton/misc",
+    "wilton/hex"
+], function(assert, fs, misc, hex) {
     "use strict";
 
     print("test: wilton/fs");
@@ -20,14 +21,27 @@ define([
     // mkdir
     fs.mkdir(fstest);
 
-    // appendFile
     var tf = fstest + "/appendFile_test.txt";
     
     // writeFile
     fs.writeFile(tf, "foo");
+    // appendFile
     fs.appendFile(tf, "bar");
     
     // readFile
+    assert.equal(fs.readFile(tf), "foobar");
+    // read as hex
+    assert.equal(fs.readFile(tf, {
+        hex: true
+    }), "666f6f626172");
+
+    // write and append hex
+    fs.writeFile(tf, "666f6f", {
+        hex: true
+    });
+    fs.appendFile(tf, "626172", {
+        hex: true
+    });
     assert.equal(fs.readFile(tf), "foobar");
 
     // exists

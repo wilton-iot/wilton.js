@@ -58,6 +58,17 @@ define([
         name: "wilton_fs"
     });
 
+    function extractHexOption(options) {
+        if ("object" === typeof(options) && null !== options) {
+            var props = utils.listProperties(options);
+            if (1 !== props.length || "hex" !== props[0] || "boolean" !== typeof(options.hex)) {
+                throw new Error("Invalid 'options' object, properties: [" + JSON.stringify(props) + "]");
+            }
+            return options.hex;
+        }
+        return false;
+    }
+
     /**
      * @function appendFile
      * 
@@ -67,9 +78,14 @@ define([
      * 
      * @param path `String` path to file
      * @param data `String` data to append
-     * @param options `Undefined` placeholder parameter, added for compatibility with Node API
+     * @param options `Object|Undefined` configuration object, can be omitted, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
      * @return `Undefined`
+     * 
+     * __Options__
+     *  - __hex__ `Boolean` whether data is specified in HEX format and needs
+     *                      to be converted to binary before appending it to file;
+     *                      `false` by default
      */
     function appendFile(path, data, options, callback) {
         if ("undefined" === typeof(callback)) {
@@ -78,7 +94,8 @@ define([
         try {
             wiltoncall("fs_append_file", {
                 path: path,
-                data: data
+                data: data,
+                hex: extractHexOption(options)
             });
             utils.callOrIgnore(callback);
         } catch (e) {
@@ -172,9 +189,14 @@ define([
      * Reads the entire contents of a file.
      * 
      * @param path `String` path to file
-     * @param options `Undefined` placeholder parameter, added for compatibility with Node API
+     * @param options `Object|Undefined` configuration object, can be omitted, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
      * @returns `String` file contents
+     * 
+     * __Options__
+     *  - __hex__ `Boolean` whether data read from file needs
+     *                      to be converted to HEX format before returning it to caller
+     *                      `false` by default
      */
     function readFile(path, options, callback) {
         if ("undefined" === typeof (callback)) {
@@ -182,7 +204,8 @@ define([
         }
         try {
             var res = wiltoncall("fs_read_file", {
-                path: path
+                path: path,
+                hex: extractHexOption(options)
             });
             utils.callOrIgnore(callback, res);
             return res;
@@ -349,9 +372,14 @@ define([
      * 
      * @param path `String` path to file
      * @param data `String` data to write
-     * @param options `Undefined` placeholder parameter, added for compatibility with Node API
+     * @param options `Object|Undefined` configuration object, can be omitted, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
      * @return `Undefined`
+     * 
+     * __Options__
+     *  - __hex__ `Boolean` whether data is specified in HEX format and needs
+     *                      to be converted to binary before writing it to file;
+     *                      `false` by default
      */
     function writeFile(path, data, options, callback) {
         if ("undefined" === typeof (callback)) {
@@ -360,7 +388,8 @@ define([
         try {
             wiltoncall("fs_write_file", {
                 path: path,
-                data: data
+                data: data,
+                hex: extractHexOption(options)
             });
             utils.callOrIgnore(callback);
         } catch (e) {
