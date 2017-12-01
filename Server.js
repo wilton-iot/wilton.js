@@ -137,9 +137,6 @@ define([
         if (!(views instanceof Array)) {
             throw new Error("Invalid non-array 'views'attribute specified");
         }
-        if (0 === views.length) {
-            throw new Error("Invalid empty array 'views'attribute specified");
-        }
         var res = [];
         for (var i = 0; i < views.length; i++) {
             var vi = views[i];
