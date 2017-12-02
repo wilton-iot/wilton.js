@@ -48,52 +48,18 @@
  * 
  */
 define([
+    "require",
     "./misc",
     "./mustache",
     "./utils",
     "./wiltoncall"
-], function(misc, mustache, utils, wiltoncall) {
+], function(require, misc, mustache, utils, wiltoncall) {
    
     var conf = misc.wiltonConfig();
     
     var fileProtocolPrefix = "file://";
     var zipProtocolPrefix = "zip://";
    
-    function _findModuleUrl(modname, callback) {
-        try {
-            if ("string" !== typeof(modname)) {
-                throw new Error("Invalid non-string module name specified, modname: [" + modname + "]");
-            }
-            var res = null;
-            var paths = conf.requireJs.paths;
-            if ("object" === typeof (paths)) {
-                for (var mod in paths) {
-                    if (paths.hasOwnProperty(mod)) {
-                        var modshort = mod;
-                        if (utils.endsWith(mod, "/")) {
-                            modshort = mod.substring(0, mod.length - 2);
-                        }
-                        if (utils.startsWith(modname, modshort)) {
-                            var modpath = paths[mod];
-                            if (modname.length > mod.length) {
-                                var tail = modname.substr(mod.length);
-                                modpath = modpath + tail;
-                            }
-                            res = modpath;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (null === res) {
-                res = conf.requireJs.baseUrl + "/" + modname;
-            }
-            return res;
-        } catch (e) {
-            utils.callOrThrow(callback, e);
-        }
-    }
-    
     /**
      * @function findModulePath
      * 
@@ -108,7 +74,7 @@ define([
      */
     function findModulePath(modname, callback) {
         try {
-            var url = _findModuleUrl(modname);
+            var url = require.toUrl(modname);
             if (utils.startsWith(url, fileProtocolPrefix)) {
                 url = url.substr(fileProtocolPrefix.length);
             } else if (utils.startsWith(url, zipProtocolPrefix)) {
@@ -135,7 +101,7 @@ define([
      */
     function loadModuleResource(modname, callback) {
         try {
-            var url = _findModuleUrl(modname);
+            var url = require.toUrl(modname);
             var res = wiltoncall("load_module_resource", url);
             utils.callOrIgnore(callback, res);
             return res;
