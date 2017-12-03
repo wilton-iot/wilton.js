@@ -89,7 +89,7 @@ define([
     "use strict";
 
     dyload({
-        name: "wilton_http"
+        name: "wilton_server"
     });
 
     var METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"];
