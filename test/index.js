@@ -23,7 +23,8 @@ define([], function() {
                 "wilton/test/processTest",
                 "wilton/test/ServerTest",
                 "wilton/test/threadTest",
-                "wilton/test/utilsTest"
+                "wilton/test/utilsTest",
+                "wilton/test/zipTest"
             ], function() {});
         }
     };

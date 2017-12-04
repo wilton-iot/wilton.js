@@ -195,7 +195,7 @@ define([
      * 
      * __Options__
      *  - __hex__ `Boolean` whether data read from file needs
-     *                      to be converted to HEX format before returning it to caller
+     *                      to be converted to HEX format before returning it to caller;
      *                      `false` by default
      */
     function readFile(path, options, callback) {

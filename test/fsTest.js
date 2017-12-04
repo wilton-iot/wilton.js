@@ -7,9 +7,8 @@
 define([
     "assert",
     "wilton/fs",
-    "wilton/misc",
-    "wilton/hex"
-], function(assert, fs, misc, hex) {
+    "wilton/misc"
+], function(assert, fs, misc) {
     "use strict";
 
     print("test: wilton/fs");
