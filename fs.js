@@ -48,10 +48,12 @@
  * @endcode
  */
 define([
+    "utf8",
     "./dyload",
+    "./hex",
     "./utils",
     "./wiltoncall"
-], function(dyload, utils, wiltoncall) {
+], function(utf8, dyload, hex, utils, wiltoncall) {
     "use strict";
 
     dyload({
@@ -203,10 +205,16 @@ define([
             callback = options;
         }
         try {
-            var res = wiltoncall("fs_read_file", {
+            var hexRequested = extractHexOption(options);
+            var resHex = wiltoncall("fs_read_file", {
                 path: path,
-                hex: extractHexOption(options)
+                hex: true
             });
+            var res = resHex;
+            if (!hexRequested) {
+                var dataBytes = hex.decodeBytes(resHex);
+                res = utf8.decode(dataBytes, /* lenient */ true);
+            }
             utils.callOrIgnore(callback, res);
             return res;
         } catch (e) {

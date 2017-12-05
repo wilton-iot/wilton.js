@@ -24,9 +24,9 @@ define([
     assert(fs.exists("testHex.zip"));
     assert(fs.stat("testHex.zip").size > 0);
 
-    // list entries
-    assert.deepEqual(zip.listFileEntries("test.zip"), ["foo", "baz"]);
-    assert.deepEqual(zip.listFileEntries("testHex.zip"), ["foo", "baz"]);
+    // list entries (alphabetic order)
+    assert.deepEqual(zip.listFileEntries("test.zip"), ["baz", "foo"]);
+    assert.deepEqual(zip.listFileEntries("testHex.zip"), ["baz", "foo"]);
 
     // read entry
     assert.equal(zip.readFileEntry("test.zip", "foo"), "bar");

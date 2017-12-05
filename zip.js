@@ -46,10 +46,12 @@
  */
 
 define([
+    "utf8",
     "./dyload",
+    "./hex",
     "./utils",
     "./wiltoncall"
-], function(dyload, utils, wiltoncall) {
+], function(utf8, dyload, hex, utils, wiltoncall) {
     "use strict";
 
     dyload({
@@ -91,11 +93,20 @@ define([
             callback = options;
         }
         try {
+            var hexRequested = extractHexOption(options);
             var resstr = wiltoncall("zip_read_file", {
                 path: path,
-                hex: extractHexOption(options)
+                hex: true
             });
             var res = JSON.parse(resstr);
+            if (!hexRequested) {
+                for (var key in res) {
+                    if (res.hasOwnProperty(key)) {
+                        var dataBytes = hex.decodeBytes(res[key]);
+                        res[key] = utf8.decode(dataBytes, /* lenient */ true);
+                    }
+                }
+            }
             utils.callOrIgnore(callback, res);
             return res;
         } catch (e) {
@@ -128,11 +139,17 @@ define([
             callback = options;
         }
         try {
-            var res = wiltoncall("zip_read_file_entry", {
+            var hexRequested = extractHexOption(options);
+            var resHex = wiltoncall("zip_read_file_entry", {
                 path: path,
                 entry: entry,
-                hex: extractHexOption(options)
+                hex: true
             });
+            var res = resHex;
+            if (!hexRequested) {
+                var dataBytes = hex.decodeBytes(resHex);
+                res = utf8.decode(dataBytes, /* lenient */ true);
+            }
             utils.callOrIgnore(callback, res);
             return res;
         } catch (e) {
@@ -175,6 +192,8 @@ define([
      * mapping into ZIP file. "zip_entry_contents" may be optionally decoded
      * from hexadecimal (useful for binary data) if `hex: true` option is specified.
      * 
+     * Entries are sorted by keys in alphabetical order.
+     * 
      * @param path `String` path to file
      * @param entries `Object` "zip_entry_name" -> "zip_entry_contents" mapping
      * @param options `Object|Undefined` configuration object, can be omitted, see possible options below
@@ -191,9 +210,28 @@ define([
             callback = options;
         }
         try {
+            // prepare entries
+            if ("object" !== typeof(entries) || null === entries) {
+                throw new Error("Invalid 'entries' parameter, must be and 'object'");
+            }
+            var enList = [];
+            for (var key in entries) {
+                if (entries.hasOwnProperty(key)) {
+                    enList.push({
+                        name: key,
+                        value: entries[key]
+                    });
+                }
+            }
+            enList.sort(function(a, b) {
+                var nameA = utils.defaultString(a.name);
+                var nameB = utils.defaultString(b.name);
+                return nameA.localeCompare(nameB);
+            });
+            // call wilton
             var res = wiltoncall("zip_write_file", {
                 path: path,
-                entries: entries,
+                entries: enList,
                 hex: extractHexOption(options)
             });
             utils.callOrIgnore(callback, res);
