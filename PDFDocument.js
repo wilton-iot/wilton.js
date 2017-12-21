@@ -294,6 +294,33 @@ define([
         },
 
         /**
+         * @function drawImage
+         * 
+         * Draw image.
+         * 
+         * Draws the specified image scaling it to the specified `width` and `higth`
+         * at the current (last added) page of the document.
+         * 
+         * See `libharu` documentation for the information about the [coordinate system](https://github.com/libharu/libharu/wiki/Graphics#coordinate-system).
+         * 
+         * @param options `Object` configuration object, see possible options below
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Undefined`
+         * 
+         * __Options__
+         *  - __imageHex__ `String` image data in hexadecimal
+         *  - __imageFormat__ `String` file format of the specified image data,
+         *                    supported formats: `PNG`
+         *  - __x__ `Number` `x` coordinate of the lower-left corner of the rectangle
+         *  - __y__ `Number` `y` coordinate of the lower-left corner of the rectangle
+         *  - __width__ `Number` Width of the rectangle in `pt`
+         *  - __height__ `Number` Height of the rectangle in `pt`
+         */
+        drawImage: function(options, callback) {
+            this._callWithOpts("pdf_draw_image", options, callback);
+        },
+
+        /**
          * @function saveToFile
          * 
          * Write this document contents into PDF file.
