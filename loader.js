@@ -54,6 +54,7 @@ define([
     "./utils",
     "./wiltoncall"
 ], function(require, misc, mustache, utils, wiltoncall) {
+    "use strict";
    
     var conf = misc.wiltonConfig();
     

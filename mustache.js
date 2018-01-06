@@ -54,7 +54,7 @@ define([
     "use strict";
 
     dyload({
-        name: "wilton_http"
+        name: "wilton_server"
     });
 
     /**
