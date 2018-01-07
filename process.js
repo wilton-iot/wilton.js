@@ -27,16 +27,16 @@
  * @code
  * 
  * // spawn new process in background and return its pid
- * var pid = misc.spawnProcess({
- *     executable: path/to/executable
+ * var pid = process.spawnProcess({
+ *     executable: path/to/executable,
  *     args: ["foo", "bar"], 
  *     outputFile: path/to/out/file,
  *     awaitExit: false
  * });
  * 
  * // spawn new process, wait for it to exit, return exit code
- * var code = misc.spawnProcess({
- *     executable: path/to/executable
+ * var code = process.spawnProcess({
+ *     executable: path/to/executable,
  *     args: ["foo", "bar"], 
  *     outputFile: path/to/out/file,
  *     awaitExit: true

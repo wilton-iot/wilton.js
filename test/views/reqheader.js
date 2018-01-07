@@ -9,8 +9,7 @@ define(function() {
 
     return {
         GET: function(req) {
-            var meta = req.meta();
-            req.sendResponse(meta.headers["Host"]);
+            req.sendResponse(req.headers()["Host"]);
         }
     };
 });

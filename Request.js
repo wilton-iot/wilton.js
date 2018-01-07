@@ -38,8 +38,8 @@
  *     // and specified custom status code and message
  *     req.sendResponse({
  *         msg: "hello from GET handler",
- *         receivedQueries: req.meta().queries,
- *         hostnameClientSpecified: req.meta().headers["Host"]
+ *         receivedQueries: req.queries(),
+ *         hostnameClientSpecified: req.headers()["Host"]
  *     }, {
  *         meta: {
  *             statusCode: 451,
@@ -108,6 +108,27 @@ define([
                 }
                 utils.callOrIgnore(callback, this.metaCached);
                 return this.metaCached;
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
+
+        /**
+         * @function headers
+         * 
+         * Access request headers.
+         * 
+         * Returns dictionary of request headers.
+         * The same as `meta().headers`.
+         * 
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Object` dictionary of request parameters parsed from URL query fields
+         */
+        headers: function(callback) {
+            try {
+                var res = this.meta().headers;
+                utils.callOrIgnore(callback, res);
+                return res;
             } catch (e) {
                 utils.callOrThrow(callback, e);
             }
