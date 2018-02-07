@@ -75,7 +75,55 @@ define([
         }
     }
 
+    function socketOpen(options, callback) {
+        var opts = utils.defaultObject(options);
+        try {
+            var json = wiltoncall("net_socket_open", opts);
+            var res = JSON.parse(json);
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }  
+    }
+    function socketClose(options, callback) {
+        var opts = utils.defaultObject(options);
+        try {
+            var json = wiltoncall("net_socket_close", opts);
+            var res = JSON.parse(json);
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }  
+    }
+    function socketWrite(options, callback) {
+      var opts = utils.defaultObject(options);
+        try {
+            var json = wiltoncall("net_socket_write", opts);
+            var res = JSON.parse(json);
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }  
+    }
+    function socketRead(options, callback) {
+        var opts = utils.defaultObject(options);
+        try {
+            var string = wiltoncall("net_socket_read", opts);
+            utils.callOrIgnore(callback, string);
+            return string;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
     return {
-        waitForTcpConnection: waitForTcpConnection
+        waitForTcpConnection: waitForTcpConnection,
+        socketOpen:  socketOpen,
+        socketClose: socketClose,
+        socketWrite: socketWrite,
+        socketRead:  socketRead
     };
 });
