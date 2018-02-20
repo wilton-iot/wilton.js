@@ -15,12 +15,24 @@
  */
 
 define([
+    "assert",
     "wilton/net",
     "wilton/Server"
-], function(net, Server) {
+], function(assert, net, Server) {
     "use strict";
 
     print("test: wilton/net");
+
+    // resolveHostname
+
+    var ipList = net.resolveHostname({
+        hostname: "localhost",
+        timeoutMillis: 500
+    });
+    assert(ipList.length > 0);
+
+
+    // waitForTcpConnection
 
     var server = new Server({
         tcpPort: 8080,
@@ -35,6 +47,18 @@ define([
         timeoutMillis: 100
     });
 
+    var thrown = false;
+    net.waitForTcpConnection({
+        ipAddress: "8.8.8.8",
+        tcpPort: 8081,
+        timeoutMillis: 100
+    }, function(e) {
+        if ("undefined" !== typeof(e)) {
+            thrown = true;
+        }
+    });
+    assert(thrown);
+
     server.stop();
-    
+
 });

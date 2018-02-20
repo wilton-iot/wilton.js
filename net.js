@@ -20,11 +20,18 @@
  * __wilton/net__ \n
  * Networking operations.
  * 
- * This module currently provides only one function: `waitForTcpConnection()` .
+ * This module provide a number of networking oprerations,
+ * auxilary to the networking sockets API provided by `wilton/Socket` module.
  * 
  * Usage example:
  * 
  * @code
+ * 
+ * // resolve hostname to a list of IP addresses
+ * var ipList = net.resolveHostname({
+ *     hostname: "github.com",
+ *     timeoutMillis: 3000
+ * });
  * 
  * // wait for the TCP endpoint to become available
  * net.waitForTcpConnection({
@@ -45,6 +52,35 @@ define([
     dyload({
         name: "wilton_net"
     });
+
+    /**
+     * @function resolveHostname
+     * 
+     * Find IP address for the specified hostname.
+     * 
+     * Finds the list of IPv4 addresses for the specified hostname. 
+     * If call exits without exception, the returned list
+     * of IP addresses is always non-empty.
+     * 
+     * @param options `Object` configuration object, see possible options below
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Array` list of IP addresses
+     * 
+     * __Options__
+     *  - __hostname__ `String` hostname to resolve
+     *  - __timeoutMillis__ `Number` max wait time, in milliseconds
+     */
+    function resolveHostname(options, callback) {
+        var opts = utils.defaultObject(options);
+        try {
+            var resJson = wiltoncall("net_resolve_hostname", opts);
+            var res = JSON.parse(resJson);
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
 
     /**
      * @function waitForTcpConnection
@@ -76,6 +112,7 @@ define([
     }
 
     return {
+        resolveHostname: resolveHostname,
         waitForTcpConnection: waitForTcpConnection
     };
 });

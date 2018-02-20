@@ -28,8 +28,8 @@ define([
 
     thread.run({
         callbackScript: {
-            "module": "wilton/test/helpers/threadHelper",
-            "func": "increment1"
+            module: "wilton/test/helpers/threadHelper",
+            func: "increment1"
         }
     });
 

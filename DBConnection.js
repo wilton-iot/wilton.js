@@ -22,7 +22,7 @@
  * 
  * This module allows to work with relational databases.
  * 
- * It implementa a lightweight ORM - object-relational mapping,
+ * It implements a lightweight ORM - object-relational mapping,
  * allows to map JavaScript objects to query parameters and to map
  * query results to JavaScript objects.
  * 

@@ -60,6 +60,8 @@ define([
     /**
      * @function render
      * 
+     * Render template specified as a string.
+     * 
      * Renders template specified as a string.
      * 
      * @param template `String` template body
@@ -84,6 +86,10 @@ define([
 
     /**
      * @function renderFile
+     * 
+     * Render template specified as a path to file.
+     * 
+     * Renders template specified as a path to file.
      * 
      * @param templateFile `String` path to template file
      * @param values `Object|Undefined` template parameters to use

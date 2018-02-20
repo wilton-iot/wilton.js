@@ -85,7 +85,7 @@ define([
      * @return `Undefined`
      * 
      * __Options__
-     *  - __hex__ `Boolean` whether data is specified in HEX format and needs
+     *  - __hex__ `Boolean|Undefined` whether data is specified in hexadecimal encoding and needs
      *                      to be converted to binary before appending it to file;
      *                      `false` by default
      */
@@ -196,8 +196,8 @@ define([
      * @returns `String` file contents
      * 
      * __Options__
-     *  - __hex__ `Boolean` whether data read from file needs
-     *                      to be converted to HEX format before returning it to caller;
+     *  - __hex__ `Boolean|Undefined` whether data read from file needs
+     *                      to be converted to hexadecimal encoding before returning it to caller;
      *                      `false` by default
      */
     function readFile(path, options, callback) {
@@ -385,7 +385,7 @@ define([
      * @return `Undefined`
      * 
      * __Options__
-     *  - __hex__ `Boolean` whether data is specified in HEX format and needs
+     *  - __hex__ `Boolean|Undefined` whether data is specified in hexadecimal encoding and needs
      *                      to be converted to binary before writing it to file;
      *                      `false` by default
      */
