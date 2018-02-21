@@ -16,11 +16,12 @@
 
 define([
     "assert",
+    "wilton/Channel",
     "wilton/Socket"
-], function(assert, Socket) {
+], function(assert, Channel, Socket) {
 
     return {
-        handleClient: function(bytesToRead) {
+        handleTCP: function(bytesToRead) {
             var socket = new Socket({
                 ipAddress: "127.0.0.1",
                 tcpPort: 8088,
@@ -56,6 +57,39 @@ define([
                 timeoutMillis: 10000
             });
             socket.close();
+        },
+
+        handleUDP: function(bytesToRead, startupChannel) {
+            var server = new Socket({
+                ipAddress: "127.0.0.1",
+                udpPort: 8089,
+                protocol: "UDP",
+                role: "server",
+                timeoutMillis: 60000
+            });
+
+            Channel.lookup(startupChannel).send(true);
+
+            var client = new Socket({
+                ipAddress: "127.0.0.1",
+                udpPort: 8088,
+                protocol: "UDP",
+                role: "client",
+                timeoutMillis: 60000
+            });
+            var received = server.read({
+                bytesToRead: bytesToRead,
+                timeoutMillis: 10000
+            });
+            assert.equal(received.length, bytesToRead);
+
+            client.write({
+                data: received,
+                timeoutMillis: 10000
+            });
+
+            server.close();
+            client.close();
         }
     };
 });

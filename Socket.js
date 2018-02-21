@@ -22,7 +22,7 @@
  * 
  * This module provides access to networking sockets API.
  * 
- * TCP (TODO: and UDP) protocols are supported for both "client" and "server"
+ * TCP and UDP protocols are supported for both "client" and "server"
  * operations. Implementation uses async IO underneath, but
  * all operations are always done on the caller thread,
  * effectively providing a synchronous API.
@@ -77,17 +77,24 @@ define([
      * 
      * Create and open a networking socket.
      * 
-     * Creates a TCP or UDP socket and establishes the networking connections.
+     * Creates a TCP or UDP socket and establishes the networking connection.
      * For client sockets - opens the connection to server.
      * For server sockets - bind to the specified local address
-     * and (for TCPfor TCPfor TCPfor TCP) accepts the incoming connection.
+     * and (for TCP) accepts the incoming connection.
      * 
      * @param options `Object` configuration object, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
      * @return `Object` `Socket` instance
      * 
      * __Options__
-     *  - __todo__ `String` TODO
+     *  - __ipAddress__ `String` for `server` - IP address to bind to, for client:
+     *                          address to connect to
+     *  - __tcpPort__ `Number|Undefined` TCP port number
+     *  - __udpPort__ `Number|Undefined` UDP port number
+     *  - __protocol__ `String` networking protocol, supported values: `TCP`, `UDP`
+     *  - __role__ `String` socket role, supported values: `client`, `server`
+     *  - __timeoutMillis__ `String` max number of milliseconds allowed
+     *                      to establish the connection
      */
     var Socket = function(options, callback) {
         var opts = utils.defaultObject(options);
