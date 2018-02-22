@@ -171,8 +171,7 @@ define([
             var opts = utils.defaultObject(options);
             try {
                 opts.socketHandle = this.handle;
-                var resNullable = wiltoncall("net_socket_read", opts);
-                var res = null !== resNullable ? resNullable : "";
+                var res = wiltoncall("net_socket_read", opts);
                 utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {

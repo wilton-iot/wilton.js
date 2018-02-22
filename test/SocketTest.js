@@ -114,5 +114,6 @@ define([
 
     udpClient.close();
     udpServer.close();
+    udpStarted.close();
 
 });

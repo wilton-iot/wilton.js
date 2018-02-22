@@ -23,15 +23,6 @@ define([
 
     print("test: wilton/net");
 
-    // resolveHostname
-
-    var ipList = net.resolveHostname({
-        hostname: "localhost",
-        timeoutMillis: 500
-    });
-    assert(ipList.length > 0);
-
-
     // waitForTcpConnection
 
     var server = new Server({
@@ -60,5 +51,13 @@ define([
     assert(thrown);
 
     server.stop();
+
+    // resolveHostname
+
+    var ipList = net.resolveHostname({
+        hostname: "localhost",
+        timeoutMillis: 500
+    });
+    assert(ipList.length > 0);
 
 });
