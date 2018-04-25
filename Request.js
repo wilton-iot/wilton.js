@@ -46,7 +46,7 @@
  *             statusMessage: "Unavailable For Legal Reasons"
  *         }
  *     });
- * },
+ * }
  * 
  * @endcode
  */
@@ -478,6 +478,35 @@ define([
                     data: ""
                 });
                 utils.callOrIgnore(callback);
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
+
+        /**
+         * @function sendResponseLater
+         * 
+         * Delay sending the response
+         * 
+         * Creates a `responseWriterHandle` and releases
+         * the current thread without sending the response.
+         * Response can be sent to client later from any thread
+         * using the `DelayedResponse`, that must be created with the
+         * returned handle as an argument.
+         * 
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Number` `responseWriterHandle` that can be used to create
+         *         a `DelayedResponse` inside another thread
+         * 
+         */
+        sendResponseLater: function(callback) {
+            try {
+                var jsonStr = wiltoncall("request_send_later", {
+                    requestHandle: this.handle
+                });
+                utils.callOrIgnore(callback);
+                var json = JSON.parse(jsonStr);
+                return json.responseWriterHandle;
             } catch (e) {
                 utils.callOrThrow(callback, e);
             }

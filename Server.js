@@ -183,13 +183,17 @@ define([
      * @return `Object` `Serial` instance
      * 
      * __Options__
-     *  - __views__ `Array` list of module names that will be using to handle incoming request;
+     *  - __views__ `Array` list of module names that will be used to handle incoming request;
      *              the same module names are also used as URL paths for requiests routing;
      *              functions with following names are used inside the handler module to handle the
      *              requests:`GET`, `POST`, `PUT`, `DELETE` and `OPTIONS`;
      *              each handler function receives `Request` instance as an only parameter
      *              and must use `sendResponse()`, `sendTempFile()` or `sendMustache()`
      *              methods to return the response to client
+     *  - __filters__ `Array` list of module names that will be called on the incoming request,
+     *                each module must return a `function(req, doFilter)`, and can either
+     *                call `doFilter(req)` to proceed to the next filter (and eventually -
+     *                to the request view), or handle the request with `sendResponse()`
      *  - __numberOfThreads__ `Number|Undefined` number of background threads to start, default value: `2`
      *  - __tcpPort__ `Number|Undefined` TCP port to bind to, default value: `8080`
      *  - __ipAddress__ `String|Undefined` IP address to bind to, default value: `0.0.0.0`

@@ -71,7 +71,7 @@ define([
      * 
      * Create `Serial` instance.
      * 
-     * Creates `Serial` object instace and opens the underlying `RS232` connection.
+     * Creates `Serial` object instance and opens the underlying `RS232` connection.
      * 
      * @param options `Object` configuration object, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error

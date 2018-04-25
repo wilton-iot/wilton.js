@@ -16,12 +16,14 @@
 
 define([
     "assert",
+    "wilton/Channel",
     "wilton/fs",
     "wilton/Server",
     "wilton/loader",
     "wilton/misc",
+    "wilton/thread",
     "wilton/test/helpers/httpClientHelper"
-], function(assert, fs, Server, loader, misc, clientHelper) {
+], function(assert, Channel, fs, Server, loader, misc, thread, clientHelper) {
     "use strict";
 
     print("test: wilton/Server");
@@ -36,7 +38,16 @@ define([
         var parentpath = parenturl.replace(/^\w+?\:\/\//g, "");
         certdir = parentpath + "/wilton_core/test/certificates/";
     }
-    
+
+    // worker and channel for delayed reponses
+    var delayedChannel = new Channel("ServerTest_delayed");
+    thread.run({
+        callbackScript: {
+            module: "wilton/test/helpers/delayedRequestsWorker",
+            args: ["ServerTest_delayed"]
+        }
+    });
+
     var server = new Server({
         tcpPort: 8443,
         views: [
@@ -48,7 +59,8 @@ define([
             "wilton/test/views/respfooheader",
             "wilton/test/views/respjson",
             "wilton/test/views/respmustache",
-            "wilton/test/views/filtered"
+            "wilton/test/views/filtered",
+            "wilton/test/views/delayed"
         ],
         filters: [
             "wilton/test/helpers/serverFilter1Helper",
@@ -62,7 +74,7 @@ define([
         },
         rootRedirectLocation: "/wilton/test/views/hi"
     });
-    
+
     var meta = {
         sslcertFilename: certdir + "client/testclient.pem",
         sslcertype: "PEM",
@@ -98,8 +110,11 @@ define([
     assert.equal(clientHelper.httpGetHeader(prefix + "respfooheader", "X-Foo", meta), "foo");
     assert.equal(clientHelper.httpPost(prefix + "postmirror", "foobar", meta), "foobar");
     assert.equal(clientHelper.httpGet(prefix + "filtered", meta), "filtered OK");
+    assert.equal(clientHelper.httpGet(prefix + "delayed", meta), "delayed OK");
+    assert.equal(clientHelper.httpGetHeader(prefix + "delayed", "X-Test-Delayed", meta), "true");
 
     // optional
     server.stop();
-    
+    delayedChannel.close();
+
 });
