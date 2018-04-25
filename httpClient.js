@@ -23,7 +23,7 @@
  * This module allows to send HTTP requests.
  * 
  * By default HTTP connections are cached into the single process-wide
- * connection pool and can be reused from defferent threads.
+ * connection pool and can be reused from different threads.
  * 
  * This module supports HTTPS and request with `X.509` client certificates.
  * 
@@ -32,13 +32,13 @@
  * @code
  * 
  * // send GET request
- * var resp1 = httpClient.sendRequest("https://google.com");
+ * var resp1 = http.sendRequest("https://google.com");
  * 
  * // send POST request
  * var resp2 = http.sendRequest(url, {
  *     data: "foo",
  *     meta: {
- *         method: POST
+ *         method: "POST"
  *     }
  * });
  * 
@@ -91,7 +91,7 @@ define([
      * 
      * Sends HTTP request to server, received response
      * can be stored in-memory or in the specified file
-     * (in this case response will be written into file in streaming mode).
+     * (in this case response will be written into the file in streaming mode).
      * 
      * @param url `String` URL of the HTTP server
      * @param options `Object` configuration object, see possible options below
@@ -105,6 +105,9 @@ define([
      *                `UTF-8` encoding
      *  - __data__ `String` data decoded as a `String` with invalid `UTF-8` code sequences
      *             replaced with `0xFFFD`
+     *  - __json__ `Function` parses the contents of `data` field as a JSON, resulting
+     *             JSON object is cached for this response instance - the same object is
+     *             returned for the following `json()` invocations
      *  - __headers__ `Object` response headers in `"Header-Name": "value"` format
      *  - __effectiveUrl__ `String` final URL (after possible redirection) that was used
      *  - __responseCode__ `Number` HTTP response status code
