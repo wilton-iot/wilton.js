@@ -50,9 +50,10 @@
  * 
  */
 define([
+    "arrays/StringBuilder",
     "utf8",
     "./utils"
-], function(utf8, utils) {
+], function(StringBuilder, utf8, utils) {
     "use strict";
 
     var SYMBOLS = "0123456789abcdef";
@@ -75,14 +76,15 @@ define([
             if ("string" !== typeof(str)) {
                 throw new Error("Invalid non-string input specified: [" + str + "]");
             }
-            var resp = "";
+            var sb = new StringBuilder(str.length * 2);
             for (var i = 0; i < str.length; i++) {
                 var code = str.charCodeAt(i);
                 var idx = code >> 4;
-                resp += SYMBOLS[idx];
+                sb.push(SYMBOLS[idx]);
                 idx = code & 0x0f;
-                resp += SYMBOLS[idx];
+                sb.push(SYMBOLS[idx]);
             }
+            var resp = sb.toString();
             utils.callOrIgnore(callback, resp);
             return resp;
         } catch (e) {
@@ -174,13 +176,15 @@ define([
                 if (0 !== (hexstr.length % 2)) {
                     throw new Error("Invalid non-hexstring input specified: [" + hexstr + "]");
                 }
+                var sb = new StringBuilder();
                 for (var i = 0; i < hexstr.length; i += 2 ) {
-                    if (resp.length > 0) {
-                        resp += " ";
+                    if (sb.length > 0) {
+                        sb.push(" ");
                     }
-                    resp += hexstr[i];
-                    resp += hexstr[i + 1];
+                    sb.push(hexstr[i]);
+                    sb.push(hexstr[i + 1]);
                 }
+                resp = sb.toString();
             }
             utils.callOrIgnore(callback, resp);
             return resp;
@@ -235,16 +239,17 @@ define([
             if (0 !== (uhex.length % 2)) {
                 throw new Error("Invalid non-hexstring input specified");
             }
-            var resp = "";
             var i = 0;
             if (uhex.length > 2 && '0' === uhex[0] &&
                     ('x' === uhex[1] || 'X' === uhex[1])) {
                 i += 2;
             }
+            var sb = new StringBuilder(uhex.length / 2);
             for (; i < uhex.length; i += 2) {
                 var num = parseInt(uhex.substr(i, 2), 16);
-                resp += String.fromCharCode(num);
+                sb.push(String.fromCharCode(num));
             }
+            var resp = sb.toString();
             utils.callOrIgnore(callback, resp);
             return resp;
         } catch (e) {
@@ -293,11 +298,12 @@ define([
                 throw new Error("Invalid non-string input specified");
             }
             var st = decodeBytes(hexstr);
-            var target = "";
+            var sb = new StringBuilder(st.length);
             for (var i = 0; i < st.length; i++) {
                 var code = st.charCodeAt(i);
-                target += code >= 32 ? st[i] : " ";
+                sb.push(code >= 32 ? st[i] : " ");
             }
+            var target = sb.toString();
             var resp = encodeBytes(target);
             utils.callOrIgnore(callback, resp);
             return resp;

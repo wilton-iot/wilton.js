@@ -23,5 +23,7 @@ define([
     print("test: wilton/misc");
 
     assert("object" === typeof(misc.wiltonConfig()));
-    
+
+    misc.runGC();
+
 });

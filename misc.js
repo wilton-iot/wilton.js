@@ -112,10 +112,32 @@ define([
             utils.callOrThrow(callback, e);
         }
     }
-    
+
+    /**
+     * @function runGC
+     * 
+     * Run a garbage collector
+     * 
+     * Runs a garbage collector for the default JS engine in a current thread.
+     * Actual GC run may or may not be async from this call depending on
+     * an engine. For JSC engine different versions may behave differently in that regard.
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Undefined`
+     */
+    function runGC(callback) {
+        try {
+            wiltoncall("run_garbage_collector");
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+ 
     return {
         wiltonConfig: wiltonConfig,
         stdinReadline: stdinReadline,
-        waitForSignal: waitForSignal
+        waitForSignal: waitForSignal,
+        runGC: runGC
     };
 });
