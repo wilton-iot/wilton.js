@@ -127,7 +127,8 @@ define([
      */
     function runGC(callback) {
         try {
-            wiltoncall("run_garbage_collector");
+            var callname = "rungc_" + wiltonConfig().defaultScriptEngine;
+            wiltoncall(callname);
             utils.callOrIgnore(callback);
         } catch (e) {
             utils.callOrThrow(callback, e);
