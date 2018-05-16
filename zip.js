@@ -198,7 +198,7 @@ define([
      * @param entries `Object` "zip_entry_name" -> "zip_entry_contents" mapping
      * @param options `Object|Undefined` configuration object, can be omitted, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
-     * @returns `String` entry contents
+     * @returns `Undefined`
      * 
      * __Options__
      *  - __hex__ `Boolean` whether ZIP entry data needs to be converted to
@@ -214,28 +214,32 @@ define([
             if ("object" !== typeof(entries) || null === entries) {
                 throw new Error("Invalid 'entries' parameter, must be and 'object'");
             }
-            var enList = [];
+            var entryNames = [];
             for (var key in entries) {
                 if (entries.hasOwnProperty(key)) {
-                    enList.push({
-                        name: key,
-                        value: entries[key]
-                    });
+                    entryNames.push(key);
                 }
             }
-            enList.sort(function(a, b) {
-                var nameA = utils.defaultString(a.name);
-                var nameB = utils.defaultString(b.name);
+            entryNames.sort(function(a, b) {
+                var nameA = utils.defaultString(a);
+                var nameB = utils.defaultString(b);
                 return nameA.localeCompare(nameB);
             });
-            // call wilton
-            var res = wiltoncall("zip_write_file", {
-                path: path,
-                entries: enList,
-                hex: extractHexOption(options)
-            });
-            utils.callOrIgnore(callback, res);
-            return res;
+            // use thread-local writer
+            try {
+                wiltoncall("zip_open_tl_file_writer", {
+                    path: path,
+                    entries: entryNames,
+                    hex: extractHexOption(options)
+                });
+                for (var i = 0; i < entryNames.length; i++) {
+                    var key = entryNames[i];
+                    wiltoncall("zip_write_tl_entry_content", entries[key]);
+                }
+            } finally {
+                wiltoncall("zip_close_tl_file_writer");
+            }
+            utils.callOrIgnore(callback);
         } catch (e) {
             utils.callOrThrow(callback, e);
         }
