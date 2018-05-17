@@ -22,21 +22,25 @@ define([
     "use strict";
 
     print("test: wilton/fs");
-    
+
     var appdir = misc.wiltonConfig().applicationDirectory;
 
+    // cleanup possible remnants
     var fstest = appdir + "fstest";
+    if (fs.exists(fstest)) {
+        fs.rmdir(fstest);
+    }
 
     // mkdir
     fs.mkdir(fstest);
 
     var tf = fstest + "/appendFile_test.txt";
-    
+ 
     // writeFile
     fs.writeFile(tf, "foo");
     // appendFile
     fs.appendFile(tf, "bar");
-    
+
     // readFile
     assert.equal(fs.readFile(tf), "foobar");
     // read as hex
@@ -56,10 +60,10 @@ define([
     // exists
     assert(fs.exists(fstest));
     assert(fs.exists(tf));
-    
+
     // readdir
     assert(fs.readdir(fstest)[0], "appendFile_test.txt");
-    
+
     // stat
     var sdir = fs.stat(fstest);
     assert(!sdir.isFile);
@@ -67,7 +71,7 @@ define([
     var sfile = fs.stat(tf);
     assert(sfile.isFile);
     assert(!sfile.isDirectory);
-    
+
     // copy
     var tfCopied = fstest + "/appendFile_test_copied.txt";
     fs.copyFile(tf, tfCopied);
@@ -76,20 +80,20 @@ define([
     assert.equal(fs.readFile(tfCopied), "foobar");
     fs.unlink(tfCopied);
     assert(!fs.exists(tfCopied));
-    
+
     // rename
     var tfMoved = fstest + "/appendFile_test_moved.txt";
     fs.rename(tf, tfMoved);
     assert(!fs.exists(tf));
     assert(fs.exists(tfMoved));
-    
+
     // unlink
     fs.unlink(tfMoved);
     assert(!fs.exists(tfMoved));
 
     // readLines
     var tflines = fstest + "/readLines_test.txt";
-    
+
     // writeFile
     fs.writeFile(tflines, "foo\n");
     fs.appendFile(tflines, "bar\r\n");
@@ -99,7 +103,21 @@ define([
     assert.equal(li[0], "foo");
     assert.equal(li[1], "bar");
     assert.equal(li[2], "42");
-    
+
+    // write, overwrite and append list
+    var tfarr = fstest + "/appendList_test.txt";
+    fs.writeFile(tfarr, ["foo", "bar"]);
+    fs.writeFile(tfarr, ["baz", "boo", "\n"]);
+    fs.appendFile(tfarr, ["666f6f", "626172"], {
+        hex: true,
+        delimiter: ""
+    });
+    var li = fs.readLines(tfarr);
+    assert.equal(li.length, 3);
+    assert.equal(li[0], "baz");
+    assert.equal(li[1], "boo");
+    assert.equal(li[2], "foobar");
+
     // not needed - rmdir is recursive
     //fs.unlink(tflines);
     //assert(!fs.exists(tflines));

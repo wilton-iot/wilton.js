@@ -62,13 +62,57 @@ define([
 
     function extractHexOption(options) {
         if ("object" === typeof(options) && null !== options) {
-            var props = utils.listProperties(options);
-            if (1 !== props.length || "hex" !== props[0] || "boolean" !== typeof(options.hex)) {
-                throw new Error("Invalid 'options' object, properties: [" + JSON.stringify(props) + "]");
+            if ("undefined" !== typeof(options.hex)) {
+                if ("boolean" !== typeof(options.hex)) {
+                    throw new Error("Invalid 'options' object," +
+                            " properties: [" + JSON.stringify(utils.listProperties(options)) + "]");
+                }
+                return options.hex;
             }
-            return options.hex;
         }
         return false;
+    }
+
+    function extractDelimiterOption(options) {
+        if ("object" === typeof(options) && null !== options) {
+            if ("undefined" !== typeof(options.delimiter)) {
+                if ("string" !== typeof(options.delimiter)) {
+                    throw new Error("Invalid 'options' object," +
+                            " properties: [" + JSON.stringify(utils.listProperties(options)) + "]");
+                }
+                return options.hex;
+            }
+        }
+        return "\n";
+    }
+
+    function writeOrAppend(path, data, opts, callback) {
+        try {
+            var entries = data instanceof Array ? data : [data];
+            var delim = "string" === typeof(opts.delimiter) ? opts.delimiter : "";
+            if (opts.hex) {
+                delim = hex.encodeUTF8(delim);
+            }
+            // use thread-local writer
+            try {
+                wiltoncall("fs_open_tl_file_writer", {
+                    path: path,
+                    append: opts.append,
+                    hex: opts.hex 
+                });
+                for (var i = 0; i < entries.length; i++) {
+                    wiltoncall("fs_append_tl_file_writer", entries[i]);
+                    if (i < entries.length - 1 && delim.length > 0) {
+                        wiltoncall("fs_append_tl_file_writer", delim);
+                    }
+                }
+            } finally {
+                wiltoncall("fs_close_tl_file_writer");
+            }
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
     }
 
     /**
@@ -79,7 +123,8 @@ define([
      * Appends data to a file, creating the file if it does not yet exist.
      * 
      * @param path `String` path to file
-     * @param data `String` data to append
+     * @param data `String|Array` data to write, can be a string or an array of strings;
+     *             `options.delimiter` string is appended after every array element except the last one
      * @param options `Object|Undefined` configuration object, can be omitted, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
      * @return `Undefined`
@@ -88,23 +133,20 @@ define([
      *  - __hex__ `Boolean|Undefined` whether data is specified in hexadecimal encoding and needs
      *                      to be converted to binary before appending it to file;
      *                      `false` by default
+     *  - __delimiter__ `String|Undefined` string that is appended after every array element
+     *              except the last one, default value: `\n`
      */
     function appendFile(path, data, options, callback) {
         if ("undefined" === typeof(callback)) {
             callback = options;
         }
-        try {
-            wiltoncall("fs_append_file", {
-                path: path,
-                data: data,
-                hex: extractHexOption(options)
-            });
-            utils.callOrIgnore(callback);
-        } catch (e) {
-            utils.callOrThrow(callback, e);
-        }
+        writeOrAppend(path, data, {
+            append: true,
+            hex: extractHexOption(options),
+            delimiter: extractDelimiterOption(options)
+        }, callback);
     }
-    
+
     /**
      * @function exists
      * 
@@ -128,7 +170,7 @@ define([
             utils.callOrThrow(callback, e);
         }
     }
-    
+
     /**
      * @function mkdir
      * 
@@ -247,7 +289,7 @@ define([
             utils.callOrThrow(callback, e);
         }
     }
- 
+
     /**
      * @function realpath
      * 
@@ -274,7 +316,7 @@ define([
             utils.callOrThrow(callback, e);
         }
     }
-    
+ 
     /**
      * @function rename
      * 
@@ -320,7 +362,7 @@ define([
             utils.callOrThrow(callback, e);
         }
     }
-    
+ 
     /**
      * @function stat
      * 
@@ -370,7 +412,7 @@ define([
             utils.callOrThrow(callback, e);
         }
     }
-    
+
     /**
      * @function writeFile
      * 
@@ -379,7 +421,8 @@ define([
      * Writess pecified data to a file, overwriting a file if it exists.
      * 
      * @param path `String` path to file
-     * @param data `String` data to write
+     * @param data `String|Array` data to write, can be a string or an array of strings;
+     *             `options.delimiter` string is appended after every array element except the last one
      * @param options `Object|Undefined` configuration object, can be omitted, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
      * @return `Undefined`
@@ -388,23 +431,20 @@ define([
      *  - __hex__ `Boolean|Undefined` whether data is specified in hexadecimal encoding and needs
      *                      to be converted to binary before writing it to file;
      *                      `false` by default
+     *  - __delimiter__ `String|Undefined` string that is appended after every array element
+     *              except the last one, default value: `\n`
      */
     function writeFile(path, data, options, callback) {
         if ("undefined" === typeof (callback)) {
             callback = options;
         }
-        try {
-            wiltoncall("fs_write_file", {
-                path: path,
-                data: data,
-                hex: extractHexOption(options)
-            });
-            utils.callOrIgnore(callback);
-        } catch (e) {
-            utils.callOrThrow(callback, e);
-        }
+        writeOrAppend(path, data, {
+            append: false,
+            hex: extractHexOption(options),
+            delimiter: extractDelimiterOption(options)
+        }, callback);
     }
-    
+
     /**
      * @function copyFile
      * 
@@ -465,7 +505,7 @@ define([
             utils.callOrThrow(callback, e);
         }
     }
-    
+
     return {
         appendFile: appendFile,
         appendFileSync: appendFile,
