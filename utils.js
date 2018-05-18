@@ -180,6 +180,10 @@ define([], function() {
         } else {
             if (e instanceof Error) {
                 throw e;
+            } else if ("object" === typeof(e) && 
+                    "string" === typeof(e.message) &&
+                    "string" === typeof(e.stack)) {
+                throw new Error(e.message);
             } else {
                 throw new Error(String(e));
             }
