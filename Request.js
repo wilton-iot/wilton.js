@@ -395,6 +395,85 @@ define([
         },
 
         /**
+         * @function sendWebSocket
+         * 
+         * Send string or JSON response to client over WebSocket.
+         * 
+         * Sends response to client converting specified object into
+         * JSON if necessary over the WebSocket connection
+         * 
+         * @param data `String|Object` response body, object will be converted to JSON
+         * @param options `Object|Undefined` configuration object, currently ignored
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Undefined`
+         * 
+         */
+        sendWebSocket: function(data, options, callback) {
+            try {
+                // data
+                var dt = utils.defaultJson(data);
+                wiltoncall("request_send_response", {
+                    requestHandle: this.handle,
+                    data: dt
+                });
+                utils.callOrIgnore(callback);
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
+
+        /**
+         * @function closeWebSocket
+         * 
+         * Close WebSocket connection
+         * 
+         * Closed WebSocket sending `close` frame to client and
+         * closing the underlying TCP connection
+         * 
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Undefined`
+         * 
+         */
+        closeWebSocket: function(callback) {
+            try {
+                wiltoncall("request_close_websocket", {
+                    requestHandle: this.handle,
+                });
+                utils.callOrIgnore(callback);
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
+
+        /**
+         * @function getWebSocketId
+         * 
+         * Return the ID of the WebSocket connection
+         * 
+         * Returns the ID of the current WebSocket connection.
+         * This ID can be used to filter `Server.broadcastWebSocket` messages.
+         * 
+         * For HTTP requests returns empty string.
+         * 
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Undefined`
+         * 
+         */
+        getWebSocketId: function(callback) {
+            try {
+                var key = this.headers()["Sec-WebSocket-Key"];
+                var res = "";
+                if ("string" === typeof(key)) {
+                    res = key;
+                }
+                utils.callOrIgnore(res, callback);
+                return res;
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
+
+        /**
          * @function sendMustache
          * 
          * Send rendered [mustache](https://mustache.github.io/) template to client.

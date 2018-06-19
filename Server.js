@@ -30,6 +30,9 @@
  * `GET`, `POST`, `PUT`, `DELETE` and `OPTIONS` (for CORS support) methods are used inside
  * the handler modules to handle incoming requests with the corresponding HTTP method.
  * 
+ * Additionally `WSOPEN`, `WSMESSAGE` and `WSCLOSE` WebSocket event names can be used
+ * inside hanler modules to handle incoming WebSocket events.
+ * 
  * `Server` can also serve static files (from file-system or from ZIP files)
  * specifying `documentRoots` configuration parameter.
  * 
@@ -92,7 +95,7 @@ define([
         name: "wilton_server"
     });
 
-    var METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"];
+    var METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS", "WSOPEN", "WSMESSAGE", "WSCLOSE"];
 
     function createMethodEntries(filters, vi) {
         var mod = null;
@@ -124,7 +127,7 @@ define([
         }
         if (0 === methodEntries.length) {
             throw new Error("Invalid 'views' element: must have one or more" +
-                    " function attrs: GET, POST, PUT, DELETE, OPTIONS," +
+                    " function attrs: GET, POST, PUT, DELETE, OPTIONS, WSOPEN, WSMESSAGE, WSCLOSE," +
                     " index: [" + i + "]");
         }
         return methodEntries;
@@ -187,9 +190,11 @@ define([
      *              the same module names are also used as URL paths for requiests routing;
      *              functions with following names are used inside the handler module to handle the
      *              requests:`GET`, `POST`, `PUT`, `DELETE` and `OPTIONS`;
+     *              the following method names can be used for WebSocket events:
+     *              `WSOPEN`, `WSMESSAGE` and `WSCLOSE`;
      *              each handler function receives `Request` instance as an only parameter
-     *              and must use `sendResponse()`, `sendTempFile()` or `sendMustache()`
-     *              methods to return the response to client
+     *              and must use `sendResponse()`, `sendTempFile()`, `sendMustache()` or
+     *              `sendWebSocket()` methods to return the response to client;
      *  - __filters__ `Array` list of module names that will be called on the incoming request,
      *                each module must return a `function(req, doFilter)`, and can either
      *                call `doFilter(req)` to proceed to the next filter (and eventually -
@@ -227,17 +232,22 @@ define([
      *    - __partialsDirs__ `Array` list of directories to use for loading mustache partial
      *                      templates when returning rendered mustache templates using
      *                      `Request.sendMustache()`
+     *  - __handle__ `Number|Undefined` handle to access `Server` instance from another thread
      *  
      */
     var Server = function(options, callback) {
         var opts = utils.defaultObject(options);
         try {
-            var filters = prepareFilters(opts.filters);
-            delete opts.filters;
-            opts.views = prepareViews(filters, opts.views);
-            var handleJson = wiltoncall("server_create", opts);
-            var handleObj = JSON.parse(handleJson);
-            this.handle = handleObj.serverHandle;
+            if (utils.hasPropertyWithType(opts, "handle", "number")) {
+                this.handle = opts.handle;
+            } else {
+                var filters = prepareFilters(opts.filters);
+                delete opts.filters;
+                opts.views = prepareViews(filters, opts.views);
+                var handleJson = wiltoncall("server_create", opts);
+                var handleObj = JSON.parse(handleJson);
+                this.handle = handleObj.serverHandle;
+            }
             utils.callOrIgnore(callback);
         } catch (e) {
             utils.callOrThrow(callback, e);
@@ -261,6 +271,39 @@ define([
                 wiltoncall("server_stop", {
                     serverHandle: this.handle
                 });
+                utils.callOrIgnore(callback);
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
+
+        /**
+         * @function broadcastWebSocket
+         * 
+         * Broadcast a message to WebSocket clients
+         * 
+         * Broadcasts the message to all the WebSocket clients
+         * currently connected on the specified `path`.
+         * 
+         * List of clients to include into broadcast mey be specified directly
+         * using `idList` option.
+         * 
+         * @param options `Object` configuration object, see possible options below
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Undefined`
+         * 
+         * __Options__
+         *  - __path__ `String` WebSocket path to broadcast on
+         *  - __message__ `String|Object` message to send, specified `Object` will be
+         *                converted to JSON
+         *  - __idList__ `Array|Undefined` optional list of WebSocket client IDs to include
+         *                into the broadcast
+         */
+        broadcastWebSocket: function(options, callback) {
+            var opts = utils.defaultObject(options);
+            try {
+                opts.serverHandle = this.handle;
+                wiltoncall("server_broadcast_websocket", opts);
                 utils.callOrIgnore(callback);
             } catch (e) {
                 utils.callOrThrow(callback, e);
