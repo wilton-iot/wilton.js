@@ -24,8 +24,8 @@
  * to handler functions registered with `wilton/Server`.
  * 
  * Each handler function receives `Request` instance as an only parameter
- * and must use `sendResponse()`, `sendTempFile()` or `sendMustache()`
- * methods to return the response to client
+ * and must use `sendResponse()`, `sendTempFile()`, `sendMustache()`
+ * or `sendWebSocket()` methods to return the response to client
  * 
  * Usage example:
  * 
@@ -425,7 +425,7 @@ define([
         /**
          * @function closeWebSocket
          * 
-         * Close WebSocket connection
+         * Close WebSocket connection.
          * 
          * Closed WebSocket sending `close` frame to client and
          * closing the underlying TCP connection

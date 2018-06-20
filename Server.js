@@ -285,7 +285,12 @@ define([
          * Broadcasts the message to all the WebSocket clients
          * currently connected on the specified `path`.
          * 
-         * List of clients to include into broadcast mey be specified directly
+         * May cause the broadcast message
+         * to interleave with other frames (put in the middle of continuation sequence, or
+         * in the middle to TCP fragmented sequence), if target connection is used for
+         * outbound traffic at the the time of broadcast.
+         * 
+         * List of clients to include into broadcast may be specified directly
          * using `idList` option.
          * 
          * @param options `Object` configuration object, see possible options below
