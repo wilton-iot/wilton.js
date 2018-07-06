@@ -18,7 +18,7 @@
  * @namespace service
  * 
  * __wilton/service__ \n
- * Serviceability operations.
+ * Serviceability functions.
  * 
  * Usage example:
  * 
@@ -27,12 +27,16 @@
  * // get pid of current process
  * var pid = getPid();
  * 
+ * // get memorySize of current process in bytes
+ * var memory = getMemorySize();
+ * 
  * @endcode
  */
 define([
     "./utils",
-    "./wiltoncall"
-], function(utils, wiltoncall) {
+    "./wiltoncall",
+    "./fs"
+], function(utils, wiltoncall, fs) {
     "use strict";
 
     /**
@@ -54,7 +58,33 @@ define([
         }
     }
 
+    /**
+     * @function getMemorySize
+     * 
+     * Get memorySize of current process in bytes.
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Number` memorySize of current process
+     */
+    function getMemorySize(callback) {
+        try {
+            var res = wiltoncall("service_get_process_memory_size_bytes"), resnum;
+            if (res === null) {
+                //it's Linux, so parse /proc/pid/status
+                var pid = getPid();
+                var status = fs.readFile("/proc/" + pid + "/status");
+                var regexp = /(VmRSS:).+(\n)/i;
+                resnum = parseInt(regexp.exec(status)[0]);
+            } else resnum = parseInt(res);
+            utils.callOrIgnore(callback, resnum);
+            return resnum;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
     return {
-        getPid: getPid
+        getPid: getPid,
+        getMemorySize: getMemorySize
     };
 });
