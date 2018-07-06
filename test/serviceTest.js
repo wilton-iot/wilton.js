@@ -30,6 +30,7 @@ define([
     }
     
     var pid = service.getPid();
+    var memory = service.getMemorySize();
     assert(pid >= 0);
-    
+    assert(memory > 0);
 });
