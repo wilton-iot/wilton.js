@@ -74,7 +74,7 @@ define([
                 var pid = getPid();
                 var status = fs.readFile("/proc/" + pid + "/status");
                 var regexp = /(VmRSS:).+(\n)/i;
-                resnum = parseInt(regexp.exec(status)[0]);
+                resnum = parseInt(regexp.exec(status)[0].match(/\d+/i)) * 1024;
             } else resnum = parseInt(res);
             utils.callOrIgnore(callback, resnum);
             return resnum;
