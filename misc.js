@@ -134,11 +134,82 @@ define([
             utils.callOrThrow(callback, e);
         }
     }
+
+    function _isCompileTimeOS(name, callback) {
+        try {
+            var conf = wiltonConfig();
+            var res = name === conf.compileTimeOS;
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
+     * @function isAndroid
+     * 
+     * Check whether current Wilton binary was compiled for Android
+     * 
+     * Checks that `compileTimeOS` parameter of `wiltonConfig` is "android".
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Boolean` `true` if current Wilton binary was compiled for Android, false otherwise
+     */
+    function isAndroid(callback) {
+        return _isCompileTimeOS("android", callback);
+    }
+
+    /**
+     * @function isWindows
+     * 
+     * Check whether current Wilton binary was compiled for Windows
+     * 
+     * Checks that `compileTimeOS` parameter of `wiltonConfig` is "windows".
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Boolean` `true` if current Wilton binary was compiled for Windows, false otherwise
+     */
+    function isWindows(callback) {
+        return _isCompileTimeOS("windows", callback);
+    }
+
+    /**
+     * @function isLinux
+     * 
+     * Check whether current Wilton binary was compiled for Linux
+     * 
+     * Checks that `compileTimeOS` parameter of `wiltonConfig` is "linux".
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Boolean` `true` if current Wilton binary was compiled for Linux, false otherwise
+     */
+    function isLinux(callback) {
+        return _isCompileTimeOS("linux", callback);
+    }
+
+    /**
+     * @function isMac
+     * 
+     * Check whether current Wilton binary was compiled for macOS 
+     * 
+     * Checks that `compileTimeOS` parameter of `wiltonConfig` is "macos".
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Boolean` `true` if current Wilton binary was compiled for macOS, false otherwise
+     */
+    function isMac(callback) {
+        return _isCompileTimeOS("macos", callback);
+    }
  
     return {
         wiltonConfig: wiltonConfig,
         stdinReadline: stdinReadline,
         waitForSignal: waitForSignal,
-        runGC: runGC
+        runGC: runGC,
+        isAndroid: isAndroid,
+        isWindows: isWindows,
+        isLinux: isLinux,
+        isMac: isMac
     };
 });

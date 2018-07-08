@@ -24,6 +24,9 @@ define([
 
     assert("object" === typeof(misc.wiltonConfig()));
 
+    // GC call present
     misc.runGC();
 
+    // compile-time OS
+    assert(misc.isAndroid() || misc.isWindows() || misc.isLinux() || misc.isMac());
 });
