@@ -35,10 +35,127 @@
 define([
     "./utils",
     "./wiltoncall",
+    "./dyload",
+    "./misc",
     "./fs"
-], function(utils, wiltoncall, fs) {
+], function(utils, wiltoncall, dyload, misc, fs) {
     "use strict";
 
+    dyload({
+        name: "wilton_service"
+    });
+
+    /**
+     * @function isTraceOn
+     * 
+     * Check if trace is recording.
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Boolean` true if trace recording is on, false otherwise
+     */
+
+    function isTraceOn(callback){
+        try {
+            var res = parseInt(wiltoncall("service_is_trace_info_gather_enabled"));
+            utils.callOrIgnore(callback);
+            return parseInt(res) === 1;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
+     * @function traceTurnOff
+     * 
+     * Turn off trace recording.
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Undefined`
+     */
+
+    function traceTurnOff(callback){
+        try {
+            wiltoncall("service_disable_trace_info_gather");
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
+     * @function traceTurnOff
+     * 
+     * Turn on trace recording.
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Undefined`
+     */
+
+    function traceTurnOn(callback){
+        try {
+            wiltoncall("service_enable_trace_info_gather");
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
+     * @function getCurrentCallStack
+     * 
+     * Returns string with current callstack.
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `String` with current callstack
+     */
+
+    function getCurrentCallStack(callback){
+        try {
+            var res = wiltoncall("service_get_call_stack");
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
+     * @function getAllCalls
+     * 
+     * Returns string with all function calls on current moment.
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `String` with all function calls
+     */
+
+    function getAllCalls(callback){
+        try {
+            var res = wiltoncall("service_get_all_calls");
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
+     * @function getThreadsCount
+     * 
+     * Returns quantity of threads in current process.
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Number` qty of threads
+     */
+
+    function getThreadsCount(callback){
+        try {
+            var res = parseInt(wiltoncall("service_get_threads_count"));
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
     /**
      * @function getPid
      * 
@@ -68,14 +185,16 @@ define([
      */
     function getMemorySize(callback) {
         try {
-            var res = wiltoncall("service_get_process_memory_size_bytes"), resnum;
-            if (res === null) {
+            if (misc.isLinux()) {
                 //it's Linux, so parse /proc/pid/status
                 var pid = getPid();
                 var status = fs.readFile("/proc/" + pid + "/status");
                 var regexp = /(VmRSS:).+(\n)/i;
                 resnum = parseInt(regexp.exec(status)[0].match(/\d+/i)) * 1024;
-            } else resnum = parseInt(res);
+            } else {
+                var res = wiltoncall("service_get_process_memory_size_bytes"), resnum;
+                resnum = parseInt(res);
+            }
             utils.callOrIgnore(callback, resnum);
             return resnum;
         } catch (e) {
@@ -85,6 +204,12 @@ define([
 
     return {
         getPid: getPid,
-        getMemorySize: getMemorySize
+        getMemorySize: getMemorySize,
+        isTraceOn: isTraceOn,
+        traceTurnOff: traceTurnOff,
+        traceTurnOn: traceTurnOn,
+        getCurrentCallStack: getCurrentCallStack,
+        getAllCalls: getAllCalls,
+        getThreadsCount: getThreadsCount
     };
 });
