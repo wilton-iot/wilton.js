@@ -15,9 +15,9 @@
  */
 
 /**
- * @namespace PGConnection
+ * @namespace pgsql
  * 
- * __wilton/PGConnection__ \n
+ * __wilton/pgsql__ \n
  * Connect to PostgreSQL database.
  * 
  * This module allows to work with PostgreSQL database.
@@ -34,7 +34,7 @@
  * @code
  * 
  * // open connection
- * var conn = new PGConnection("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
+ * var conn = new pgsql("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
  *
  * // execute DDL
  * conn.execute("create table t1 (foo varchar, bar int)");
@@ -75,7 +75,7 @@ define([
     });
 
     /**
-     * @function PGConnection
+     * @function pgsql
      * 
      * Open connection to database.
      * 
@@ -84,9 +84,9 @@ define([
      * @param url `String` backend-specific connection URL,
      *            postgres example: `postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test`,
      * @param callback `Function|Undefined` callback to receive result or error
-     * @return `Object` `PGConnection` instance
+     * @return `Object` `pgsql` instance
      */
-    var PGConnection = function(_url, callback) {
+    var pgsql = function(_url, callback) {
         const PREFIX = 'postgresql://';
 
         try {
@@ -101,7 +101,7 @@ define([
         }
     };
 
-    PGConnection.prototype = {
+    pgsql.prototype = {
         /**
          * @function execute
          * 
@@ -217,12 +217,7 @@ define([
         queryObject: function(sql, params, callback) {
             try {
                 var list = this.queryList(sql, params);
-                if (1 !== list.length) {
-                    throw new Error("Invalid number of records returned, expected 1 record," +
-                            " query: [" + sql + "], params: [" + JSON.stringify(params) + "]," +
-                            " number of records: [" + list.length +  "]");
-                }
-                var res = list[0];
+                var res = list[0] || null;
                 utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {
@@ -335,7 +330,7 @@ define([
      * @return `Object` loaded queries.
      */
     // https://github.com/alexkasko/springjdbc-typed-queries/blob/master/typed-queries-common/src/main/java/com/alexkasko/springjdbc/typedqueries/common/PlainSqlQueriesParser.java
-    PGConnection.loadQueryFile = function(path, callback) {
+    pgsql.loadQueryFile = function(path, callback) {
         try {
             var lines = fs.readLines(path);
             var nameRegex = new RegExp("^\\s*/\\*{2}\\s*(.*?)\\s*\\*/\\s*$");
@@ -385,5 +380,5 @@ define([
         }
     }
     
-    return PGConnection;
+    return pgsql;
 });
