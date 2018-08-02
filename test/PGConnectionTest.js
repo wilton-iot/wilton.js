@@ -17,18 +17,17 @@
 define([
     "assert",
     "wilton/Channel",
-    "wilton/DBConnection",
+    "wilton/PGConnection",
     "wilton/loader",
     "wilton/misc"
-], function(assert, Channel, DBConnection, loader, misc) {
+], function(assert, Channel, PGConnection, loader, misc) {
     "use strict";
 
-    print("test: wilton/DBConnection");
+    print("test: wilton/PGConnection");
 
     var appdir = misc.wiltonConfig().applicationDirectory;
 
-    var conn = new DBConnection("sqlite://" + appdir + "test.db");
-//    var conn = new DBConnection("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
+    var conn = new PGConnection("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
 
     conn.execute("drop table if exists t1");
     // insert
@@ -66,7 +65,7 @@ define([
     lock.close();
 
     // loadQueryFile
-    var queries = DBConnection.loadQueryFile(loader.findModulePath("wilton/test/data/test.sql"));
+    var queries = PGConnection.loadQueryFile(loader.findModulePath("wilton/test/data/test.sql"));
     assert.equal(queries.myTestSelect, "select foo from bar\n    where baz = 1\n    and 1 > 0 -- stupid condidion\n    limit 42");
     assert.equal(queries.myTestSelect2, "-- slow query\ndelete from foo\n    where baz = 1");
     assert.equal(queries.myTestSelect3, "drop table foo");

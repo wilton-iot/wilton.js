@@ -15,22 +15,16 @@
  */
 
 /**
- * @namespace DBConnection
+ * @namespace PGConnection
  * 
- * __wilton/DBConnection__ \n
- * Connect to relational databases.
+ * __wilton/PGConnection__ \n
+ * Connect to PostgreSQL database.
  * 
- * This module allows to work with relational databases.
+ * This module allows to work with PostgreSQL database.
  * 
  * It implements a lightweight ORM - object-relational mapping,
  * allows to map JavaScript objects to query parameters and to map
  * query results to JavaScript objects.
- * 
- * [SQLite](https://www.sqlite.org/) and [PostgreSQL](https://www.postgresql.org/)
- * databases are supported out of the box. 
- * 
- * Support for Oracle, MSSQL (through ODBC), MySQL
- * and Firebird can be added in custom builds.
  * 
  * DB connection can be closed manually to release system resource, otherwise
  * it will be closed during the shutdown.
@@ -40,7 +34,7 @@
  * @code
  * 
  * // open connection
- * var conn = new DBConnection("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
+ * var conn = new PGConnection("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
  *
  * // execute DDL
  * conn.execute("create table t1 (foo varchar, bar int)");
@@ -81,7 +75,7 @@ define([
     });
 
     /**
-     * @function DBConnection
+     * @function PGConnection
      * 
      * Open connection to database.
      * 
@@ -89,13 +83,16 @@ define([
      * 
      * @param url `String` backend-specific connection URL,
      *            postgres example: `postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test`,
-     *            sqlite example: `sqlite://test.db`
      * @param callback `Function|Undefined` callback to receive result or error
-     * @return `Object` `DBConnection` instance
+     * @return `Object` `PGConnection` instance
      */
-    var DBConnection = function(url, callback) {
+    var PGConnection = function(_url, callback) {
+        const PREFIX = 'postgresql://';
+
         try {
-            var handleJson = wiltoncall("db_connection_open", url);
+            var url = _url.startsWith(PREFIX) ? _url.slice(PREFIX.length) : _url;
+
+            var handleJson = wiltoncall("db_pgsql_connection_open", url);
             var handleParsed = JSON.parse(handleJson);
             this.handle = handleParsed.connectionHandle;
             utils.callOrIgnore(callback);
@@ -104,14 +101,12 @@ define([
         }
     };
 
-    DBConnection.prototype = {
+    PGConnection.prototype = {
         /**
          * @function execute
          * 
-         * Execute DML (`insert` or `update`) or DDL (`create` or `drop`) query
-         * 
-         * Executes DML (`insert` or `update`) or DDL (`create` or `drop`) query
-         * 
+         * Execute specified SQL query
+         *
          * @param sql `String` SQL query
          * @param params `Object|Undefined` query parameters object
          * @param callback `Function|Undefined` callback to receive result or error
@@ -121,7 +116,7 @@ define([
             try {
                 var sqlstr = utils.defaultString(sql);
                 var pars = utils.defaultObject(params);
-                wiltoncall("db_connection_execute", {
+                wiltoncall("db_pgsql_connection_execute_sql_with_parameters", {
                     connectionHandle: this.handle,
                     sql: sqlstr,
                     params: pars
@@ -192,7 +187,7 @@ define([
             try {
                 var sqlstr = utils.defaultString(sql);
                 var pars = utils.defaultObject(params);
-                var json = wiltoncall("db_connection_query", {
+                var json = wiltoncall("db_pgsql_connection_execute_sql_with_parameters", {
                     connectionHandle: this.handle,
                     sql: sqlstr,
                     params: pars
@@ -249,19 +244,18 @@ define([
          */
         doInTransaction: function(operations, callback) {
             try {
-                var tranJson = wiltoncall("db_transaction_start", {
+                wiltoncall("db_pgsql_transaction_begin", {
                     connectionHandle: this.handle
                 });
-                var tran = JSON.parse(tranJson);
                 var res = null;
                 try {
                     res = operations();
-                    wiltoncall("db_transaction_commit", {
-                        transactionHandle: tran.transactionHandle
+                    wiltoncall("db_pgsql_transaction_commit", {
+                        connectionHandle: this.handle
                     });
                 } catch (e) {
-                    wiltoncall("db_transaction_rollback", {
-                        transactionHandle: tran.transactionHandle
+                    wiltoncall("db_pgsql_transaction_rollback", {
+                        connectionHandle: this.handle
                     });
                     logger.warn("Transaction rolled back, error: [" + utils.formatError(e) + "]");
                     utils.callOrThrow(callback, e);
@@ -316,7 +310,7 @@ define([
          */
         close: function(callback) {
             try {
-                wiltoncall("db_connection_close", {
+                wiltoncall("db_pgsql_connection_close", {
                     connectionHandle: this.handle
                 });
                 utils.callOrIgnore(callback);
@@ -341,7 +335,7 @@ define([
      * @return `Object` loaded queries.
      */
     // https://github.com/alexkasko/springjdbc-typed-queries/blob/master/typed-queries-common/src/main/java/com/alexkasko/springjdbc/typedqueries/common/PlainSqlQueriesParser.java
-    DBConnection.loadQueryFile = function(path, callback) {
+    PGConnection.loadQueryFile = function(path, callback) {
         try {
             var lines = fs.readLines(path);
             var nameRegex = new RegExp("^\\s*/\\*{2}\\s*(.*?)\\s*\\*/\\s*$");
@@ -391,5 +385,5 @@ define([
         }
     }
     
-    return DBConnection;
+    return PGConnection;
 });
