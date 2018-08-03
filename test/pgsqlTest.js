@@ -61,12 +61,19 @@ define([
     assert.equal(conn.doInSyncTransaction("DBConnectionTest.lock", function() { return 42; }), 42);
     lock.close();
 
-    // loadQueryFile
-    var queries = pgsql.loadQueryFile(loader.findModulePath("wilton/test/data/test.sql"));
-    assert.equal(queries.myTestSelect, "select foo from bar\n    where baz = 1\n    and 1 > 0 -- stupid condidion\n    limit 42");
-    assert.equal(queries.myTestSelect2, "-- slow query\ndelete from foo\n    where baz = 1");
-    assert.equal(queries.myTestSelect3, "drop table foo");
 
+    // loadQueryFile PREPARED_STATEMENTS
+    const statements = conn.loadAndPrepareStatements('test/pgsql', loader.findModulePath("wilton/test/data/pgtest.sql"));
+    statements.execute('insertT1', [ 'ggg', 55 ]);
+
+    var res = statements.queryList('selectT1', { bar: 41 });
+    assert(Array.isArray(res));
+    assert.equal(res.length, 3);
+    assert.deepEqual(res[0], { foo: 'bbb', bar: 42 });
+    assert.deepEqual(res[1], { foo: 'ccc', bar: 43 });
+    assert.deepEqual(res[2], { foo: 'ggg', bar: 55 });
+
+    assert.throws(function() { statements.execute('UNDEFINED') });
 
     /// Specific types
     conn.execute("drop table if exists t2");
@@ -84,7 +91,7 @@ define([
         true
     ]);
 
-    var res = conn.queryList('select * from t2');
+    res = conn.queryList('select * from t2');
     assert(Array.isArray(res));
     assert.equal(res.length, 2);
     assert.strictEqual(res[0].b, false);
