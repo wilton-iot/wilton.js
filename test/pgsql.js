@@ -66,4 +66,44 @@ define([
     assert.equal(queries.myTestSelect, "select foo from bar\n    where baz = 1\n    and 1 > 0 -- stupid condidion\n    limit 42");
     assert.equal(queries.myTestSelect2, "-- slow query\ndelete from foo\n    where baz = 1");
     assert.equal(queries.myTestSelect3, "drop table foo");
+
+
+    /// Specific types
+    conn.execute("drop table if exists t2");
+    conn.execute("create table if not exists t2 (id serial primary key,b bool, arr int[],js json);");
+
+    const insertT2Query = 'insert into t2 values (DEFAULT, $3, $2, $1);';
+    conn.execute(insertT2Query, {
+        $3: false,
+        $2: [ 3, 2, 1, 0 ],
+        $1: { test: 1, sec: 3 }
+    });
+    conn.execute(insertT2Query, [
+        { a: 1, b: { c: 2 } },
+        [ 1, 2, 3 ],
+        true
+    ]);
+
+    var res = conn.queryList('select * from t2');
+    assert(Array.isArray(res));
+    assert.equal(res.length, 2);
+    assert.strictEqual(res[0].b, false);
+    assert.deepEqual(res[0].arr, [ 3, 2, 1, 0 ]);
+    assert.deepEqual(res[0].js, { test: 1, sec: 3 });
+    assert.strictEqual(res[1].b, true);
+    assert.deepEqual(res[1].arr, [ 1, 2, 3 ]);
+    assert.deepEqual(res[1].js, { a: 1, b: { c: 2 } });
+
+    conn.execute('insert into t2 values (DEFAULT, null, null, null);');
+    ///conn.execute(insertT2Query, [ null, null, null ]);    /// TODO fixme
+
+    conn.queryList('select * from t2');
+
+
+    //conn.execute(insertT2Query, [ {}, [], null ]);
+    ///var res = conn.queryList("select js -> 'b' as eval from t2;");
+    /*var res = conn.queryList("select * from t2;");
+
+    console.log('RES:::');
+    console.log(JSON.stringify(res, null, 4));*/
 });
