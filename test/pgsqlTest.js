@@ -101,9 +101,11 @@ define([
     assert.deepEqual(res[1].arr, [ 1, 2, 3 ]);
     assert.deepEqual(res[1].js, { a: 1, b: { c: 2 } });
 
-    conn.execute('insert into t2 values (DEFAULT, null, null, null);');
-    ///conn.execute(insertT2Query, [ null, null, null ]);                               /// TODO fixme!!!
-    ///conn.queryList('select * from t2');                                              /// TODO fixme!!!
+    conn.execute(insertT2Query, [ null, null, null ]);
+    res = conn.queryList('select * from t2 where b is null');
+    assert(Array.isArray(res));
+    assert.equal(res.length, 1);
+    assert.deepEqual(res[0], { id: 3, b: null, arr: null, js: null });
 
     res = conn.queryList("select js -> 'b' as eval from t2;");
     assert(Array.isArray(res));
