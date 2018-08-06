@@ -63,7 +63,7 @@ define([
 
 
     // loadQueryFile PREPARED_STATEMENTS
-    const statements = conn.loadAndPrepareStatements('test/pgsql', loader.findModulePath("wilton/test/data/pgtest.sql"));
+    var statements = conn.loadAndPrepareStatements('test/pgsql', loader.findModulePath("wilton/test/data/pgtest.sql"));
     statements.execute('insertT1', [ 'ggg', 55 ]);
 
     var res = statements.queryList('selectT1', { bar: 41 });
@@ -80,7 +80,7 @@ define([
     conn.execute("drop table if exists t2");
     conn.execute("create table if not exists t2 (id serial primary key,b bool, arr int[],js json);");
 
-    const insertT2Query = 'insert into t2 values (DEFAULT, $3, $2, $1);';
+    var insertT2Query = 'insert into t2 values (DEFAULT, $3, $2, $1);';
     conn.execute(insertT2Query, {
         $3: false,
         $2: [ 3, 2, 1, 0 ],

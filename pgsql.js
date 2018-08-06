@@ -95,7 +95,7 @@ define([
      * @return `Object` `pgsql` instance
      */
     var pgsql = function(_url, callback) {
-        const PREFIX = 'postgresql://';
+        var PREFIX = 'postgresql://';
 
         try {
             var url = _url.startsWith(PREFIX) ? _url.slice(PREFIX.length) : _url;
@@ -345,8 +345,8 @@ define([
 
                 wiltoncall('db_pgsql_connection_prepare', {
                     connectionHandle: this.handle,
-                    name,
-                    sql
+                    name: name,
+                    sql: sql
                 });
 
                 utils.callOrIgnore(callback);
@@ -369,7 +369,7 @@ define([
             try {
                 wiltoncall('db_pgsql_connection_deallocate_prepared', {
                     connectionHandle: this.handle,
-                    name
+                    name: name
                 });
 
                 utils.callOrIgnore(callback);
@@ -393,7 +393,7 @@ define([
             try {
                 var res = wiltoncall('db_pgsql_connection_get_prepare_info', {
                     connectionHandle: this.handle,
-                    name
+                    name: name
                 });
 
                 utils.callOrIgnore(callback, res);
@@ -420,8 +420,8 @@ define([
                 var params = utils.defaultObject(_params);
                 var res = wiltoncall('db_pgsql_connection_execute_prepared_with_parameters', {
                     connectionHandle: this.handle,
-                    name,
-                    params
+                    name: name,
+                    params: params
                 });
 
                 utils.callOrIgnore(callback, res);
@@ -471,7 +471,7 @@ define([
             this.moduleId = moduleId;
             this.statements = statements;
 
-            Object.keys(statements).forEach(key => {
+            Object.keys(statements).forEach(function(key) {
                 this.db.prepareStatement(this.getPreparedName(key), statements[key]);
             });
 
