@@ -336,7 +336,8 @@ define([
      * Each query must start with `/** myQuery STAR/` header.
      * 
      * Lines with comments are preserved, empty lines are ignored.
-     * 
+     *
+     * @param path `String` path to file with data
      * @param callback `Function|Undefined` callback to receive result or error
      * @return `Object` loaded queries.
      */

@@ -40,7 +40,7 @@
  * conn.execute("create table t1 (foo varchar, bar int)");
  * 
  * // execute DQL
- * var res = conn.query("select foo, bar from t1 where foo = :foo or bar = :bar order by bar", {
+ * var res = conn.queryList("select foo, bar from t1 where foo = :foo or bar = :bar order by bar", {
  *     foo: "ccc",
  *     bar: 42
  * });
@@ -52,6 +52,13 @@
  *         bar: 42
  *     });
  * });
+ *
+ * // prepared statements
+ * var queriesPath = loader.findModulePath(module.id + ".sql");
+ * var statements = conn.loadAndPrepareStatements(module.id, queriesPath);
+ *
+ * statements.execute('insert', [ 'one', 'two' ]);
+ * var res = statements.queryList('select', [ 'three' ]);
  * 
  * // close connection
  * conn.close();
@@ -93,7 +100,10 @@ define([
         try {
             var url = _url.startsWith(PREFIX) ? _url.slice(PREFIX.length) : _url;
 
-            var handleJson = wiltoncall("db_pgsql_connection_open", url);
+            var handleJson = wiltoncall("db_pgsql_connection_open", {
+                parameters: url,
+                ping_on: true
+            });
             var handleParsed = JSON.parse(handleJson);
             this.handle = handleParsed.connectionHandle;
             utils.callOrIgnore(callback);
@@ -213,7 +223,7 @@ define([
          * @param sql `String` SQL query
          * @param params `Object|Undefined` query parameters object
          * @param callback `Function|Undefined` callback to receive result or error
-         * @return `Object` object converted from the single row returned
+         * @return `Object|null` object converted from the single row returned
          */
         queryObject: function(sql, params, callback) {
             try {
@@ -315,7 +325,19 @@ define([
             }
         },
 
-        createPreparedStatement: function(name, sql, callback) {
+        /**
+         * @function prepareStatement
+         *
+         * Prepare a statement for execution.
+         *
+         * Prepares a statement for execution.
+         *
+         * @param name `String` Name of prepared statement
+         * @param sql `String` SQL query
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Undefined`
+         */
+        prepareStatement: function(name, sql, callback) {
             try {
                 if (name.length > 63) {
                     throw new Error('Prepared statement name will be truncated to 63 chars maximum. [' + name + ']');
@@ -333,7 +355,17 @@ define([
             }
         },
 
-        dropPreparedStatement: function(name, callback) {
+        /**
+         * @function deallocate
+         *
+         * Deallocate a prepared statement.
+         *
+         * Deallocate a prepared statement.
+         *
+         * @param name `String` Name of prepared statement
+         * @param callback `Function|Undefined` callback to receive result or error
+         */
+        deallocate: function(name, callback) {
             try {
                 wiltoncall('db_pgsql_connection_deallocate_prepared', {
                     connectionHandle: this.handle,
@@ -346,6 +378,17 @@ define([
             }
         },
 
+        /**
+         * @function getPreparedStatementInfo
+         *
+         * Get information about a prepared statement.
+         *
+         * Get information about a prepared statement's parameters types.
+         *
+         * @param name `String` Name of prepared statement
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @returns {*}
+         */
         getPreparedStatementInfo: function(name, callback) {
             try {
                 var res = wiltoncall('db_pgsql_connection_get_prepare_info', {
@@ -360,6 +403,18 @@ define([
             }
         },
 
+        /**
+         * @function executePreparedStatement
+         *
+         * Execute a prepared statement.
+         *
+         * Executes a prepared statement query.
+         *
+         * @param name `String` Name of prepared statement
+         * @param _params `Object|Undefined` query parameters object
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @returns {*}
+         */
         executePreparedStatement: function(name, _params, callback) {
             try {
                 var params = utils.defaultObject(_params);
@@ -372,10 +427,30 @@ define([
                 utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {
+                if (e.message.split('\n')[0].match(/prepared statement ".*" does not exist/)) {
+                    e = new Error('Undefined prepared statement');
+                }
+
                 utils.callOrThrow(callback, e);
             }
         },
 
+        /**
+         * @function loadAndPrepareStatements
+         *
+         * Load and prepare queries from SQL file.
+         *
+         * Parses a file with SQL queries as `query_name: sql` object.
+         *
+         * Each query must start with `/** myQuery STAR/` header.
+         *
+         * Lines with comments are preserved, empty lines are ignored.
+         *
+         * @param moduleId `String` unique namespace, uses as prefix of prepared statements names
+         * @param path `String` path to file with data
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @returns `PreparedStatements` Object working with loaded prepared statements {execute(name, params), queryList(name,params), queryObject(name,params)}
+         */
         loadAndPrepareStatements: function(moduleId, path, callback) {
             try {
                 var statements = DBConnection.loadQueryFile(path);
@@ -397,7 +472,7 @@ define([
             this.statements = statements;
 
             Object.keys(statements).forEach(key => {
-                this.db.createPreparedStatement(this.getPreparedName(key), statements[key]);
+                this.db.prepareStatement(this.getPreparedName(key), statements[key]);
             });
 
             utils.callOrIgnore(callback);
@@ -430,6 +505,18 @@ define([
             try {
                 var json = this.execute(name, params);
                 var res = JSON.parse(json);
+
+                utils.callOrIgnore(callback, res);
+                return res;
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
+
+        queryObject: function(name, params, callback) {
+            try {
+                var list = this.queryList(name, params);
+                var res = list[0] || null;
 
                 utils.callOrIgnore(callback, res);
                 return res;

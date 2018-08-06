@@ -73,7 +73,8 @@ define([
     assert.deepEqual(res[1], { foo: 'ccc', bar: 43 });
     assert.deepEqual(res[2], { foo: 'ggg', bar: 55 });
 
-    assert.throws(function() { statements.execute('UNDEFINED') });
+    assert.throws(function() { statements.execute('UNDEFINED') }, /Unknown module's prepared statement/);
+    assert.throws(function() { conn.executePreparedStatement('UNDEFINED') }, /Undefined prepared statement/);
 
     /// Specific types
     conn.execute("drop table if exists t2");
