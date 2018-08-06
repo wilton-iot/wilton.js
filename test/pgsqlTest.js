@@ -114,4 +114,18 @@ define([
     assert.deepEqual(res[0], { eval: null });
     assert.deepEqual(res[1], { eval: { c: 2 } });
     assert.deepEqual(res[2], { eval: null });
+
+    /// Float
+    conn.execute('drop table if exists t3');
+    conn.execute('create table if not exists t3 (id serial primary key, dec decimal, num numeric, real real)');
+
+    var floats = {
+        id: 1,
+        dec: 0.000157,
+        num: 0.000333,
+        real: 0.000789
+    };
+    conn.execute('insert into t3 values(default, :dec, :num, :real)', floats);
+    res = conn.queryObject('select * from t3');
+    assert.deepEqual(res, floats);
 });
