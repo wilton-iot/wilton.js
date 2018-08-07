@@ -50,6 +50,11 @@ define([
     assert.equal(rs[0].bar, 42);
     assert.equal(rs[1].foo, "ccc");
     assert.equal(rs[1].bar, 43);
+    var rsEmpty = conn.queryList("select foo, bar from t1 where foo = :foo or bar = :bar order by bar", {
+        foo: "ccc_empty",
+        bar: 44
+    });
+    assert.equal(rsEmpty.length, 0);
     var el = conn.queryObject("select foo, bar from t1 where foo = :foo or bar = :bar order by bar", {
         foo: "bbb",
         bar: 42

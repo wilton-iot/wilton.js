@@ -17,17 +17,17 @@
 define([
     "assert",
     "wilton/Channel",
-    "wilton/pgsql",
+    "wilton/PGConnection",
     "wilton/loader",
     "wilton/misc"
-], function(assert, Channel, pgsql, loader, misc) {
+], function(assert, Channel, PGConnection, loader, misc) {
     "use strict";
 
-    print("test: wilton/pgsql");
+    print("test: wilton/PGconnection");
 
     var appdir = misc.wiltonConfig().applicationDirectory;
 
-    var conn = new pgsql("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
+    var conn = new PGConnection("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
 
     conn.execute("drop table if exists t1");
     // insert
@@ -63,7 +63,7 @@ define([
 
 
     // loadQueryFile PREPARED_STATEMENTS
-    var statements = conn.loadAndPrepareStatements('test/pgsql', loader.findModulePath("wilton/test/data/pgtest.sql"));
+    var statements = conn.loadAndPrepareStatements('test/PGconnection', loader.findModulePath("wilton/test/data/pgtest.sql"));
     statements.execute('insertT1', [ 'ggg', 55 ]);
 
     var res = statements.queryList('selectT1', { bar: 41 });

@@ -17,7 +17,7 @@
 /**
  * @namespace pgsql
  * 
- * __wilton/pgsql__ \n
+ * __wilton/PGconnection__ \n
  * Connect to PostgreSQL database.
  * 
  * This module allows to work with PostgreSQL database.
@@ -34,7 +34,7 @@
  * @code
  * 
  * // open connection
- * var conn = new pgsql("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
+ * var conn = new PGconnection("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
  *
  * // execute DDL
  * conn.execute("create table t1 (foo varchar, bar int)");
@@ -83,7 +83,7 @@ define([
     });
 
     /**
-     * @function pgsql
+     * @function PGconnection
      * 
      * Open connection to database.
      * 
@@ -94,11 +94,11 @@ define([
      * @param callback `Function|Undefined` callback to receive result or error
      * @return `Object` `pgsql` instance
      */
-    var pgsql = function(_url, callback) {
+    var PGconnection = function(_url, callback) {
         var PREFIX = 'postgresql://';
 
         try {
-            var url = _url.startsWith(PREFIX) ? _url.slice(PREFIX.length) : _url;
+            var url = utils.startsWith(_url, PREFIX) ? _url.slice(PREFIX.length) : _url;
 
             var handleJson = wiltoncall("db_pgsql_connection_open", {
                 parameters: url,
@@ -112,7 +112,7 @@ define([
         }
     };
 
-    pgsql.prototype = {
+    PGconnection.prototype = {
         /**
          * @function execute
          * 
@@ -527,5 +527,5 @@ define([
     };
 
 
-    return pgsql;
+    return PGconnection;
 });

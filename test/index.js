@@ -31,7 +31,7 @@ define([], function() {
                 "wilton/test/mustacheTest",
                 "wilton/test/netTest",
                 "wilton/test/PDFDocumentTest",
-                "wilton/test/pgsqlTest",
+//                "wilton/test/PGConnectionTest",
                 "wilton/test/processTest",
                 "wilton/test/ServerTest",
                 "wilton/test/SocketTest",
