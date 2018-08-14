@@ -53,13 +53,6 @@
  *     });
  * });
  *
- * // prepared statements
- * var queriesPath = loader.findModulePath(module.id + ".sql");
- * var statements = conn.loadAndPrepareStatements(module.id, queriesPath);
- *
- * statements.execute('insert', [ 'one', 'two' ]);
- * var res = statements.queryList('select', [ 'three' ]);
- * 
  * // close connection
  * conn.close();
  * 
@@ -126,13 +119,32 @@ define([
         execute: function(sql, params, callback) {
             try {
                 var sqlstr = utils.defaultString(sql);
+                if (!sqlstr) {
+                    throw new Error('Empty sql query.');
+                }
+
                 var pars = utils.defaultObject(params);
-                wiltoncall("db_pgsql_connection_execute_sql_with_parameters", {
+                var json = wiltoncall("db_pgsql_connection_execute_sql", {
                     connectionHandle: this.handle,
                     sql: sqlstr,
                     params: pars
                 });
-                utils.callOrIgnore(callback);
+                var res = JSON.parse(json);
+
+                if (res.cmd_status) {
+                    var status = res.cmd_status.split(' ');
+                    res.cmd = status[0];
+
+                    if (status.length === 3) {
+                        res.oid = status[1];
+                        res.count = status[2];
+                    } else {
+                        res.count = status[1];
+                    }
+                }
+
+                utils.callOrIgnore(callback, res);
+                return res;
             } catch (e) {
                 utils.callOrThrow(callback, e);
             }
@@ -196,14 +208,7 @@ define([
          */
         queryList: function(sql, params, callback) {
             try {
-                var sqlstr = utils.defaultString(sql);
-                var pars = utils.defaultObject(params);
-                var json = wiltoncall("db_pgsql_connection_execute_sql_with_parameters", {
-                    connectionHandle: this.handle,
-                    sql: sqlstr,
-                    params: pars
-                });
-                var res = JSON.parse(json);
+                var res = this.execute(sql, params);
                 utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {
@@ -274,36 +279,6 @@ define([
         },
 
         /**
-         * @function doInSyncTransaction
-         * 
-         * Perform a set of DB operations inside the synchronized transaction.
-         * 
-         * This method runs specified operations inside the transaactional
-         * block (using `doInTransaction`) additionally wrapping it with
-         * synchroinized block (using `Channel.synchronize()`).
-         * 
-         * @param lockChannelName `String` name of the channel to use for synchronization
-         *                        it must be existing empty channel with `maxSize` = `1`
-         * @param operations `Function` function performing DB operations
-         * @param callback `Function|Undefined` callback to receive result or error
-         * @return `Any` value returned by `operations` function
-         */
-        doInSyncTransaction: function(lockChannelName, operations, callback) {
-            try {
-                var Channel = WILTON_requiresync("wilton/Channel");
-                var lock = Channel.lookup(lockChannelName);
-                var self = this;
-                var res = lock.synchronize(function() {
-                    return self.doInTransaction(operations);
-                });
-                utils.callOrIgnore(callback, res);
-                return res;
-            } catch (e) {
-                utils.callOrThrow(callback, e);
-            }
-        },
-
-        /**
          * @function close
          * 
          * Close database connection.
@@ -323,208 +298,26 @@ define([
             } catch (e) {
                 utils.callOrThrow(callback, e);
             }
-        },
-
-        /**
-         * @function prepareStatement
-         *
-         * Prepare a statement for execution.
-         *
-         * Prepares a statement for execution.
-         *
-         * @param name `String` Name of prepared statement
-         * @param sql `String` SQL query
-         * @param callback `Function|Undefined` callback to receive result or error
-         * @return `Undefined`
-         */
-        prepareStatement: function(name, sql, callback) {
-            try {
-                if (name.length > 63) {
-                    throw new Error('Prepared statement name will be truncated to 63 chars maximum. [' + name + ']');
-                }
-
-                wiltoncall('db_pgsql_connection_prepare', {
-                    connectionHandle: this.handle,
-                    name: name,
-                    sql: sql
-                });
-
-                utils.callOrIgnore(callback);
-            } catch (e) {
-                utils.callOrThrow(callback, e);
-            }
-        },
-
-        /**
-         * @function deallocate
-         *
-         * Deallocate a prepared statement.
-         *
-         * Deallocate a prepared statement.
-         *
-         * @param name `String` Name of prepared statement
-         * @param callback `Function|Undefined` callback to receive result or error
-         */
-        deallocate: function(name, callback) {
-            try {
-                wiltoncall('db_pgsql_connection_deallocate_prepared', {
-                    connectionHandle: this.handle,
-                    name: name
-                });
-
-                utils.callOrIgnore(callback);
-            } catch (e) {
-                utils.callOrThrow(callback, e);
-            }
-        },
-
-        /**
-         * @function getPreparedStatementInfo
-         *
-         * Get information about a prepared statement.
-         *
-         * Get information about a prepared statement's parameters types.
-         *
-         * @param name `String` Name of prepared statement
-         * @param callback `Function|Undefined` callback to receive result or error
-         * @returns {*}
-         */
-        getPreparedStatementInfo: function(name, callback) {
-            try {
-                var res = wiltoncall('db_pgsql_connection_get_prepare_info', {
-                    connectionHandle: this.handle,
-                    name: name
-                });
-
-                utils.callOrIgnore(callback, res);
-                return res;
-            } catch (e) {
-                utils.callOrThrow(callback, e);
-            }
-        },
-
-        /**
-         * @function executePreparedStatement
-         *
-         * Execute a prepared statement.
-         *
-         * Executes a prepared statement query.
-         *
-         * @param name `String` Name of prepared statement
-         * @param _params `Object|Undefined` query parameters object
-         * @param callback `Function|Undefined` callback to receive result or error
-         * @returns {*}
-         */
-        executePreparedStatement: function(name, _params, callback) {
-            try {
-                var params = utils.defaultObject(_params);
-                var res = wiltoncall('db_pgsql_connection_execute_prepared_with_parameters', {
-                    connectionHandle: this.handle,
-                    name: name,
-                    params: params
-                });
-
-                utils.callOrIgnore(callback, res);
-                return res;
-            } catch (e) {
-                if (e.message.split('\n')[0].match(/prepared statement ".*" does not exist/)) {
-                    e = new Error('Undefined prepared statement');
-                }
-
-                utils.callOrThrow(callback, e);
-            }
-        },
-
-        /**
-         * @function loadAndPrepareStatements
-         *
-         * Load and prepare queries from SQL file.
-         *
-         * Parses a file with SQL queries as `query_name: sql` object.
-         *
-         * Each query must start with `/** myQuery STAR/` header.
-         *
-         * Lines with comments are preserved, empty lines are ignored.
-         *
-         * @param moduleId `String` unique namespace, uses as prefix of prepared statements names
-         * @param path `String` path to file with data
-         * @param callback `Function|Undefined` callback to receive result or error
-         * @returns `PreparedStatements` Object working with loaded prepared statements {execute(name, params), queryList(name,params), queryObject(name,params)}
-         */
-        loadAndPrepareStatements: function(moduleId, path, callback) {
-            try {
-                var statements = DBConnection.loadQueryFile(path);
-                var res = new PreparedStatements(moduleId, statements, this);
-
-                utils.callOrIgnore(callback, res);
-                return res;
-            } catch (e) {
-                utils.callOrThrow(callback, e);
-            }
         }
     };
 
-
-    var PreparedStatements = function(moduleId, statements, db, callback) {
-        try {
-            this.db = db;
-            this.moduleId = moduleId;
-            this.statements = statements;
-
-            Object.keys(statements).forEach(function(key) {
-                this.db.prepareStatement(this.getPreparedName(key), statements[key]);
-            });
-
-            utils.callOrIgnore(callback);
-        } catch (e) {
-            utils.callOrThrow(callback, e);
-        }
-    };
-
-    PreparedStatements.prototype = {
-        getPreparedName: function(name) {
-            return this.moduleId + ':' + name;
-        },
-
-        execute: function(name, params, callback) {
-            try {
-                if (!this.statements[name]) {
-                    throw new Error('Unknown module\'s prepared statement: ' + name);
-                }
-
-                var res = this.db.executePreparedStatement(this.getPreparedName(name), params);
-
-                utils.callOrIgnore(callback, res);
-                return res;
-            } catch (e) {
-                utils.callOrThrow(callback, e);
-            }
-        },
-
-        queryList: function(name, params, callback) {
-            try {
-                var json = this.execute(name, params);
-                var res = JSON.parse(json);
-
-                utils.callOrIgnore(callback, res);
-                return res;
-            } catch (e) {
-                utils.callOrThrow(callback, e);
-            }
-        },
-
-        queryObject: function(name, params, callback) {
-            try {
-                var list = this.queryList(name, params);
-                var res = list[0] || null;
-
-                utils.callOrIgnore(callback, res);
-                return res;
-            } catch (e) {
-                utils.callOrThrow(callback, e);
-            }
-        }
-    };
+    /**
+     * @static loadQueryFile
+     *
+     * Load queries froma an SQL file.
+     *
+     * Parses a file with SQL queries as `query_name: sql` object.
+     *
+     * Each query must start with `/** myQuery STAR/` header.
+     *
+     * Lines with comments are preserved, empty lines are ignored.
+     *
+     * @param path `String` path to file with data
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Object` loaded queries.
+     */
+    // https://github.com/alexkasko/springjdbc-typed-queries/blob/master/typed-queries-common/src/main/java/com/alexkasko/springjdbc/typedqueries/common/PlainSqlQueriesParser.java
+    PGconnection.loadQueryFile = DBConnection.loadQueryFile;
 
 
     return PGconnection;

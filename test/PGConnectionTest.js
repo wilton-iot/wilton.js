@@ -32,12 +32,26 @@ define([
     conn.execute("drop table if exists t1");
     // insert
     conn.execute("create table t1 (foo varchar, bar int)");
-    conn.execute("insert into t1 values('aaa', 41)");
+    var res = conn.execute("insert into t1 values('aaa', 41)");
+    assert.equal(res.cmd, "INSERT");
+    assert.equal(res.count, 1);
+
     // named params
-    conn.execute("insert into t1 values(:foo, :bar)", {
+    res = conn.execute("insert into t1 values(:foo, :bar)", {
         foo: "bbb",
         bar: 42
     });
+    assert.equal(res.cmd, "INSERT");
+    assert.equal(res.count, 1);
+
+    res = conn.execute('update t1 set foo = $1 where bar = $2', [ 'bbb22', 42 ]);
+    assert.equal(res.cmd, "UPDATE");
+    assert.equal(res.count, 1);
+
+    res = conn.execute('update t1 set foo = $1 where bar = $2', [ 'bbb22', 77 ]);
+    assert.equal(res.cmd, "UPDATE");
+    assert.equal(res.count, 0);
+
     conn.execute("insert into t1 values(:foo, :bar)", ["ccc", 43]);
     // select
     var rs = conn.queryList("select foo, bar from t1 where foo = :foo or bar = :bar order by bar", {
@@ -45,7 +59,7 @@ define([
         bar: 42
     });
     assert.equal(rs.length, 2);
-    assert.equal(rs[0].foo, "bbb");
+    assert.equal(rs[0].foo, "bbb22");
     assert.equal(rs[0].bar, 42);
     assert.equal(rs[1].foo, "ccc");
     assert.equal(rs[1].bar, 43);
@@ -53,28 +67,33 @@ define([
         foo: "bbb",
         bar: 42
     });
-    assert.equal(el.foo, "bbb");
+    assert.equal(el.foo, "bbb22");
     assert.equal(el.bar, 42);
 
-    assert.equal(conn.doInTransaction(function() { return 42; }), 42);
-    var lock = new Channel("DBConnectionTest.lock", 1);
-    assert.equal(conn.doInSyncTransaction("DBConnectionTest.lock", function() { return 42; }), 42);
-    lock.close();
+    res = conn.execute('delete from t1 where foo = $1', [ 'bbb' ]);
+    assert.equal(res.cmd, "DELETE");
+    assert.equal(res.count, 0);
 
+    res = conn.execute('delete from t1 where foo = $1', [ 'bbb22' ]);
+    assert.equal(res.cmd, "DELETE");
+    assert.equal(res.count, 1);
+
+    assert.equal(conn.doInTransaction(function() { return 42; }), 42);
 
     // loadQueryFile PREPARED_STATEMENTS
-    var statements = conn.loadAndPrepareStatements('test/PGconnection', loader.findModulePath("wilton/test/data/pgtest.sql"));
-    statements.execute('insertT1', [ 'ggg', 55 ]);
+    var queries = PGConnection.loadQueryFile(loader.findModulePath("wilton/test/data/pgtest.sql"));
+    conn.execute(queries.insertT1, [ 'ggg', 55 ]);
 
-    var res = statements.queryList('selectT1', { bar: 41 });
+    var res = conn.queryList(queries.selectT1, { bar: 41 });
     assert(Array.isArray(res));
-    assert.equal(res.length, 3);
-    assert.deepEqual(res[0], { foo: 'bbb', bar: 42 });
-    assert.deepEqual(res[1], { foo: 'ccc', bar: 43 });
-    assert.deepEqual(res[2], { foo: 'ggg', bar: 55 });
+    assert.equal(res.length, 2);
+    assert.deepEqual(res[0], { foo: 'ccc', bar: 43 });
+    assert.deepEqual(res[1], { foo: 'ggg', bar: 55 });
 
-    assert.throws(function() { statements.execute('UNDEFINED') }, /Unknown module's prepared statement/);
-    assert.throws(function() { conn.executePreparedStatement('UNDEFINED') }, /Undefined prepared statement/);
+    assert.throws(function() { conn.execute(queries.undefined) }, /Empty sql query./);
+    assert.throws(function() { conn.queryList(queries.undefined) }, /Empty sql query./);
+    assert.throws(function() { conn.queryObject(queries.undefined) }, /Empty sql query./);
+
 
     /// Specific types
     conn.execute("drop table if exists t2");
@@ -114,6 +133,7 @@ define([
     assert.deepEqual(res[0], { eval: null });
     assert.deepEqual(res[1], { eval: { c: 2 } });
     assert.deepEqual(res[2], { eval: null });
+
 
     /// Float
     conn.execute('drop table if exists t3');
