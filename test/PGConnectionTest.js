@@ -25,8 +25,6 @@ define([
 
     print("test: wilton/PGconnection");
 
-    var appdir = misc.wiltonConfig().applicationDirectory;
-
     var conn = new PGConnection("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
 
     conn.execute("drop table if exists t1");
@@ -77,6 +75,14 @@ define([
     res = conn.execute('delete from t1 where foo = $1', [ 'bbb22' ]);
     assert.equal(res.cmd, "DELETE");
     assert.equal(res.count, 1);
+
+    var testObj = { jkl: 123, bb: 22 };
+    conn.execute('insert into t1 values($1, $2)', [ JSON.stringify(testObj), 99 ]);
+
+    res = conn.queryObject('select * from t1 where $1 = bar', [ 99 ]);
+    assert.strictEqual(res.foo, JSON.stringify(testObj));
+
+    conn.execute('delete from t1 where $1 = bar', [ 99 ]);
 
     assert.equal(conn.doInTransaction(function() { return 42; }), 42);
 
