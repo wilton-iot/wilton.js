@@ -136,10 +136,10 @@ define([
                     res.cmd = status[0];
 
                     if (status.length === 3) {
-                        res.oid = status[1];
-                        res.count = status[2];
+                        res.oid = parseInt(status[1]);
+                        res.count = parseInt(status[2]);
                     } else {
-                        res.count = status[1];
+                        res.count = parseInt(status[1]);
                     }
                 }
 

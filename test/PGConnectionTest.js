@@ -19,8 +19,9 @@ define([
     "wilton/Channel",
     "wilton/PGConnection",
     "wilton/loader",
-    "wilton/misc"
-], function(assert, Channel, PGConnection, loader, misc) {
+    "wilton/misc",
+    "moment"
+], function(assert, Channel, PGConnection, loader, misc, moment) {
     "use strict";
 
     print("test: wilton/PGconnection");
@@ -32,7 +33,7 @@ define([
     conn.execute("create table t1 (foo varchar, bar int)");
     var res = conn.execute("insert into t1 values('aaa', 41)");
     assert.equal(res.cmd, "INSERT");
-    assert.equal(res.count, 1);
+    assert.strictEqual(res.count, 1);
 
     // named params
     res = conn.execute("insert into t1 values(:foo, :bar)", {
@@ -40,15 +41,15 @@ define([
         bar: 42
     });
     assert.equal(res.cmd, "INSERT");
-    assert.equal(res.count, 1);
+    assert.strictEqual(res.count, 1);
 
     res = conn.execute('update t1 set foo = $1 where bar = $2', [ 'bbb22', 42 ]);
     assert.equal(res.cmd, "UPDATE");
-    assert.equal(res.count, 1);
+    assert.strictEqual(res.count, 1);
 
     res = conn.execute('update t1 set foo = $1 where bar = $2', [ 'bbb22', 77 ]);
     assert.equal(res.cmd, "UPDATE");
-    assert.equal(res.count, 0);
+    assert.strictEqual(res.count, 0);
 
     conn.execute("insert into t1 values(:foo, :bar)", ["ccc", 43]);
     // select
@@ -70,11 +71,11 @@ define([
 
     res = conn.execute('delete from t1 where foo = $1', [ 'bbb' ]);
     assert.equal(res.cmd, "DELETE");
-    assert.equal(res.count, 0);
+    assert.strictEqual(res.count, 0);
 
     res = conn.execute('delete from t1 where foo = $1', [ 'bbb22' ]);
     assert.equal(res.cmd, "DELETE");
-    assert.equal(res.count, 1);
+    assert.strictEqual(res.count, 1);
 
     var testObj = { jkl: 123, bb: 22 };
     conn.execute('insert into t1 values($1, $2)', [ JSON.stringify(testObj), 99 ]);
@@ -154,4 +155,17 @@ define([
     conn.execute('insert into t3 values(default, :dec, :num, :real)', floats);
     res = conn.queryObject('select * from t3');
     assert.deepEqual(res, floats);
+
+
+    /// Timestamps
+    conn.execute('drop table if exists t4;');
+    conn.execute('create table if not exists t4 (id int, date timestamp (0) with time zone)');
+
+    var date1 = new Date();
+    conn.execute('insert into t4 values(:id, :date)', [ 22, date1 ]);
+
+    res = conn.queryList('select * from t4');
+
+    var date2 = new moment(res[0].date);
+    assert.equal(Math.round(date1 / 1000), Math.round(date2 / 1000));
 });
