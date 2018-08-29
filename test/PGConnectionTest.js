@@ -16,12 +16,10 @@
 
 define([
     "assert",
-    "wilton/Channel",
     "wilton/PGConnection",
     "wilton/loader",
-    "wilton/misc",
     "moment"
-], function(assert, Channel, PGConnection, loader, misc, moment) {
+], function(assert, PGConnection, loader, moment) {
     "use strict";
 
     print("test: wilton/PGconnection");
@@ -140,7 +138,6 @@ define([
     assert.deepEqual(res[0], { eval: null });
     assert.deepEqual(res[1], { eval: { c: 2 } });
     assert.deepEqual(res[2], { eval: null });
-
 
     /// Float
     conn.execute('drop table if exists t3');

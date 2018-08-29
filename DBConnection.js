@@ -234,7 +234,7 @@ define([
                 utils.callOrThrow(callback, e);
             }
         },
-        
+
         /**
          * @function doInTransaction
          * 
@@ -391,6 +391,6 @@ define([
             utils.callOrThrow(callback, e);
         }
     }
-    
+
     return DBConnection;
 });

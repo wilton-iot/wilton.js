@@ -26,7 +26,7 @@
  * allows to map JavaScript objects to query parameters and to map
  * query results to JavaScript objects.
  * 
- * DB connection can be closed manually to release system resource, otherwise
+ * Postgres connection can be closed manually to release system resource, otherwise
  * it will be closed during the shutdown.
  * 
  * Usage example:
@@ -83,7 +83,7 @@ define([
      * Opens connection to database.
      * 
      * @param url `String` backend-specific connection URL,
-     *            postgres example: `postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test`,
+     *            example: `postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test`,
      * @param callback `Function|Undefined` callback to receive result or error
      * @return `Object` `pgsql` instance
      */
@@ -193,7 +193,7 @@ define([
                 utils.callOrThrow(callback, e);
             }
         },
-        
+
         /**
          * @function queryList
          * 
@@ -240,7 +240,7 @@ define([
                 utils.callOrThrow(callback, e);
             }
         },
-        
+
         /**
          * @function doInTransaction
          * 
