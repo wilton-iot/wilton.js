@@ -219,20 +219,26 @@ define([
         /**
          * @function queryObject
          * 
-         * Execute `select` query returning result as an object.
+         * Execute `select` query returning single row result as an object or null on empty query.
          * 
-         * Executes `select` query and returns its result as an object.
+         * Executes `select` query and returns its single row result as an object or null on empty query.
          * 
-         * Query must return exactly one row, otherwise `Error` will be thrown.
+         * Query must return only one row or be empty, otherwise `Error` will be thrown.
          * 
          * @param sql `String` SQL query
          * @param params `Object|Undefined` query parameters object
          * @param callback `Function|Undefined` callback to receive result or error
-         * @return `Object|null` object converted from the single row returned
+         * @return `Object|null` object converted from the single row or null returned
          */
         queryObject: function(sql, params, callback) {
             try {
                 var list = this.queryList(sql, params);
+                if (list.length > 1) {
+                    throw new Error("Invalid number of records returned, expected no more than 1 record," +
+                            " query: [" + sql + "], params: [" + JSON.stringify(params) + "]," +
+                            " number of records: [" + list.length +  "]");
+                }
+
                 var res = list[0] || null;
                 utils.callOrIgnore(callback, res);
                 return res;
