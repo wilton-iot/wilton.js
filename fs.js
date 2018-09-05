@@ -506,6 +506,30 @@ define([
         }
     }
 
+    /**
+     * @function symlink
+     * 
+     * Create a symbolic link.
+     * 
+     * Creates a symbolic link to file or directory.
+     * 
+     * @param dest `String` destination path
+     * @param link `String` path to link to create
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Undefined`
+     */
+    function symlink(dest, link, callback) {
+        try {
+            wiltoncall("fs_symlink", {
+                dest: dest,
+                link: link 
+            });
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
     return {
         appendFile: appendFile,
         appendFileSync: appendFile,
@@ -534,6 +558,8 @@ define([
         copyFile: copyFile,
         copyFileSync: copyFile,
         copyDirectory: copyDirectory,
-        copyDirectorySync: copyDirectory
+        copyDirectorySync: copyDirectory,
+        symlink: symlink,
+        symlinkSync: symlink
     };
 });

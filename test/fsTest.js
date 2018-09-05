@@ -134,6 +134,19 @@ define([
     assert.deepEqual(fs.readdir(fstest1 + "/dir1"), fs.readdir(fstest + "/dir1"));
     assert.deepEqual(fs.readdir(fstest1 + "/dir1/dir12"), fs.readdir(fstest + "/dir1/dir12"));
 
+    // symlinks, supported on win64, but not on win32
+    if (!misc.isWindows()) {
+        var dest = fstest + "/dest.file";
+        var link = fstest + "/dest.file.link";
+        fs.writeFile(dest, "foo");
+        fs.symlink(dest, link);
+        assert.equal(fs.readFile(link), "foo");
+        assert(fs.exists(link));
+        fs.unlink(link);
+        assert(!fs.exists(link));
+        assert(fs.exists(dest));
+    }
+
     // rmdir
     fs.rmdir(fstest);
     assert(!fs.exists(fstest));
