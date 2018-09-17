@@ -114,7 +114,7 @@ define([
          * @param sql `String` SQL query
          * @param params `Object|Undefined` query parameters object
          * @param callback `Function|Undefined` callback to receive result or error
-         * @return `Undefined`
+         * @return `Object|Object[]`
          */
         execute: function(sql, params, callback) {
             try {
@@ -167,7 +167,7 @@ define([
         executeFile: function(filePath, callback) {
             try {
                 var contents = fs.readFile(filePath);
-                var queries = contents.split(";");
+                var queries = contents.indexOf(';;') !== -1 ? contents.split(';;') : contents.split(';');
                 var commentRegexp = /^\s*--.*$/;
                 var trimRegex = /^\s+|\s+$/g;
                 var count = 0;
