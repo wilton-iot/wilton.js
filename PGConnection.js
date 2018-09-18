@@ -15,9 +15,9 @@
  */
 
 /**
- * @namespace pgsql
+ * @namespace PGConnection
  * 
- * __wilton/PGconnection__ \n
+ * __wilton/PGConnection__ \n
  * Connect to PostgreSQL database.
  * 
  * This module allows to work with PostgreSQL database.
@@ -34,7 +34,7 @@
  * @code
  * 
  * // open connection
- * var conn = new PGconnection("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
+ * var conn = new PGConnection("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
  *
  * // execute DDL
  * conn.execute("create table t1 (foo varchar, bar int)");
@@ -76,7 +76,7 @@ define([
     });
 
     /**
-     * @function PGconnection
+     * @function PGConnection
      * 
      * Open connection to database.
      * 
@@ -87,7 +87,7 @@ define([
      * @param callback `Function|Undefined` callback to receive result or error
      * @return `Object` `pgsql` instance
      */
-    var PGconnection = function(_url, callback) {
+    var PGConnection = function(_url, callback) {
         var PREFIX = 'postgresql://';
 
         try {
@@ -105,7 +105,7 @@ define([
         }
     };
 
-    PGconnection.prototype = {
+    PGConnection.prototype = {
         /**
          * @function execute
          * 
@@ -323,8 +323,8 @@ define([
      * @return `Object` loaded queries.
      */
     // https://github.com/alexkasko/springjdbc-typed-queries/blob/master/typed-queries-common/src/main/java/com/alexkasko/springjdbc/typedqueries/common/PlainSqlQueriesParser.java
-    PGconnection.loadQueryFile = DBConnection.loadQueryFile;
+    PGConnection.loadQueryFile = DBConnection.loadQueryFile;
 
 
-    return PGconnection;
+    return PGConnection;
 });
