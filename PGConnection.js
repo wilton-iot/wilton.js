@@ -154,7 +154,7 @@ define([
          * 
          * Execute all queries from file.
          * 
-         * Queries are parsed from file splitting it by `;` symbols
+         * Queries are parsed from file splitting it by `;` or `;;` symbols
          * and then executed one by one.
          * 
          * Comment-only lines are ignored;
