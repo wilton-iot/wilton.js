@@ -15,8 +15,8 @@
  */
 
 /**
- * @namespace PGConnection
- * 
+ * @namespace PGconnection
+ *
  * __wilton/PGConnection__ \n
  * Connect to PostgreSQL database.
  * 
@@ -94,8 +94,7 @@ define([
             var url = utils.startsWith(_url, PREFIX) ? _url.slice(PREFIX.length) : _url;
 
             var handleJson = wiltoncall("db_pgsql_connection_open", {
-                parameters: url,
-                ping_on: true
+                parameters: url
             });
             var handleParsed = JSON.parse(handleJson);
             this.handle = handleParsed.connectionHandle;
@@ -114,7 +113,7 @@ define([
          * @param sql `String` SQL query
          * @param params `Object|Undefined` query parameters object
          * @param callback `Function|Undefined` callback to receive result or error
-         * @return `Undefined`
+         * @return `Object|Object[]`
          */
         execute: function(sql, params, callback) {
             try {
@@ -155,7 +154,7 @@ define([
          * 
          * Execute all queries from file.
          * 
-         * Queries are parsed from file splitting it by `;` symbols
+         * Queries are parsed from file splitting it by `;` or `;;` symbols
          * and then executed one by one.
          * 
          * Comment-only lines are ignored;
@@ -167,7 +166,7 @@ define([
         executeFile: function(filePath, callback) {
             try {
                 var contents = fs.readFile(filePath);
-                var queries = contents.split(";");
+                var queries = contents.indexOf(';;') !== -1 ? contents.split(';;') : contents.split(';');
                 var commentRegexp = /^\s*--.*$/;
                 var trimRegex = /^\s+|\s+$/g;
                 var count = 0;
