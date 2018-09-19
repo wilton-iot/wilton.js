@@ -15,7 +15,7 @@
  */
 
 /**
- * @namespace pgsql
+ * @namespace PGconnection
  * 
  * __wilton/PGconnection__ \n
  * Connect to PostgreSQL database.
@@ -94,8 +94,7 @@ define([
             var url = utils.startsWith(_url, PREFIX) ? _url.slice(PREFIX.length) : _url;
 
             var handleJson = wiltoncall("db_pgsql_connection_open", {
-                parameters: url,
-                ping_on: true
+                parameters: url
             });
             var handleParsed = JSON.parse(handleJson);
             this.handle = handleParsed.connectionHandle;
