@@ -15,7 +15,7 @@
  */
 
 /**
- * @namespace PGconnection
+ * @namespace PGConnection
  *
  * __wilton/PGConnection__ \n
  * Connect to PostgreSQL database.
