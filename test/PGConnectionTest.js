@@ -165,4 +165,41 @@ define([
 
     var date2 = new moment(res[0].date);
     assert.equal(Math.round(date1 / 1000), Math.round(date2 / 1000));
+
+
+    function trim(str) { return str.trim(); }
+    /// Strings
+    conn.execute("drop table if exists t5");
+    conn.execute("create table if not exists t5 (id serial primary key, chrs char(16)[], vchrs varchar(16)[], texts text[], str varchar(16));");
+    var insertT5Query = 'insert into t5 values (DEFAULT, $1, $2, $3, $4);';
+    conn.execute(insertT5Query, [ [ 'one', 'two', 'three' ], [ 'thr', 'tw', 'on' ], [ 'abc', 'qwe' ], 'helloWorld' ]);
+    conn.execute(insertT5Query, { $1: [], $2: [], $3: [], $4: '' });
+    res = conn.queryList('select * from t5');
+    assert(Array.isArray(res));
+    assert.equal(res.length, 2);
+    assert.deepEqual(res[0].id, 1);
+    assert.deepEqual(res[0].chrs.map(trim), [ 'one', 'two', 'three' ]);
+    assert.deepEqual(res[0].vchrs, [ 'thr', 'tw', 'on' ]);
+    assert.deepEqual(res[0].texts, [ 'abc', 'qwe' ]);
+    assert.deepEqual(res[0].str, 'helloWorld');
+    assert.deepEqual(res[1], { id: 2, chrs: [], vchrs: [], texts: [], str: '' });
+
+
+    /// ENUMs
+    conn.execute("drop table if exists t6");
+    conn.execute("drop type if exists mood");
+    conn.execute("CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy')");
+    conn.execute("create table if not exists t6 (id serial, cm mood)");
+    var insertT6Query = 'insert into t6 values (DEFAULT, $1);';
+    conn.execute(insertT6Query, [ 'ok' ]);
+    conn.execute(insertT6Query, [ 'sad' ]);
+    conn.execute(insertT6Query, [ 'happy' ]);
+    assert.throws(function() { conn.execute(insertT6Query, [ 'unknown' ]); }, /PQexecPrepared error Fatal error. ОШИБКА:  неверное значение для перечисления/);
+    assert.throws(function() { conn.execute("update t6 set cm=$1 where id=$2", [ 'unknown', 2 ]); }, /PQexecPrepared error Fatal error. ОШИБКА:  неверное значение для перечисления/);
+    res = conn.queryList('select * from t6');
+    assert(Array.isArray(res));
+    assert.equal(res.length, 3);
+    assert.deepEqual(res[0], { id: 1, cm: 'ok' });
+    assert.deepEqual(res[1], { id: 2, cm: 'sad' });
+    assert.deepEqual(res[2], { id: 3, cm: 'happy' });
 });
