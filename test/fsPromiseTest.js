@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-define(["assert", "wilton/fs", "wilton/utils"], function(assert, fs, utils) {
+define([
+    "assert",
+    "wilton/fs",
+    "wilton/misc",
+    "wilton/utils"
+], function(assert, fs, misc, utils) {
     "use strict";
     utils.promisifyAll(fs);
 
@@ -29,7 +34,7 @@ define(["assert", "wilton/fs", "wilton/utils"], function(assert, fs, utils) {
     }).catch(function(err) {
         assert(false);
     });
-    assert(true === called);
+    assert(true === called || misc.isAndroid());
     
     called = false;
     fs.readdirPromise("FAIL").then(function(li) {
