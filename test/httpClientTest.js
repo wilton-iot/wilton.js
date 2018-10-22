@@ -113,7 +113,7 @@ define([
     // send file by parts
     fs.mkdir(appdir + "tmp");
     fs.writeFile(appdir + "tmp/test_part_send.txt", "foobar");
-    print("send file by parts")
+    print("test: send file by parts")
     var respFileSend = "none"
     respFileSend = http.sendFileByParts("http://127.0.0.1:8080/wilton/test/views/save_file", {
         filePath: appdir + "tmp/test_part_send.txt",
