@@ -530,6 +530,57 @@ define([
         }
     }
 
+    /**
+     * @function insertFile
+     * 
+     * Writes the contents from one file to another.
+     * 
+     * Writes the contents of the specified source file to destination file, starts from offset.
+     * 
+     * @param sourcePath `String` path to source file 
+     * @param destPath `String` path to destination file
+     * @param offset `Number` offset from destination file write position
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Undefined`
+     */
+    function insertFile(sourcePath, destPath, offset, callback) {
+        try {
+            wiltoncall("fs_insert_file", {
+                sourcePath: sourcePath,
+                destPath: destPath,
+                offset: offset 
+            });
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
+     * @function resizeFile
+     * 
+     * Resizes file
+     * 
+     * Resizes existing file or creates file with specified size
+     * 
+     * @param path `String` path to file
+     * @param size `Number` offset from current target file write position
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Undefined`
+     */
+    function resizeFile(path, size, callback) {
+        try {
+            wiltoncall("fs_resize_file", {
+                path: path,
+                size: size 
+            });
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
+
     return {
         appendFile: appendFile,
         appendFileSync: appendFile,
@@ -560,6 +611,8 @@ define([
         copyDirectory: copyDirectory,
         copyDirectorySync: copyDirectory,
         symlink: symlink,
-        symlinkSync: symlink
+        symlinkSync: symlink,
+        insertFile: insertFile,
+        resizeFile: resizeFile
     };
 });

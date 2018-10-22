@@ -33,8 +33,13 @@ define([
         tcpPort: 8080,
         views: [
             "wilton/test/views/hi",
+            "wilton/test/views/save_file",
             "wilton/test/views/postmirror"
-        ]
+        ],
+        requestPayload: {
+            tmpDirPath: appdir,
+            memoryLimitBytes: 20000
+        }
     });
 
     var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/views/hi", {
@@ -104,7 +109,31 @@ define([
     assert(fs.exists(appdir + "clientTestSend.txt"));
     fs.unlink(appdir + "clientTestSend.txt");
     assert(!fs.exists(appdir + "clientTestSend.txt"));
-    
+
+    // send file by parts
+    fs.mkdir(appdir + "tmp");
+    fs.writeFile(appdir + "tmp/test_part_send.txt", "foobar");
+    print("send file by parts")
+    var respFileSend = "none"
+    respFileSend = http.sendFileByParts("http://127.0.0.1:8080/wilton/test/views/save_file", {
+        filePath: appdir + "tmp/test_part_send.txt",
+        meta: {
+            timeoutMillis: 1000,
+            method: "POST"
+        },
+        sendOptions: {
+            fileName: "part_file.txt",
+            fullTimeoutMillis: 2000,
+            maxChunkSize: 3
+        }
+    });
+    var saved_file = appdir + "tmp/part_file.txt";
+    assert(fs.exists(saved_file));
+    var stat = fs.stat(saved_file);
+    assert.equal(stat.size, 6);
+    assert.equal(fs.readFile(saved_file), "foobar");
+    fs.rmdir(appdir + "tmp");
+
     server.stop();
 
 });

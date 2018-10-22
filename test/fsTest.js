@@ -57,6 +57,21 @@ define([
     });
     assert.equal(fs.readFile(tf), "foobar");
 
+    // resizeFile
+    var rsf = fstest + "/resize_test.txt";
+    fs.resizeFile(rsf, 6);
+    var stat_rsf = fs.stat(rsf);
+    assert.equal(stat_rsf.size, 6);
+
+    fs.resizeFile(rsf, 12);
+    stat_rsf = fs.stat(rsf);
+    assert.equal(stat_rsf.size, 12);
+
+    // insertFile
+    fs.insertFile(tf, rsf, 0);
+    fs.insertFile(tf, rsf, 6);
+    assert.equal(fs.readFile(rsf), "foobarfoobar");
+
     // exists
     assert(fs.exists(fstest));
     assert(fs.exists(tf));

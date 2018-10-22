@@ -65,7 +65,7 @@ define([
 
     function _checkStrayOpts(opts) {
         for (var pr in opts) {
-            if ("data" !== pr && "meta" !== pr && "filePath" !== pr) {
+            if ("data" !== pr && "meta" !== pr && "filePath" !== pr && "sendOptions" !== pr) {
                 throw new Error("Invalid option specified: [" + pr + "]");
             }
         }
@@ -257,8 +257,63 @@ define([
         }
     }
 
+    /**
+     * @function sendFileByParts
+     * 
+     * Send specified file to server by parts.
+     * 
+     * Sends specified file to server using `POST` request method by default. File splitted into parts.
+     * 
+     * Specified file is read in streaming mode without loading the whole
+     * file into memory.
+     * 
+     * @param url `String` URL of the HTTP server
+     * @param options `Object` configuration object, see details in `sendRequest()` function and
+     *      also sendOptions `Object` configuration object, see possible options below.
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Object` response object, see details below
+     *
+     * __0__ `Array` Array of `response objects, see details in `sendRequest()` function | strings with error messages`
+     * __1__ `Array`  ...
+     * __2__ `Array`  ...
+     *  ...
+     * 
+     * __sendOptions__
+     * 
+     *  - __fileName__ `String` name of file that will be created on server to store sended data
+     *  - __fullTimeoutMillis__ Number|Undefined` consumer threads wakeup timeout, in milliseconds, 
+     *             default value: `10000`, equal to 10 seconds.
+     *  - __maxChunkSize__ `Number` maximum size of sent chunk 
+     *  - __fileSize__ `Number|Undefined` the size of the file being sent
+     *  - __filePath__ `String|Undefined` path to file that will be sent.
+     *  - __url__ `String|Undefined` URL of the HTTP server
+     */
+    function sendFileByParts(url, options, callback) {
+        var opts = utils.defaultObject(options);
+        try {
+            _checkStrayOpts(opts);
+            var urlstr = utils.defaultString(url);
+            var fp = utils.defaultString(opts.filePath);
+            var meta = utils.defaultObject(opts.meta);
+            var send_options = utils.defaultObject(opts.sendOptions);
+            var resp_json = wiltoncall("httpclient_send_file_by_parts", {
+                url: urlstr,
+                filePath: fp,
+                sendOptions: send_options,
+                metadata: meta,
+                remove: true === opts.remove
+            });
+            var resp = JSON.parse(resp_json);
+            utils.callOrIgnore(callback, resp);
+            return resp;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
     return {
         sendRequest: sendRequest,
-        sendFile: sendFile
+        sendFile: sendFile,
+        sendFileByParts: sendFileByParts
     };
 });
