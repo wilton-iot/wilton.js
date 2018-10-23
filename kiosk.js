@@ -35,8 +35,8 @@
  * kiosk.run({
  *     url: "http://localhost:8080",
  *     fullscreen: false,
- *     width: 800,
- *     height: 600
+ *     windowWidth: 800,
+ *     windowHeight: 600
  * });
  * 
  * @endcode
