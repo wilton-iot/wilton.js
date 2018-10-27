@@ -33,7 +33,7 @@ define([
         tcpPort: 8080,
         views: [
             "wilton/test/views/hi",
-            "wilton/test/views/save_file",
+            "wilton/test/views/savefile",
             "wilton/test/views/postmirror"
         ],
         requestPayload: {
@@ -118,7 +118,7 @@ define([
     fs.mkdir(tmp_dir);
     fs.writeFile(tmp_dir + "test_part_send.txt", "foobar");
     var respFileSend = "none"
-    respFileSend = http.sendFileByParts("http://127.0.0.1:8080/wilton/test/views/save_file", {
+    respFileSend = http.sendFileByParts("http://127.0.0.1:8080/wilton/test/views/savefile", {
         filePath: tmp_dir + "test_part_send.txt",
         meta: {
             timeoutMillis: 60000,

@@ -31,13 +31,6 @@ define([
     var certdir = loader.findModulePath("wilton/test/certificates/");
     // check path exists
     var checkpath = certdir + "server/localhost.pem";
-    if (!fs.exists(checkpath)) {
-        // fallback for the case when tests are run from zip file
-        var zippath = misc.wiltonConfig().requireJs.baseUrl;
-        var parenturl = zippath.replace(/\/[^/]+$/g, "");
-        var parentpath = parenturl.replace(/^\w+?\:\/\//g, "");
-        certdir = parentpath + "/wilton_core/test/certificates/";
-    }
 
     // worker and channel for delayed reponses
     var delayedChannel = new Channel("ServerTest_delayed");
@@ -60,7 +53,8 @@ define([
             "wilton/test/views/respjson",
             "wilton/test/views/respmustache",
             "wilton/test/views/filtered",
-            "wilton/test/views/delayed"
+            "wilton/test/views/delayed",
+            "wilton/test/views/metaaftercommit"
         ],
         filters: [
             "wilton/test/helpers/serverFilter1Helper",
@@ -95,8 +89,7 @@ define([
     var getresp = JSON.parse(getjson);
     assert.equal(getresp.foo, 1);
     assert.equal(clientHelper.httpGetHeader(prefix + "respjson", "Content-Type", meta), "application/json");
-    var html = clientHelper.httpGet(prefix + "respmustache", meta);
-    assert(-1 !== html.indexOf("Hi Chris! Hi Mark! Hi Scott!"));
+    assert(-1 !== clientHelper.httpGet(prefix + "respmustache", meta).indexOf("Hi Chris! Hi Mark! Hi Scott!"));
     assert.equal(clientHelper.httpGetHeader(prefix + "respmustache", "Content-Type", meta), "text/html");
     assert.equal(getresp.bar, "baz");
     assert.equal(clientHelper.httpGet(prefix + "resperror", meta), "Error triggered");
@@ -112,6 +105,7 @@ define([
     assert.equal(clientHelper.httpGet(prefix + "filtered", meta), "filtered OK");
     assert.equal(clientHelper.httpGet(prefix + "delayed", meta), "delayed OK");
     assert.equal(clientHelper.httpGetHeader(prefix + "delayed", "X-Test-Delayed", meta), "true");
+    assert.equal(clientHelper.httpGet(prefix + "metaaftercommit", meta), "metaaftercommit");
 
     // optional
     server.stop();
