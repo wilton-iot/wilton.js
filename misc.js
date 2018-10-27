@@ -46,10 +46,10 @@ define([
      * @param callback `Function|Undefined` callback to receive result or error
      * @returns `Object` configuration object with the following fields:
      * 
-     * __defaultScriptEngine__ `String` name of the script engine that is used by default
-     * __applicationDirectory__ `String` path to the application directory of the current process
-     * __environmentVariables__ `Object` system environment variables collected during the startup
-     * __requireJs__ `Object` `RequireJS` configuration
+     * - __defaultScriptEngine__ `String` name of the script engine that is used by default
+     * - __applicationDirectory__ `String` path to the application directory of the current process
+     * - __environmentVariables__ `Object` system environment variables collected during the startup
+     * - __requireJs__ `Object` `RequireJS` configuration
      */
     function wiltonConfig(callback) {
         try {
