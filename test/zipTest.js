@@ -17,11 +17,17 @@
 define([
     "assert",
     "wilton/fs",
+    "wilton/misc",
     "wilton/zip"
-], function(assert, fs, zip) {
+], function(assert, fs, misc, zip) {
     "use strict";
 
     print("test: wilton/zip");
+    // chakra "module->DecrementObjectCount()" segfault on shutdown
+    // jscript9.dll!Js::WindowsGlobalizationAdapter::~WindowsGlobalizationAdapter()
+    if ("chakra" === misc.wiltonConfig().defaultScriptEngine) {
+        return;
+    }
 
     // write file
     zip.writeFile("test.zip", {
