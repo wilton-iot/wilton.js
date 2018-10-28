@@ -194,8 +194,8 @@ define([
     conn.execute(insertT6Query, [ 'ok' ]);
     conn.execute(insertT6Query, [ 'sad' ]);
     conn.execute(insertT6Query, [ 'happy' ]);
-    assert.throws(function() { conn.execute(insertT6Query, [ 'unknown' ]); }, /PQexecPrepared error Fatal error. ОШИБКА:  неверное значение для перечисления/);
-    assert.throws(function() { conn.execute("update t6 set cm=$1 where id=$2", [ 'unknown', 2 ]); }, /PQexecPrepared error Fatal error. ОШИБКА:  неверное значение для перечисления/);
+    assert.throws(function() { conn.execute(insertT6Query, [ 'unknown' ]); }, /PQexecPrepared error Fatal error. Code: \[22P02\]/);
+    assert.throws(function() { conn.execute("update t6 set cm=$1 where id=$2", [ 'unknown', 2 ]); }, /PQexecPrepared error Fatal error. Code: \[22P02\]/);
     res = conn.queryList('select * from t6');
     assert(Array.isArray(res));
     assert.equal(res.length, 3);
