@@ -307,6 +307,7 @@ define([
         broadcastWebSocket: function(options, callback) {
             var opts = utils.defaultObject(options);
             try {
+                opts.message = utils.defaultJson(opts.message);
                 opts.serverHandle = this.handle;
                 wiltoncall("server_broadcast_websocket", opts);
                 utils.callOrIgnore(callback);

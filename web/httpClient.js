@@ -227,7 +227,7 @@ define([], function() {
      * 
      * Send XHR request to server.
      * 
-     * Sends XHR request to server, call callback on response
+     * Sends XHR request to server, calls callback on response
      * received or on timeout.
      * 
      * @param url `String` URL of the HTTP server
