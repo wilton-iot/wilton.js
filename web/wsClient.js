@@ -212,8 +212,7 @@ define([], function() {
             } else {
                 receivePayload(socket, msg.messageId, msg.payload);
             }
-        } else if ("string" === typeof(msg.broadcast) &&
-                "undefined" !== typeof(msg.payload)) {
+        } else if ("string" === typeof(msg.broadcast)) {
             receiveBroadcast(socket, msg.broadcast, msg.payload);
         } else {
             throw new Error("Invalid unknown message received");
