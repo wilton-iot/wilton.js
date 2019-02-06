@@ -64,12 +64,15 @@ define([
     /**
      * @function findModulePath
      * 
-     * Find the full path to the specified module.
+     * Find out the full path to the specified module
      * 
      * Returns the full path to the specified module. Returned path may
      * point either to file system or to ZIP path.
      * 
-     * @param modname `String` 
+     * Note, that to get the path to module file in FS input module ID
+     * must include the file extension, example: `module.id + ".js"`.
+     * 
+     * @param modname `String` module ID
      * @param callback `Function|Undefined` callback to receive result or error
      * @return `String` full path to the specified module
      */
@@ -87,7 +90,30 @@ define([
             utils.callOrThrow(callback, e);
         }
     }
-    
+
+    /**
+     * @function findModuleDirectory
+     * 
+     * Find out the full path to the specified module direcotory
+     * 
+     * Finds out directory where resides file of the specified module.
+     * 
+     * @param modname `String` module ID
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `String` path to module directory
+     * 
+     */
+    function findModuleDirectory(modname, callback) {
+        try {
+            var path = findModulePath(modname, callback);
+            var dir = path.replace(/\/\w+(.js)?$/g, "/");
+            utils.callOrIgnore(callback, dir);
+            return dir;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
     /**
      * @function loadModuleResource
      * 
@@ -173,6 +199,7 @@ define([
         fileProtocolPrefix: fileProtocolPrefix,
         zipProtocolPrefix: zipProtocolPrefix,
         findModulePath: findModulePath,
+        findModuleDirectory: findModuleDirectory,
         loadModuleResource: loadModuleResource,
         loadModuleJson: loadModuleJson,
         loadAppConfig: loadAppConfig

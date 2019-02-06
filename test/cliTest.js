@@ -18,10 +18,10 @@ define([
     "module",
     "assert",
     "wilton/fs",
+    "wilton/loader",
     "wilton/misc",
-    "wilton/process",
-    "wilton/utils"
-], function(module, assert, fs, misc, process, utils) {
+    "wilton/process"
+], function(module, assert, fs, loader, misc, process) {
     "use strict";
 
     print("test: wilton/cli (launcher)");
@@ -44,13 +44,22 @@ define([
             outputFile: outFile,
             awaitExit: true
         });
+        if (8 === code) {
+            return "foreign_arch";
+        }
         assert.equal(code, 0);
         var output = fs.readFile(outFile);
         fs.unlink(outFile);
         return output.trim();
     }
 
-    var dir = utils.moduleDirectory(module);
+    var dir = loader.findModuleDirectory(module.id);
+
+    // check can run
+    var out = run(["-h"]);
+    if ("foreign_arch" === out) {
+        return;
+    }
 
     // run script
     assert.equal(run([dir + "helpers/cliHelper.js"]), "helpers/cliHelper");

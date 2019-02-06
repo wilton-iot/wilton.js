@@ -430,29 +430,6 @@ define([], function() {
         return a.localeCompare(b);
     }
 
-    /**
-     * @function moduleDirectory
-     * 
-     * Find out module file directory
-     * 
-     * Finds out directory where resides the JS file of the specified module.
-     * 
-     * @param modOrUri `Object|String` either module object obtained from RequireJS
-     *                  requiering "module" id, or an URI field from the module object
-     * @returns `String` path to module directory
-     * 
-     */
-    function moduleDirectory(modOrUri) {
-        var uri = modOrUri.hasOwnProperty("uri") ? modOrUri.uri : modOrUri;
-        if ("string" !== typeof(uri)) {
-            throw new Error("Invalid module or URI specified: [" + JSON.stringify(modOrUri, null, 4) + "]");
-        }
-        var path = uri.replace(/^\w+:\/\//g, "");
-        var dir = path.replace(/\/\w+(.js)?$/g, "/");
-        return dir;
-    }
-
-    
     return {
         undefinedOrNull: undefinedOrNull,
         startsWith: startsWith,
@@ -470,8 +447,7 @@ define([], function() {
         formatError: formatError,
         promisifyAll: promisifyAll,
         cloneObject: cloneObject,
-        localeComparator: localeComparator,
-        moduleDirectory: moduleDirectory
+        localeComparator: localeComparator
     };
     
 });
