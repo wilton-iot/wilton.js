@@ -410,7 +410,7 @@ define([], function() {
     /**
      * @function localeComparator
      * 
-     * Compares two strings using `String.prototype.localeCompare()`
+     * Compare two strings using `String.prototype.localeCompare()`
      * 
      * Compares two strings using `String.prototype.localeCompare()`.
      * 
@@ -429,6 +429,29 @@ define([], function() {
         var b = defaultString(str2);
         return a.localeCompare(b);
     }
+
+    /**
+     * @function moduleDirectory
+     * 
+     * Find out module file directory
+     * 
+     * Finds out directory where resides the JS file of the specified module.
+     * 
+     * @param modOrUri `Object|String` either module object obtained from RequireJS
+     *                  requiering "module" id, or an URI field from the module object
+     * @returns `String` path to module directory
+     * 
+     */
+    function moduleDirectory(modOrUri) {
+        var uri = modOrUri.hasOwnProperty("uri") ? modOrUri.uri : modOrUri;
+        if ("string" !== typeof(uri)) {
+            throw new Error("Invalid module or URI specified: [" + JSON.stringify(modOrUri, null, 4) + "]");
+        }
+        var path = uri.replace(/^\w+:\/\//g, "");
+        var dir = path.replace(/\/\w+(.js)?$/g, "/");
+        return dir;
+    }
+
     
     return {
         undefinedOrNull: undefinedOrNull,
@@ -447,7 +470,8 @@ define([], function() {
         formatError: formatError,
         promisifyAll: promisifyAll,
         cloneObject: cloneObject,
-        localeComparator: localeComparator
+        localeComparator: localeComparator,
+        moduleDirectory: moduleDirectory
     };
     
 });

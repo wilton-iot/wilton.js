@@ -30,7 +30,11 @@ define([
 ], function(dyload, utils, wiltoncall) {
     "use strict";
 
-    if (true !== process.env.ANDROID) {
+    if (true === process.env.ANDROID) {
+        dyload({
+            name: "wilton_channel"
+        });
+    } else {
         dyload({
             name: "wilton_signal"
         });
@@ -201,7 +205,7 @@ define([
     function isMac(callback) {
         return _isCompileTimeOS("macos", callback);
     }
- 
+
     return {
         wiltonConfig: wiltonConfig,
         stdinReadline: stdinReadline,

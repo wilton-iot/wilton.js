@@ -21,6 +21,7 @@ define([], function() {
             require([
                 "wilton/test/LoggerTest",
                 "wilton/test/ChannelTest",
+                "wilton/test/cliTest",
                 "wilton/test/CronTaskTest",
                 "wilton/test/DBConnectionTest",
                 "wilton/test/fsTest",

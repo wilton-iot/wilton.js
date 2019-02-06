@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, alex at staticlibs.net
+ * Copyright 2019, alex at staticlibs.net
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-define(["wilton/Channel"], function(Channel) {
+define(["binmod/cliHelper"], function(helper) {
     "use strict";
     
     return {
-        increment1: function() {
-            var msg = Channel.lookup("cronTestOut").receive();
-            Channel.lookup("cronTestIn").send(msg + 1);
+        main: function() {
+            helper();
         }
     };
 });

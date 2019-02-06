@@ -85,4 +85,11 @@ define(["assert", "wilton/utils"], function(assert, utils) {
     assert.throws(function() { utils.cloneObject(null); });
     assert.throws(function() { utils.cloneObject(""); });
     assert.deepEqual(utils.cloneObject(obj), obj);
+
+    // moduleDirectory
+    assert.equal(utils.moduleDirectory("file:///foo/bar.js"), "/foo/");
+    assert.equal(utils.moduleDirectory("file:///foo/bar/baz.js"), "/foo/bar/");
+    assert.equal(utils.moduleDirectory({uri: "file:///foo/bar.js"}), "/foo/");
+    assert.throws(function() { utils.moduleDirectory(null); });
+    assert.throws(function() { utils.moduleDirectory({}); });
 });

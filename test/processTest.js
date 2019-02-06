@@ -16,19 +16,22 @@
 
 define([
     "assert",
-    "wilton/fs",
-    "wilton/loader",
+    "wilton/misc",
     "wilton/process"
-], function(assert, fs, loader, process) {
+], function(assert, misc, process) {
     "use strict";
 
     print("test: wilton/process");
 
-    var executable = loader.findModulePath("") + "/../build/bin/wilton_cli";
-    if (!fs.exists(executable)) {
+    if (misc.isAndroid()) {
+        return;
+    }
+
+    var executable = misc.wiltonConfig().applicationDirectory + "/bin/wilton";
+    if (misc.isWindows()) { 
         executable += ".exe";
     }
-    
+
     var pid = process.spawn({
         executable: executable, 
         args: ["-h"], 
@@ -36,5 +39,4 @@ define([
         awaitExit: false
     });
     assert(pid > 0);
-    
 });
