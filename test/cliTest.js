@@ -68,10 +68,16 @@ define([
     assert.equal(run([dir + "helpers/cliHelper.js", "-s", "foo/bar"]), "foo/bar/cliHelper");
 
     // run one-liner
-    assert.equal(run(["-e", "", "'foo' + 'bar'"]), "foobar");
+    // todo: windows quoting
+    if (!misc.isWindows()) {
+        assert.equal(run(["-e", "", "'foo' + 'bar'"]), "foobar");
+    }
 
     // run script with binmod
-    var binmod = appdir + "examples/binmod.wlib";
-    assert.equal(run([dir + "helpers/cliHelperBinmod.js", "-b", binmod]), "binmod/cliHelper");
+    // todo: windows binmod path separator
+    if (!misc.isWindows()) {
+        var binmod = appdir + "examples/binmod.wlib";
+        assert.equal(run([dir + "helpers/cliHelperBinmod.js", "-b", binmod]), "binmod/cliHelper");
+    }
 
 });
