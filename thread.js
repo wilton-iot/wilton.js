@@ -80,14 +80,15 @@ define([
      *               if function is not specified, only module will be loaded
      *               (its top-level code will be executed)
      *    - __args__ `Array|Undefined` optional list of arguments, that will be passed to specified function
+     *  - __capabilities__ `Array|Undefined` list of the `wiltoncall` calls names allowed to
+     *                     be used from the spawned thread; if this parameter is not specified,
+     *                     then capabilities checks are not performed for the spawned thread
      */
     function run(options, callback) {
         var opts = utils.defaultObject(options);
         try {
             utils.checkProperties(opts, ["callbackScript"]);
-            wiltoncall("thread_run", {
-                callbackScript: opts.callbackScript
-            });
+            wiltoncall("thread_run", opts); 
             utils.callOrIgnore(callback);
         } catch (e) {
             utils.callOrThrow(callback, e);

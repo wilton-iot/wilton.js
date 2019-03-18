@@ -17,8 +17,9 @@
 define([
     "assert",
     "wilton/Channel",
+    "wilton/misc",
     "wilton/thread"
-], function(assert, Channel, thread) {
+], function(assert, Channel, misc, thread) {
     "use strict";
 
     print("test: wilton/thread");
@@ -26,11 +27,22 @@ define([
     var chanOut = new Channel("threadTestOut");
     var chanIn = new Channel("threadTestIn");
 
+    var engine = misc.wiltonConfig().defaultScriptEngine;
+
     thread.run({
         callbackScript: {
             module: "wilton/test/helpers/threadHelper",
             func: "increment1"
-        }
+        },
+        capabilities: [
+            "get_wiltoncall_config", // init script engine
+            "runscript_" + engine, // run script on a default engine
+            "load_module_resource", // required by require.js on duktape
+            "dyload_shared_library", // required by wilton/Channels
+            "channel_lookup",
+            "channel_receive",
+            "channel_send"
+        ]
     });
 
     chanOut.send(42);

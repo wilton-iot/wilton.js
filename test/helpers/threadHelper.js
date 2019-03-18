@@ -19,8 +19,19 @@ define(["wilton/Channel"], function(Channel) {
     
     return {
         increment1: function() {
-            var msg = Channel.lookup("threadTestOut").receive();
-            Channel.lookup("threadTestIn").send(msg + 1);
+            var chanIn = Channel.lookup("threadTestOut");
+            var msg = chanIn.receive();
+            var chanOut = Channel.lookup("threadTestIn");
+            // check that the lack of "channel_create" capability
+            // is handled correctly
+            try {
+                new Channel("threadHelper_must_fail");
+                // return fail to threadTest
+                chanOut.send(-1);
+            } catch (e) {
+                // return success to threadTest
+                chanOut.send(msg + 1);
+            }
         }
     };
 });
