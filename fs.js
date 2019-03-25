@@ -392,6 +392,36 @@ define([
     }
 
     /**
+     * @function isFile
+     * 
+     * Check whether path is an ordinary file.
+     * 
+     * Checks whether specified path is an ordinary file. Uses `stat(...).isFile`.
+     * 
+     * @param path `String`
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Boolean` `true` if specified path is an ordinary file, false otherwise
+     */
+    function isFile(path, callback) {
+        return stat(path, callback).isFile;
+    }
+
+    /**
+     * @function isDirectory
+     * 
+     * Check whether path is a directory.
+     * 
+     * Checks whether specified path is a directory. Uses `stat(...).isDirectory`.
+     * 
+     * @param path `String`
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Boolean` `true` if specified path is a directory, false otherwise
+     */
+    function isDirectory(path, callback) {
+        return stat(path, callback).isDirectory;
+    }
+
+    /**
      * @function unlink
      * 
      * Delete file.
@@ -602,6 +632,8 @@ define([
         rmdirSync: rmdir,
         stat: stat,
         statSync: stat,
+        isFile: isFile,
+        isDirectory: isDirectory,
         unlink: unlink,
         unlinkSync: unlink,
         writeFile: writeFile,

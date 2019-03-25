@@ -82,10 +82,14 @@ define([
     // stat
     var sdir = fs.stat(fstest);
     assert(!sdir.isFile);
+    assert(!fs.isFile(fstest));
     assert(sdir.isDirectory);
+    assert(fs.isDirectory(fstest));
     var sfile = fs.stat(tf);
     assert(sfile.isFile);
+    assert(fs.isFile(tf));
     assert(!sfile.isDirectory);
+    assert(!fs.isDirectory(tf));
 
     // copy
     var tfCopied = fstest + "/appendFile_test_copied.txt";

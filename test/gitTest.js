@@ -34,9 +34,17 @@ define([
     }
     fs.mkdir(dir);
 
-    var url = loader.findModuleDirectory("wilton/git");
-    var repo = dir + "repo";
+    var modpath = loader.findModuleDirectory("wilton/git");
 
+    var url = "";
+    var jsBundleUsed = fs.isDirectory(modpath + "../.git");
+    if (jsBundleUsed) {
+        url = "file://" + modpath + "../../core/";
+    } else {
+        url = "file://" + modpath;
+    }
+
+    var repo = dir + "repo";
     git.clone({
         url: url,
         repo: repo
@@ -48,5 +56,31 @@ define([
     });
 
     fs.rmdir(dir);
+
+
+// TODO: error input, wrong creds hang
+
+/*
+    git.clone({
+        url: "git+ssh://androiddev@127.0.0.1/home/androiddev/app",
+        repo: repo,
+        options: {
+            sshPublicKeyPath: "/home/alex/.ssh/id_rsa.pub",
+            sshPrivateKeyPath: "/home/alex/.ssh/id_rsa"
+        }
+    });
+ */
+
+/*
+    git.clone({
+        url: "",
+        repo: repo,
+        options: {
+            httpsUser: "",
+            httpsPassword: ""
+        }
+    });
+ */
+
 });
 
