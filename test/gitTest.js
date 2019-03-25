@@ -33,6 +33,7 @@ define([
         fs.rmdir(dir);
     }
     fs.mkdir(dir);
+    var repo = dir + "repo";
 
     var modpath = loader.findModuleDirectory("wilton/git");
 
@@ -44,43 +45,38 @@ define([
         url = "file://" + modpath;
     }
 
-    var repo = dir + "repo";
-    git.clone({
-        url: url,
-        repo: repo
+    // clone
+
+    // no protocol prefix
+    assert.throws(function() {
+        git.clone(modpath, repo);
     });
+
+    git.clone(url, repo);
+
+    // todo: pull
 
     git.pull({
         repo: repo,
         branch: "wilton"
     });
 
-    fs.rmdir(dir);
-
-
-// TODO: error input, wrong creds hang
-
 /*
-    git.clone({
-        url: "git+ssh://androiddev@127.0.0.1/home/androiddev/app",
-        repo: repo,
-        options: {
+    git.clone("git+ssh://androiddev@127.0.0.1/home/androiddev/app", repo, {
             sshPublicKeyPath: "/home/alex/.ssh/id_rsa.pub",
             sshPrivateKeyPath: "/home/alex/.ssh/id_rsa"
-        }
-    });
- */
+        });
+*/
 
 /*
-    git.clone({
-        url: "",
-        repo: repo,
-        options: {
+    git.clone("https://", repo, {
             httpsUser: "",
             httpsPassword: ""
-        }
-    });
- */
+        });
+*/
+
+    // cleanup
+    fs.rmdir(dir);
 
 });
 
