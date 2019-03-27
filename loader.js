@@ -55,12 +55,12 @@ define([
     "./wiltoncall"
 ], function(require, misc, mustache, utils, wiltoncall) {
     "use strict";
-   
+
     var conf = misc.wiltonConfig();
-    
+
     var fileProtocolPrefix = "file://";
     var zipProtocolPrefix = "zip://";
-   
+
     /**
      * @function findModulePath
      * 
@@ -136,7 +136,7 @@ define([
             utils.callOrThrow(callback, e);
         }
     }
-    
+
     /**
      * @function loadModuleJson
      * 
@@ -161,7 +161,7 @@ define([
             utils.callOrThrow(callback, e);
         }
     }
-    
+
     /**
      * @function loadAppConfig
      * 
@@ -171,21 +171,29 @@ define([
      * directory structure:
      * 
      * - `appdir`: application directory, can have arbitrary name
-     *   - `bin`: contains executables and libraries
+     *   - `bin`: (optional) contains executables and libraries
      *   - `conf`: contains `config.json`
      *   - `log`: contains log output files
      *   - `work`: contains temporary files
+     *   - `index.js`: startup module
      *   
      * Loaded file contents are preprocessed replacing references to `{{{appdir}}}`
      * with an actual path to application directory.
      * 
+     * @param startupModule `Object|Undefined` RequireJS startup module
      * @param callback `Function|Undefined` callback to receive result or error
      * @returns `Object` configuration object parsed from `config.json` file
      */
-    function loadAppConfig(callback) {
+    function loadAppConfig(startupModule, callback) {
         try {
-            var values = {"appdir": conf.applicationDirectory};
-            var confPath = conf.applicationDirectory + "conf/config.json";
+            var appdir = conf.applicationDirectory;
+            if("object" === typeof(startupModule) && "string" === typeof(startupModule.id)) {
+                appdir = findModuleDirectory(startupModule.id);
+            }
+            var values = {
+                appdir: appdir
+            };
+            var confPath = appdir + "conf/config.json";
             var confStr = mustache.renderFile(confPath, values);
             var res = JSON.parse(confStr);
             utils.callOrIgnore(callback, res);
@@ -194,7 +202,7 @@ define([
             utils.callOrThrow(callback, e);
         }
     }
-    
+
     return {
         fileProtocolPrefix: fileProtocolPrefix,
         zipProtocolPrefix: zipProtocolPrefix,

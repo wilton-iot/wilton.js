@@ -58,7 +58,7 @@ define([
     /**
      * @function clone
      * 
-     * Clone remote Git repository.
+     * Clone remote Git repository
      * 
      * Clones repote Git repository to the specified path, supports `Local`,
      * `SSH` and `HTTPS(S)` transport protocols.

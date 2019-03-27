@@ -65,7 +65,7 @@ define([
             utils.callOrThrow(callback, e);
         }
     }
-    
+
     /**
      * @function stdinReadline
      * 

@@ -430,6 +430,34 @@ define([], function() {
         return a.localeCompare(b);
     }
 
+    /**
+     * @function checkRootModuleName
+     * 
+     * Check that root module name is configured as expected
+     * 
+     * Checks that root module name is configured as expected.
+     * Throws an `Error` if module name does not match.
+     * 
+     * @param mod `Object` RequireJS `Module` object
+     * @param expected `String` expected module name
+     * @returns `Undefined`
+     */
+    function checkRootModuleName(mod, expected) {
+        if ("object" !== typeof(mod) && "string" !== typeof (mod.id)) {
+            throw new Error("'checkRootModuleName' error: specified module object is invalid: [" + mod + "]");
+        }
+        if ("string" !== typeof(expected)) {
+            throw new Error("'checkRootModuleName' error: specified module name is invalid: [" + expected + "]");
+        }
+        var root = mod.id.replace(/\/.+$/, "");
+        if (expected !== root) {
+            throw new Error("Invalid root module found," +
+                    " expected: [" + expected + "]," +
+                    " actual: [" + root + "]," +
+                    " use '-s " + expected + "' option to specify root module name");
+        }
+    }
+
     return {
         undefinedOrNull: undefinedOrNull,
         startsWith: startsWith,
@@ -447,7 +475,7 @@ define([], function() {
         formatError: formatError,
         promisifyAll: promisifyAll,
         cloneObject: cloneObject,
-        localeComparator: localeComparator
+        localeComparator: localeComparator,
+        checkRootModuleName: checkRootModuleName
     };
-    
 });

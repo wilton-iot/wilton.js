@@ -85,4 +85,12 @@ define(["assert", "wilton/utils"], function(assert, utils) {
     assert.throws(function() { utils.cloneObject(null); });
     assert.throws(function() { utils.cloneObject(""); });
     assert.deepEqual(utils.cloneObject(obj), obj);
+
+    // checkRootModuleName
+    utils.checkRootModuleName({id: "foo/bar/baz"}, "foo");
+    assert.throws(function() { utils.checkRootModuleName(); });
+    assert.throws(function() { utils.checkRootModuleName("foo"); });
+    assert.throws(function() { utils.checkRootModuleName({}, "foo"); });
+    assert.throws(function() { utils.checkRootModuleName({id: "foo/bar/baz"}, null); });
+    assert.throws(function() { utils.checkRootModuleName({id: "foo/bar/baz"}, "bar"); });
 });
