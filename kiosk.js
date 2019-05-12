@@ -24,8 +24,7 @@
  * 
  * Caller thread remains blocked until the WebView window is closed.
  * 
- * Currently only Linux/GTK+ backend is implemented, see OpenJFX-based
- * WebView example for non-Linux platforms: https://github.com/wilton-iot/examples/blob/wilton/webview.js#L17
+ * Uses WebKitGTK backend on Linux and OpenJFX on Windows (requires `rhino` or `nashorn` engine).
  * 
  * Usage example:
  * 

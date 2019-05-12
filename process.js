@@ -46,14 +46,17 @@
  */
 define([
     "./dyload",
+    "./misc",
     "./utils",
     "./wiltoncall"
-], function(dyload, utils, wiltoncall) {
+], function(dyload, misc, utils, wiltoncall) {
     "use strict";
 
-    dyload({
-        name: "wilton_process"
-    });
+    if (!misc.isAndroid()) {
+        dyload({
+            name: "wilton_process"
+        });
+    }
 
     /**
      * @function spawn
@@ -87,8 +90,15 @@ define([
     function spawn(options, callback) {
         var opts = utils.defaultObject(options);
         try {
-            var res = wiltoncall("process_spawn", opts);
-            var resnum = parseInt(res, 10);
+            if (misc.isAndroid()) {
+                var AppActivity = Packages.wilton.android.AppActivity;
+                var mainActivity = Packages.wilton.android.MainActivity.INSTANCE;
+                var intent = new Packages.android.content.Intent(mainActivity, AppActivity);
+                mainActivity.startActivity(intent);
+            } else {
+                var res = wiltoncall("process_spawn", opts);
+                var resnum = parseInt(res, 10);
+            }
             utils.callOrIgnore(callback, resnum);
             return resnum;
         } catch (e) {

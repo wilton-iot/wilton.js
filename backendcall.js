@@ -36,7 +36,6 @@
  * 
  * @endcode
  */
-
 define([
     "wilton/utils"
 ], function(utils) {
@@ -51,9 +50,9 @@ define([
      * a messages received over WebSocket in conjunction with `web_wsClient`.
      * 
      * @param message `String` message from `web_wsClient` received over WebSocket
-     * @return `Object|String|Undefined` resulting value of the module call
+     * @return `Object` resulting value of the module call
      */
-    return function(message) {
+    function backendcall(message) {
         var messageId = "unspecified";
         try {
             var msg = JSON.parse(message);
@@ -66,11 +65,16 @@ define([
                 throw new Error("Invalid call description specified");
             }
             var res = WILTON_run(JSON.stringify(msg.payload, null, 4));
+            // android workaround
             if ("object" === typeof(res) && null !== res && 
                     "object" === typeof(res.class) &&
                     "class java.lang.String" === String(res.class)) {
                 // for safe json stringify
                 res = String(res);
+            }
+            // WILTON_run workaround
+            if ("string" === typeof(res) && res.length > 0) {
+                res = JSON.parse(res);
             }
             var response = {
                 messageId: messageId,
@@ -87,4 +91,5 @@ define([
         }
     };
 
+    return backendcall;
 });
