@@ -116,6 +116,7 @@ define([
     // writeFile
     fs.writeFile(tflines, "foo\n");
     fs.appendFile(tflines, "bar\r\n");
+    fs.appendFile(tflines, "\r\n");
     fs.appendFile(tflines, "42\n");
     var li = fs.readLines(tflines);
     assert.equal(li.length, 3);
