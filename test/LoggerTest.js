@@ -16,22 +16,33 @@
 
 define([
     "assert",
+    "wilton/fs",
     "wilton/Logger",
+    "wilton/misc",
     "wilton/utils"
-], function(assert, Logger, utils) {
+], function(assert, fs, Logger, misc, utils) {
     "use strict";
 
     print("test: wilton/Logger");
+    var appdir = misc.wiltonConfig().applicationDirectory;
+    var logpath = appdir + "test_log.txt";
 
     Logger.initialize({
-        appenders: [{
+        appenders: [
+            {
                 appenderType: "CONSOLE",
                 thresholdLevel: "WARN" // lower me for debugging
-            }],
+            },
+            {
+                appenderType: "FILE",
+                thresholdLevel: "INFO",
+                filePath: logpath
+            }
+        ],
         loggers: {
             "staticlib": "INFO",
             "wilton": "DEBUG",
-            "wilton.test": "ERROR"
+            "wilton.test": "DEBUG"
         }
     });
 
@@ -49,10 +60,24 @@ define([
         foo: "bar",
         baz: 42
     };
-    logger.warn(obj, checker(JSON.stringify(obj)));
+    logger.info(obj, checker(JSON.stringify(obj)));
     var arr = ["foo", "bar"];
-    logger.warn(arr, checker(JSON.stringify(arr)));
+    logger.info(arr, checker(JSON.stringify(arr)));
     var fun = function(a) { return a; };
     logger.log(fun, checker(String(fun)));
+
+    // check file
+    var lines = fs.readLines(logpath);
+    var errFound = false;
+    var listFound = false;
+    for (var i = 0; i < lines.length; i++) {
+        var li = lines[i];
+        if (utils.endsWith(li, "Error: ERR")) {
+            errFound = true;
+        } else if (utils.endsWith(li, "[\"foo\",\"bar\"]")) {
+            listFound = true;
+        }
+    }
+    assert(errFound && listFound);
 
 });
