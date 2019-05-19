@@ -71,7 +71,7 @@ define([
     var errFound = false;
     for (var i = 0; i < lines.length; i++) {
         var li = lines[i];
-        if (utils.endsWith(li, "Error: ERR")) {
+        if (utils.endsWith(li, "ERR")) {
             errFound = true;
         }
     }
