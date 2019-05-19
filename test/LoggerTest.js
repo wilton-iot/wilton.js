@@ -69,15 +69,12 @@ define([
     // check file
     var lines = fs.readLines(logpath);
     var errFound = false;
-    var listFound = false;
     for (var i = 0; i < lines.length; i++) {
         var li = lines[i];
         if (utils.endsWith(li, "Error: ERR")) {
             errFound = true;
-        } else if (utils.endsWith(li, "[\"foo\",\"bar\"]")) {
-            listFound = true;
         }
     }
-    assert(errFound && listFound);
+    assert(errFound);
 
 });
