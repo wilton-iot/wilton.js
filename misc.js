@@ -105,7 +105,7 @@ define([
      */
     function waitForSignal(callback) {
         try {
-            if (true === process.env.ANDROID) {
+            if (isAndroid()) {
                 var Channel = WILTON_requiresync("wilton/Channel");
                 Channel.lookup("signal").receive();
             } else {

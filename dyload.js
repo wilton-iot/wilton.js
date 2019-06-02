@@ -50,6 +50,8 @@ define([
 ], function(utils, wiltoncall) {
     "use strict";
 
+    var wiltonConf = JSON.parse(wiltoncall("get_wiltoncall_config"));
+
     /**
      * @function dyload
      * 
@@ -70,6 +72,10 @@ define([
      */
     function dyload(options, callback) {
         var opts = utils.defaultObject(options);
+        // cannot use misc here due to circular dep
+        if ("android" === wiltonConf.compileTimeOS) {
+            opts.directory = wiltonConf.android.nativeLibsDir;
+        }
         try {
             wiltoncall("dyload_shared_library", opts);
             utils.callOrIgnore(callback);
