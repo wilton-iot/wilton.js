@@ -29,16 +29,27 @@
  * // clone local repo
  * git.clone("file://path/to/my/repo", "path/to/dest");
  * 
- * // clone over SSH
+ * // clone over SSH using password auth
+ * git.clone("git+ssh://androiddev@127.0.0.1/home/androiddev/app", repo, {
+ *         password: "mypwd"
+ *     });
+ * 
+ * // clone over SSH using key auth
  * git.clone("git+ssh://androiddev@127.0.0.1/home/androiddev/app", repo, {
  *         sshPublicKeyPath: "/home/alex/.ssh/id_rsa.pub",
  *         sshPrivateKeyPath: "/home/alex/.ssh/id_rsa"
  *     });
  * 
- * // clone over HTTPS
+ * // clone over HTTPS using passord auth
  * git.clone("https://bitbucket.org/orgid/repo.git", "path/to/dest", {
- *         httpsUser: "myuser",
- *         httpsPassword: "mypwd"
+ *         username: "myuser",
+ *         password: "mypwd"
+ *     });
+ * 
+ * // pull remote branch
+ * git.pull("path/to/dest", "master", {
+ *         username: "myuser",
+ *         password: "mypwd"
  *     });
  * 
  * @endcode
@@ -66,8 +77,8 @@ define([
      * For SSH authentication username must be specified as a part of the URL, example:
      * `git+ssh://myuser@127.0.0.1/path/to/my/app`
      * 
-     * For Git authentication over HTTPS username may be spacified either in URL or as a `httpsUser` option;
-     * if both variants are used at the same time - `httpUser` takes preference.
+     * Username may be specified either in URL or as a `username` option;
+     * if both variants are used at the same time - URL takes preference.
      * 
      * @param url `String` URL of the remote Git repository, must have one of the supported protocol 
      *              prfixes: `file://`, `git+ssh://`, `http://`, `https://`
@@ -77,14 +88,14 @@ define([
      * @return `Undefined`
      * 
      * __Options__
+     *  - __username__ `String|Undefined` user name that should be used for Git authentication over SSH or HTTPS
+     *  - __password__ `String|Undefined` password that should be used for Git authentication over SSH or HTTPS
      *  - __sshPublicKeyPath__ `String|Undefined` path to the public SSH key file that should be
      *                          used for authentication with the SSH server
      *  - __sshPrivateKeyPath__ `String|Undefined` path to the private SSH key file that should be
      *                          used for authentication with the SSH server
      *  - __httpsCheckCertificate__ `Boolean|Undefined` whether HTTPS certificate of the Git server
      *                          should be checked for validness, default value: `true`
-     *  - __httpsUser__ `String|Undefined` user name that should be used for Git authentication over HTTPS
-     *  - __httpsPassword__ `String|Undefined` password that should be used for Git authentication over HTTPS
      */
     function clone(url, repo, options, callback) {
         if ("undefined" === typeof(callback)) {
@@ -102,10 +113,43 @@ define([
         }
     }
 
-    function pull(options, callback) {
-        var opts = utils.defaultObject(options);
+    /**
+     * @function pull
+     * 
+     * Pulls a branch from a remote Git repository
+     * 
+     * Fetches changes from the `origin` remote repository and checkouts the specified remote branch.
+     * 
+     * Uses `origin` remote record from the specified git repo.
+     * 
+     * See `clone()` for the details about the protocols and authentication.
+     * 
+     * @param repo `String` path to the local repository
+     * @param branch `String` remote branch to checkout
+     * @param options `Object|Undefined` configuration object, can be omitted, see possible options below
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Undefined`
+     * 
+     * __Options__
+     *  - __username__ `String|Undefined` user name that should be used for Git authentication over SSH or HTTPS
+     *  - __password__ `String|Undefined` password that should be used for Git authentication over SSH or HTTPS
+     *  - __sshPublicKeyPath__ `String|Undefined` path to the public SSH key file that should be
+     *                          used for authentication with the SSH server
+     *  - __sshPrivateKeyPath__ `String|Undefined` path to the private SSH key file that should be
+     *                          used for authentication with the SSH server
+     *  - __httpsCheckCertificate__ `Boolean|Undefined` whether HTTPS certificate of the Git server
+     *                          should be checked for validness, default value: `true`
+     */
+    function pull(repo, branch, options, callback) {
+        if ("undefined" === typeof(callback)) {
+            callback = options;
+        }
         try {
-            wiltoncall("git_pull", opts);
+            wiltoncall("git_pull", {
+                repo: repo,
+                branch: branch,
+                options: utils.defaultObject(options)
+            });
             utils.callOrIgnore(callback);
         } catch (e) {
             utils.callOrThrow(callback, e);
