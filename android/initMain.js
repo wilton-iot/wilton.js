@@ -17,13 +17,22 @@
 define([
     "./initSignals",
     "./initWebView",
-    "./rhinoRunner"
-], function(initSignals, initWebView, rhinoRunner) {
+    "./rhinoRunner",
+    "./runOnUiThread"
+], function(initSignals, initWebView, rhinoRunner, runOnUiThread) {
     "use strict";
+
+    var View = Packages.android.view.View;
+    var R = Packages.wilton.android.R;
+    var mainActivity = Packages.wilton.android.MainActivity.INSTANCE;
 
     return function() {
         initSignals();
         initWebView();
+        runOnUiThread(function() {
+            var splash = mainActivity.findViewById(R.id.loading_splash);
+            splash.setVisibility(View.GONE);
+        });
         rhinoRunner();
     };
 
