@@ -56,7 +56,9 @@ define([
 
     // pull
 
-    git.pull(repo, "master");
+    git.pull(repo, {
+        branch: "master"
+    });
 
 /*
     git.clone("git+ssh://androiddev@127.0.0.1/home/androiddev/app", repo, {

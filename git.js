@@ -47,9 +47,10 @@
  *     });
  * 
  * // pull remote branch
- * git.pull("path/to/dest", "master", {
+ * git.pull("path/to/dest", {
  *         username: "myuser",
- *         password: "mypwd"
+ *         password: "mypwd",
+ *         branch: "master"
  *     });
  * 
  * @endcode
@@ -88,6 +89,7 @@ define([
      * @return `Undefined`
      * 
      * __Options__
+     *  - __branch__ `String|Undefined` Git branch to checkout after the clone, default value: `master`
      *  - __username__ `String|Undefined` user name that should be used for Git authentication over SSH or HTTPS
      *  - __password__ `String|Undefined` password that should be used for Git authentication over SSH or HTTPS
      *  - __sshPublicKeyPath__ `String|Undefined` path to the public SSH key file that should be
@@ -125,12 +127,12 @@ define([
      * See `clone()` for the details about the protocols and authentication.
      * 
      * @param repo `String` path to the local repository
-     * @param branch `String` remote branch to checkout
      * @param options `Object|Undefined` configuration object, can be omitted, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
      * @return `Undefined`
      * 
      * __Options__
+     *  - __branch__ `String|Undefined` Git branch to checkout after the fetch, default value: `master`
      *  - __username__ `String|Undefined` user name that should be used for Git authentication over SSH or HTTPS
      *  - __password__ `String|Undefined` password that should be used for Git authentication over SSH or HTTPS
      *  - __sshPublicKeyPath__ `String|Undefined` path to the public SSH key file that should be
@@ -140,14 +142,13 @@ define([
      *  - __httpsCheckCertificate__ `Boolean|Undefined` whether HTTPS certificate of the Git server
      *                          should be checked for validness, default value: `true`
      */
-    function pull(repo, branch, options, callback) {
+    function pull(repo, options, callback) {
         if ("undefined" === typeof(callback)) {
             callback = options;
         }
         try {
             wiltoncall("git_pull", {
                 repo: repo,
-                branch: branch,
                 options: utils.defaultObject(options)
             });
             utils.callOrIgnore(callback);

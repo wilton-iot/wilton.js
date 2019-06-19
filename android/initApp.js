@@ -20,10 +20,10 @@ define([
 ], function(callJsModule, initSignals) {
     "use strict";
 
-    return function() {
+    return function(startupModule) {
         initSignals();
         callJsModule({
-            module: "vueapp/index",
+            module: startupModule,
             func: "main"
         });
     };
