@@ -56,7 +56,7 @@ define([
 
     // pull
 
-    git.pull(repo, "wilton");
+    git.pull(repo, "master");
 
 /*
     git.clone("git+ssh://androiddev@127.0.0.1/home/androiddev/app", repo, {
