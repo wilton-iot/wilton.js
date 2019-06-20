@@ -23,6 +23,10 @@ define([
 ], function(assert, fs, git, loader, misc) {
     "use strict";
 
+    if (misc.isAndroid()) {
+        return;
+    }
+
     print("test: wilton/git");
     
     var appdir = misc.wiltonConfig().applicationDirectory;

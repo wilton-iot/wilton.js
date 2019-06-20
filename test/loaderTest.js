@@ -19,9 +19,14 @@ define([
     "module",
     "assert",
     "wilton/loader",
+    "wilton/misc",
     "wilton/utils"
-], function(module, assert, loader, utils) {
+], function(module, assert, loader, misc, utils) {
     "use strict";
+
+    if (misc.isAndroid()) {
+        return;
+    }
 
     print("test: wilton/loader");
 

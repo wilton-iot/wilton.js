@@ -1,0 +1,28 @@
+{
+    "appdir": "{{{appdir}}}",
+    
+    "launcher": {
+        "tcpPort": 8888,
+        "rootModuleName": "wilton",
+        "startupModule": "wilton/test/android/testLauncher"
+    },
+
+    "logging": {
+        "appenders": [
+            {
+                "appenderType": "DAILY_ROLLING_FILE",
+                "thresholdLevel": "DEBUG",
+                "filePath": "{{{appdir}}}/log/wilton_test_log.txt"
+            },
+            {
+                "appenderType": "CONSOLE",
+                "thresholdLevel": "DEBUG"
+            }
+        ],
+        "loggers": {
+            "staticlib": "WARN",
+            "wilton": "DEBUG",
+            "wilton.test": "DEBUG"
+        }
+    }
+}

@@ -23,6 +23,10 @@ define([
 ], function(assert, fs, Logger, misc, utils) {
     "use strict";
 
+    if (misc.isAndroid()) {
+        return;
+    }
+
     print("test: wilton/Logger");
     var appdir = misc.wiltonConfig().applicationDirectory;
     var logpath = appdir + "test_log.txt";

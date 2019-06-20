@@ -22,6 +22,10 @@ define([
 ], function(assert, fs, misc, PDFDocument) {
     "use strict";
 
+    if (misc.isAndroid()) {
+        return;
+    }
+
     print("test: wilton/PDFDocument");
 
     var appdir = misc.wiltonConfig().applicationDirectory;

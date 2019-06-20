@@ -22,6 +22,10 @@ define([
 ], function(assert, fs, misc, zip) {
     "use strict";
 
+    if (misc.isAndroid()) {
+        return;
+    }
+
     print("test: wilton/zip");
     // chakra "module->DecrementObjectCount()" segfault on shutdown
     // jscript9.dll!Js::WindowsGlobalizationAdapter::~WindowsGlobalizationAdapter()
