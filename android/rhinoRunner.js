@@ -20,6 +20,9 @@ define([
 ], function(Channel, callJsModule) {
     "use strict";
 
+    var Log = Packages.android.util.Log;
+    var mainActivity = Packages.wilton.android.MainActivity.INSTANCE;
+
     return function() {
         var input = new Channel("rhino/input");
         var output = new Channel("rhino/output");
@@ -28,9 +31,22 @@ define([
             var idx = Channel.select([input, killswitch]);
             if (0 === idx) { // input
                 var desc = input.receive();
-                var res = callJsModule(desc);
-                var msg = "undefined" !== typeof(res) ? res : {};
-                output.send(msg);
+                try {
+                    var res = callJsModule(desc);
+                    var msg = ("undefined" !== typeof(res) && null !== res) ? res : {};
+                    output.send(msg);
+                } catch (e) {
+                    var msg = "";
+                    if (e instanceof Error) {
+                        msg = e.message + "\n" + e.stack;
+                    } else {
+                         msg = String(e);
+                    }
+                    Log.e(mainActivity.getClass().getPackage().getName(), msg);
+                    output.send({
+                        error: msg
+                    });
+                }
             }
         }
     };

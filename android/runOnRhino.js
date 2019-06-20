@@ -15,14 +15,16 @@
  */
 
 define([
-    "wilton/Channel"
-], function(Channel) {
+    "wilton/httpClient",
+    "wilton/misc"
+], function(http, misc) {
     "use strict";
 
     return function(task) {
-        var input = Channel.lookup("rhino/input");
-        var output = Channel.lookup("rhino/output");
-        input.send(task);
-        return output.receive();
+        var url = misc.wiltonConfig().android.runOnRhinoUrl;
+        var resp = http.sendRequest(url, {
+            data: task
+        });
+        return resp.json();
     };
 });
