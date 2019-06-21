@@ -19,8 +19,9 @@ define([
     "wilton/fs",
     "wilton/git",
     "wilton/loader",
-    "wilton/misc"
-], function(assert, fs, git, loader, misc) {
+    "wilton/misc",
+    "./_scratchDir"
+], function(assert, fs, git, loader, misc, scratchDir) {
     "use strict";
 
     if (misc.isAndroid()) {
@@ -28,15 +29,10 @@ define([
     }
 
     print("test: wilton/git");
-    
-    var appdir = misc.wiltonConfig().applicationDirectory;
+    var dir = scratchDir + "gitTest/";
+    fs.mkdir(dir);
 
     // prepare sratch dir
-    var dir = appdir + "gittest/";
-    if (fs.exists(dir)) {
-        fs.rmdir(dir);
-    }
-    fs.mkdir(dir);
     var repo = dir + "repo";
 
     var modpath = loader.findModuleDirectory("wilton/git");

@@ -19,8 +19,9 @@ define([
     "wilton/fs",
     "wilton/Logger",
     "wilton/misc",
-    "wilton/utils"
-], function(assert, fs, Logger, misc, utils) {
+    "wilton/utils",
+    "./_scratchDir"
+], function(assert, fs, Logger, misc, utils, scratchDir) {
     "use strict";
 
     if (misc.isAndroid()) {
@@ -28,8 +29,10 @@ define([
     }
 
     print("test: wilton/Logger");
-    var appdir = misc.wiltonConfig().applicationDirectory;
-    var logpath = appdir + "test_log.txt";
+    var dir = scratchDir + "LoggerTest/";
+    fs.mkdir(dir);
+
+    var logpath = dir + "test_log.txt";
 
     Logger.initialize({
         appenders: [
@@ -45,7 +48,7 @@ define([
         ],
         loggers: {
             "staticlib": "INFO",
-            "wilton": "DEBUG",
+            "wilton": "INFO",
             "wilton.test": "DEBUG"
         }
     });
@@ -81,4 +84,5 @@ define([
     }
     assert(errFound);
 
+    // fs.rmdir(dir);
 });

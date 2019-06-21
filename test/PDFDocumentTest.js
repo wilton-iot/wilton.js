@@ -17,22 +17,22 @@
 define([
     "assert",
     "wilton/fs",
-    "wilton/misc",
-    "wilton/PDFDocument"
-], function(assert, fs, misc, PDFDocument) {
+    "wilton/loader",
+    "wilton/PDFDocument",
+    "./_scratchDir"
+], function(assert, fs, loader, PDFDocument, scratchDir) {
     "use strict";
-
-    if (misc.isAndroid()) {
-        return;
-    }
 
     print("test: wilton/PDFDocument");
 
-    var appdir = misc.wiltonConfig().applicationDirectory;
+    var dir = scratchDir + "PDFDocumentTest/";
+    fs.mkdir(dir);
+
     var doc = new PDFDocument();
-    var font = doc.loadFont(appdir + "../../modules/wilton_pdf/test/fonts/DejaVuSans.ttf");
+    var fontDir = loader.findModulePath("wilton/test/data/fonts/");
+    var font = doc.loadFont(fontDir + "DejaVuSans.ttf");
     assert.equal(font, "DejaVuSans,Book");
-    var fontBold = doc.loadFont(appdir + "../../modules/wilton_pdf/test/fonts/DejaVuSans-Bold.ttf");
+    var fontBold = doc.loadFont(fontDir + "DejaVuSans-Bold.ttf");
     assert.equal(fontBold, "DejaVuSans-Bold,Bold");
     doc.addPage({
         format: "A4",
@@ -174,12 +174,14 @@ define([
         width: 200,
         height: 50
     });
-    var path = "test.pdf";
+    var path = dir + "test.pdf";
     doc.saveToFile(path);
+    doc.destroy();
+
     assert(fs.exists(path));
     var stat = fs.stat(path);
     assert(stat.isFile);
     assert(stat.size > 0);
-    doc.destroy();
 
+    fs.rmdir(dir);
 });

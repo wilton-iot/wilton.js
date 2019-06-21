@@ -17,20 +17,16 @@
 define([
     "assert",
     "wilton/Channel",
-    "wilton/fs",
     "wilton/Server",
     "wilton/loader",
-    "wilton/misc",
     "wilton/thread",
     "wilton/test/helpers/httpClientHelper"
-], function(assert, Channel, fs, Server, loader, misc, thread, clientHelper) {
+], function(assert, Channel, Server, loader, thread, clientHelper) {
     "use strict";
 
     print("test: wilton/Server");
 
     var certdir = loader.findModulePath("wilton/test/certificates/");
-    // check path exists
-    var checkpath = certdir + "server/localhost.pem";
 
     // worker and channel for delayed reponses
     var delayedChannel = new Channel("ServerTest_delayed");

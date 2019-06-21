@@ -18,16 +18,18 @@ define([
     "assert",
     "wilton/Channel",
     "wilton/DBConnection",
+    "wilton/fs",
     "wilton/loader",
-    "wilton/misc"
-], function(assert, Channel, DBConnection, loader, misc) {
+    "./_scratchDir"
+], function(assert, Channel, DBConnection, fs, loader, scratchDir) {
     "use strict";
 
     print("test: wilton/DBConnection");
 
-    var appdir = misc.wiltonConfig().applicationDirectory;
+    var dir = scratchDir + "DBConnectionTest/";
+    fs.mkdir(dir);
 
-    var conn = new DBConnection("sqlite://" + appdir + "test.db");
+    var conn = new DBConnection("sqlite://" + dir + "test.db");
 //    var conn = new DBConnection("postgresql://host=127.0.0.1 port=5432 dbname=test user=test password=test");
 
     conn.execute("drop table if exists t1");
@@ -75,4 +77,7 @@ define([
     assert.equal(queries.myTestSelect, "select foo from bar\n    where baz = 1\n    and 1 > 0 -- stupid condidion\n    limit 42");
     assert.equal(queries.myTestSelect2, "-- slow query\ndelete from foo\n    where baz = 1");
     assert.equal(queries.myTestSelect3, "drop table foo");
+
+    conn.close();
+    fs.rmdir(dir);
 });

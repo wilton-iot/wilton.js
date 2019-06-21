@@ -17,24 +17,26 @@
 define([
     "assert",
     "wilton/fs",
-    "wilton/misc",
+    "wilton/loader",
     "wilton/utils"
-], function(assert, fs, misc, utils) {
+], function(assert, fs, loader, utils) {
     "use strict";
     utils.promisifyAll(fs);
 
     print("test: wilton/fs (promise)");
 
+    var dir = loader.findModulePath("wilton/test/data/");
+
     // listDirectory promise
 
     var called = false;
-    fs.readdirPromise(".").then(function(li) {
+    fs.readdirPromise(dir).then(function(li) {
         assert(li.length > 0);
         called = true;
     }).catch(function(err) {
         assert(false);
     });
-    assert(true === called || misc.isAndroid());
+    assert(true === called);
     
     called = false;
     fs.readdirPromise("FAIL").then(function(li) {

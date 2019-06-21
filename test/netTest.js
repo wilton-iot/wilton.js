@@ -40,8 +40,8 @@ define([
 
     var thrown = false;
     net.waitForTcpConnection({
-        ipAddress: "8.8.8.8",
-        tcpPort: 8081,
+        ipAddress: "127.0.0.1",
+        tcpPort: 3,
         timeoutMillis: 100
     }, function(e) {
         if ("undefined" !== typeof(e)) {

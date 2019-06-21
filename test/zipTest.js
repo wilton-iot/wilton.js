@@ -18,62 +18,67 @@ define([
     "assert",
     "wilton/fs",
     "wilton/misc",
-    "wilton/zip"
-], function(assert, fs, misc, zip) {
+    "wilton/zip",
+    "./_scratchDir"
+], function(assert, fs, misc, zip, scratchDir) {
     "use strict";
 
-    if (misc.isAndroid()) {
-        return;
-    }
-
     print("test: wilton/zip");
+    var dir = scratchDir + "zipTest/";
+    fs.mkdir(dir);
+
     // chakra "module->DecrementObjectCount()" segfault on shutdown
     // jscript9.dll!Js::WindowsGlobalizationAdapter::~WindowsGlobalizationAdapter()
     if ("chakra" === misc.wiltonConfig().defaultScriptEngine) {
         return;
     }
 
+    var testZip = dir + "test.zip";
+    var testHexZip = dir + "testHex.zip";
+
     // write file
-    zip.writeFile("test.zip", {
+    zip.writeFile(testZip, {
         foo: "bar",
         baz: "boo"
     });
-    zip.writeFile("testHex.zip", {
+    zip.writeFile(testHexZip, {
         foo: "626172",
         baz: "626f6f"
     }, {
         hex: true
     });
-    assert(fs.exists("test.zip"));
-    assert(fs.stat("test.zip").size > 0);
-    assert(fs.exists("testHex.zip"));
-    assert(fs.stat("testHex.zip").size > 0);
+    assert(fs.exists(testZip));
+    assert(fs.stat(testZip).size > 0);
+    assert(fs.exists(testHexZip));
+    assert(fs.stat(testHexZip).size > 0);
 
     // list entries (alphabetic order)
-    assert.deepEqual(zip.listFileEntries("test.zip"), ["baz", "foo"]);
-    assert.deepEqual(zip.listFileEntries("testHex.zip"), ["baz", "foo"]);
+    assert.deepEqual(zip.listFileEntries(testZip), ["baz", "foo"]);
+    assert.deepEqual(zip.listFileEntries(testHexZip), ["baz", "foo"]);
 
     // read entry
-    assert.equal(zip.readFileEntry("test.zip", "foo"), "bar");
-    assert.equal(zip.readFileEntry("test.zip", "foo", {hex: true}), "626172");
-    assert.equal(zip.readFileEntry("test.zip", "baz"), "boo");
-    assert.equal(zip.readFileEntry("test.zip", "baz", {hex: true}), "626f6f");
-    assert.equal(zip.readFileEntry("testHex.zip", "foo"), "bar");
-    assert.equal(zip.readFileEntry("testHex.zip", "foo", {hex: true}), "626172");
-    assert.equal(zip.readFileEntry("testHex.zip", "baz"), "boo");
-    assert.equal(zip.readFileEntry("testHex.zip", "baz", {hex: true}), "626f6f");
+    assert.equal(zip.readFileEntry(testZip, "foo"), "bar");
+    assert.equal(zip.readFileEntry(testZip, "foo", {hex: true}), "626172");
+    assert.equal(zip.readFileEntry(testZip, "baz"), "boo");
+    assert.equal(zip.readFileEntry(testZip, "baz", {hex: true}), "626f6f");
+    assert.equal(zip.readFileEntry(testHexZip, "foo"), "bar");
+    assert.equal(zip.readFileEntry(testHexZip, "foo", {hex: true}), "626172");
+    assert.equal(zip.readFileEntry(testHexZip, "baz"), "boo");
+    assert.equal(zip.readFileEntry(testHexZip, "baz", {hex: true}), "626f6f");
 
     // read file
-    assert.deepEqual(zip.readFile("test.zip"), {
+    assert.deepEqual(zip.readFile(testZip), {
         foo: "bar",
         baz: "boo"
     });
-    assert.deepEqual(zip.readFile("testHex.zip", {hex: true}), {
+    assert.deepEqual(zip.readFile(testHexZip, {hex: true}), {
         foo: "626172",
         baz: "626f6f"
     });
 
     // cleanup
-    fs.unlink("test.zip");
-    fs.unlink("testHex.zip");
+    fs.unlink(testZip);
+    fs.unlink(testHexZip);
+
+    fs.rmdir(dir);
 });

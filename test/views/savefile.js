@@ -15,7 +15,7 @@
  */
 
 define([
-	"assert",
+    "assert",
     "wilton/fs",
     "wilton/misc",
     "wilton/wiltoncall"
@@ -31,10 +31,10 @@ define([
         POST: function(req) {
             var tmp_filename = req.dataFilename();
 
-            var appdir = misc.wiltonConfig().applicationDirectory;
-            var save_dir = appdir + "/tmp/";
+            var dir = req.headers()["X-Scratch-Dir"];
+            var save_dir = dir + "/tmp/";
             if (!fs.exists(save_dir)) {
-            	fs.mkdir(save_dir);
+                fs.mkdir(save_dir);
             }
 
             var headers = req.headers();

@@ -17,16 +17,17 @@
 define([
     "assert",
     "wilton/fs",
-    "wilton/misc"
-], function(assert, fs, misc) {
+    "wilton/misc",
+    "./_scratchDir"
+], function(assert, fs, misc, scratchDir) {
     "use strict";
 
     print("test: wilton/fs");
-
-    var appdir = misc.wiltonConfig().applicationDirectory;
+    var dir = scratchDir + "fsTest/";
+    fs.mkdir(dir);
 
     // cleanup possible remnants
-    var fstest = appdir + "fstest";
+    var fstest = dir + "fstest";
     if (fs.exists(fstest)) {
         fs.rmdir(fstest);
     }
@@ -148,7 +149,7 @@ define([
     fs.mkdir(fstest + "/dir1/dir12");
     fs.writeFile(fstest + "/dir1/foo.txt", "foo");
     fs.writeFile(fstest + "/dir1/dir12/bar.txt", "bar");
-    var fstest1 = appdir + "fstest1";
+    var fstest1 = dir + "fstest1";
     fs.copyDirectory(fstest, fstest1);
     assert.deepEqual(fs.readdir(fstest1), fs.readdir(fstest));
     assert.deepEqual(fs.readdir(fstest1 + "/dir1"), fs.readdir(fstest + "/dir1"));
@@ -175,5 +176,7 @@ define([
     assert(!fs.exists(fstest1));
 
     // realpath
-    assert(fs.realpath(appdir + "..").length > 1);
+    assert(fs.realpath(dir + "..").length > 1);
+
+    fs.rmdir(dir);
 });

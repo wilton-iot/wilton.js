@@ -19,6 +19,7 @@ define([], function() {
     return {
         main: function() {
             require([
+                "wilton/test/_scratchDir",
                 "wilton/test/LoggerTest",
                 "wilton/test/ChannelTest",
                 "wilton/test/cliTest",

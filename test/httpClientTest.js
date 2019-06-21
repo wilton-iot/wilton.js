@@ -19,15 +19,15 @@ define([
     "wilton/Channel",
     "wilton/fs",
     "wilton/httpClient",
-    "wilton/misc",
     "wilton/Server",
-    "wilton/thread"
-], function(assert, Channel, fs, http, misc, Server, thread) {
+    "wilton/thread",
+    "./_scratchDir"
+], function(assert, Channel, fs, http, Server, thread, scratchDir) {
     "use strict";
 
     print("test: wilton/httpClient");
-
-    var appdir = misc.wiltonConfig().applicationDirectory;
+    var dir = scratchDir + "httpClientTest/";
+    fs.mkdir(dir);
 
     var server = new Server({
         tcpPort: 8080,
@@ -37,7 +37,7 @@ define([
             "wilton/test/views/postmirror"
         ],
         requestPayload: {
-            tmpDirPath: appdir,
+            tmpDirPath: dir,
             memoryLimitBytes: 20000
         }
     });
@@ -89,29 +89,29 @@ define([
         data: "foobaz",
         meta: {
             timeoutMillis: 60000,
-            responseDataFilePath: appdir + "httpClientTest.response"
+            responseDataFilePath: dir + "httpClientTest.response"
         }
     });
     var data_obj = JSON.parse(resp.data);
-    assert.equal(data_obj.responseDataFilePath, appdir + "httpClientTest.response");
-    var contents = fs.readFile(appdir + "httpClientTest.response");
+    assert.equal(data_obj.responseDataFilePath, dir + "httpClientTest.response");
+    var contents = fs.readFile(dir + "httpClientTest.response");
     assert.equal(contents, "foobaz");
 
     // send file
-    fs.writeFile(appdir + "clientTestSend.txt", "foobaf");
+    fs.writeFile(dir + "clientTestSend.txt", "foobaf");
     var respFile = http.sendFile("http://127.0.0.1:8080/wilton/test/views/postmirror", {
-        filePath: appdir + "clientTestSend.txt",
+        filePath: dir + "clientTestSend.txt",
         meta: {
             timeoutMillis: 60000
         }
     });
     assert.equal(respFile.data, "foobaf");
-    assert(fs.exists(appdir + "clientTestSend.txt"));
-    fs.unlink(appdir + "clientTestSend.txt");
-    assert(!fs.exists(appdir + "clientTestSend.txt"));
+    assert(fs.exists(dir + "clientTestSend.txt"));
+    fs.unlink(dir + "clientTestSend.txt");
+    assert(!fs.exists(dir + "clientTestSend.txt"));
 
     // send file by parts
-    var tmp_dir = appdir + "tmp/";
+    var tmp_dir = dir + "tmp/";
     if (fs.exists(tmp_dir)) {
         fs.rmdir(tmp_dir);
     }
@@ -122,7 +122,10 @@ define([
         filePath: tmp_dir + "test_part_send.txt",
         meta: {
             timeoutMillis: 60000,
-            method: "POST"
+            method: "POST",
+            headers: {
+                "X-Scratch-Dir": dir
+            }
         },
         sendOptions: {
             fileName: "part_file.txt",
@@ -139,4 +142,5 @@ define([
 
     server.stop();
 
+    fs.rmdir(dir);
 });

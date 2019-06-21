@@ -30,8 +30,8 @@ define([
         return;
     }
 
-    var appdir = misc.wiltonConfig().applicationDirectory;
-    var executable = appdir + "/bin/wilton";
+    var whome = misc.wiltonConfig().wiltonHome;
+    var executable = whome + "/bin/wilton";
     if (misc.isWindows()) { 
         executable += ".exe";
     }
@@ -76,7 +76,7 @@ define([
     // run script with binmod
     // todo: windows binmod path separator
     if (!misc.isWindows()) {
-        var binmod = appdir + "examples/binmod.wlib";
+        var binmod = whome + "examples/binmod.wlib";
         assert.equal(run([dir + "helpers/cliHelperBinmod.js", "-b", binmod]), "binmod/cliHelper");
     }
 
