@@ -57,10 +57,15 @@
 define([
     "./dyload",
     "./hex",
+    "./misc",
     "./wiltoncall",
     "./utils"
-], function(dyload, hex, wiltoncall, utils) {
+], function(dyload, hex, misc, wiltoncall, utils) {
     "use strict";
+
+    if (misc.isAndroid()) {
+        return WILTON_requiresync("wilton/android/AndroidSerial");
+    }
 
     dyload({
         name: "wilton_serial"

@@ -64,6 +64,9 @@ define([], function() {
 
     // https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/readyState
     var READY_STATE_OPEN = 1;
+    // https://developer.mozilla.org/en-US/docs/Web/API/WebSocket#Constants
+    var WEB_SOCKET_CLOSING = 2; 
+    var WEB_SOCKET_CLOSED = 3;
 
     // https://stackoverflow.com/a/21963136/314015
     var UUID_LOOKUP_TABLE = [];
@@ -385,10 +388,27 @@ define([], function() {
         socket.ws.close();
     }
 
+    /**
+     * @function isOpen
+     * 
+     * Check whether WebSocket connnection is open.
+     * 
+     * Checks whether WebSocket connection is not in 'CLOSED' or 'CLOSING' state.
+     * 
+     * @param socket `Object` `Socket` previously opened with `open()`
+     * @returns `Undefined`
+     */
+    function isOpen(socket) {
+        checkSocket(socket);
+        var st = socket.ws.readyState;
+        return WEB_SOCKET_CLOSED !== st && WEB_SOCKET_CLOSING !== st;
+    }
+
     return {
         open: open,
         send: send,
         subscribe: subscribe,
-        close: close
+        close: close,
+        isOpen: isOpen
     };
 });
