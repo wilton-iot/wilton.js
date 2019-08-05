@@ -50,9 +50,10 @@
  */
 define([
     "./dyload",
+    "./misc",
     "./wiltoncall",
     "./utils"
-], function(dyload, wiltoncall, utils) {
+], function(dyload, misc, wiltoncall, utils) {
     "use strict";
 
     dyload({
@@ -87,9 +88,22 @@ define([
     function run(options, callback) {
         var opts = utils.defaultObject(options);
         try {
-            utils.checkProperties(opts, ["callbackScript"]);
-            wiltoncall("thread_run", opts); 
-            utils.callOrIgnore(callback);
+            if (misc.isAndroid() &&
+                    ("rhino" === misc.wiltonConfig().defaultScriptEngine &&
+                    "undefined" === typeof(opts.callbackScript.engine)) ||
+                    "rhino" === opts.callbackScript.engine) {
+                // rhino thread on Android won't fit into std::thread stack size
+                var Runnable = Packages.java.lang.Runnable;
+                var Thread = Packages.java.lang.Thread;
+                var ThreadGroup = Packages.java.lang.ThreadGroup;
+                new Thread(new ThreadGroup("rhino"), new Runnable(function() {
+                    wiltoncall("runscript_rhino", opts.callbackScript);
+                }), "rhino-thread", 1024 * 1024 * 16).start();
+            } else {
+                utils.checkProperties(opts, ["callbackScript"]);
+                wiltoncall("thread_run", opts); 
+                utils.callOrIgnore(callback);
+            }
         } catch (e) {
             utils.callOrThrow(callback, e);
         }

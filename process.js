@@ -58,6 +58,23 @@ define([
         });
     }
 
+    function findStartupModule(args) {
+        if ("undefined" === typeof(args) || 
+                null === args ||
+                !(args instanceof Array)) {
+            throw new Error("Invalid process arguments specified: [" + args + "]");
+        }
+        for (var i = 0; i < args.length; i++) {
+            var ar = args[i];
+            if (utils.endsWith(ar, ".js")) {
+                var modfile = ar.replace(/^.*(\/|\\)/, "");
+                var modname = modfile.replace(/\.js$/, "");
+                return modname;
+            }
+        }
+        throw new Error("Startup script not found, args: [" + JSON.stringify(args, null, 4) + "]");
+    }
+
     /**
      * @function spawn
      * 
@@ -90,10 +107,30 @@ define([
     function spawn(options, callback) {
         var opts = utils.defaultObject(options);
         try {
-            var res = wiltoncall("process_spawn", opts);
-            var resnum = parseInt(res, 10);
-            utils.callOrIgnore(callback, resnum);
-            return resnum;
+            if (!misc.isAndroid()) {
+                var res = wiltoncall("process_spawn", opts);
+                var resnum = parseInt(res, 10);
+                utils.callOrIgnore(callback, resnum);
+                return resnum;
+            } else { // spawn wilton process
+                var runOnRhino = WILTON_requiresync("wilton/android/runOnRhino");
+                var repoPath = null;
+                var rootModuleName = null;
+                var startupModule = null;
+                // only single element in paths is expected
+                var paths = misc.wiltonConfig().requireJs.paths;
+                for (var key in paths) {
+                    repoPath = paths[key].replace(/^file:\/\//, "");
+                    rootModuleName = key;
+                    startupModule = rootModuleName + "/" + findStartupModule(opts.args);
+                    break;
+                }
+                runOnRhino({
+                    module: "wilton/android/startDeviceService",
+                    args: [repoPath, rootModuleName, startupModule]
+                });
+                return 1;
+            }
         } catch (e) {
             utils.callOrThrow(callback, e);
         }
