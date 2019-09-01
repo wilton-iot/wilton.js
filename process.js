@@ -42,6 +42,12 @@
  *     awaitExit: true
  * });
  * 
+ * // get pid of the current process
+ * var pid = process.currentPid();
+ * 
+ * // kill process by pid
+ * process.killByPid(pid);
+ * 
  * @endcode
  */
 define([
@@ -94,7 +100,7 @@ define([
      * 
      * @param options `Object` configuration object, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
-     * @return `Number` `pid` of started process or its exit code, if `awaitExit` is used
+     * @return `Number` PID of started process or its exit code, if `awaitExit` is used
      * 
      * __Options__
      *  - __executable__ `String` path to the executable file
@@ -136,7 +142,55 @@ define([
         }
     }
 
+    /**
+     * @function currentPid
+     * 
+     * Return the PID of the current process.
+     * 
+     * Returns the PID of the current process. Not supported on Android.
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Number` PID of the current process
+     */
+    function currentPid(callback) {
+        try {
+            var json = wiltoncall("process_current_pid");
+            var obj = JSON.parse(json);
+            var res = obj.pid;
+            utils.callOrIgnore(callback, res);
+            return res;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
+     * @function killByPid
+     * 
+     * Kill the process with the specified PID.
+     * 
+     * Teminates the process with the specified PID. Target process cannot
+     * prevent its termination. Not supported on Android.
+     * 
+     * @param pid `Number` PID of the process to terminate
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `String` Empty string on successfull termination, error message otherwise.
+     */
+    function killByPid(pid, callback) {
+        try {
+            var err = wiltoncall("process_kill_by_pid", {
+                pid: pid
+            });
+            utils.callOrIgnore(callback, err);
+            return err;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
     return {
-        spawn: spawn
+        spawn: spawn,
+        currentPid: currentPid,
+        killByPid: killByPid
     };
 });

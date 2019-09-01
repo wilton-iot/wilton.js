@@ -32,6 +32,8 @@ define([
         executable += ".exe";
     }
 
+    // spawn
+
     var pid = process.spawn({
         executable: executable, 
         args: ["-h"], 
@@ -39,4 +41,12 @@ define([
         awaitExit: false
     });
     assert(pid > 0);
+
+    // kill
+    var err = process.killByPid(pid);
+    assert.equal(err, "");
+
+    // current pid
+    var cpid = process.currentPid();
+    assert(cpid > 0);
 });
