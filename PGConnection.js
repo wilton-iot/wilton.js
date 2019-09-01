@@ -238,7 +238,7 @@ define([
                             " number of records: [" + list.length +  "]");
                 }
 
-                var res = list[0] || null;
+                var res = 1 === list.length ? list[0] : null;
                 utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {

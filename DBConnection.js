@@ -222,12 +222,12 @@ define([
         queryObject: function(sql, params, callback) {
             try {
                 var list = this.queryList(sql, params);
-                if (1 !== list.length) {
+                if (list.length > 1) {
                     throw new Error("Invalid number of records returned, expected 1 record," +
                             " query: [" + sql + "], params: [" + JSON.stringify(params) + "]," +
                             " number of records: [" + list.length +  "]");
                 }
-                var res = list[0];
+                var res = 1 === list.length ? list[0] : null;
                 utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {
