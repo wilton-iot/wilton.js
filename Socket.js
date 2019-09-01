@@ -27,6 +27,8 @@
  * all operations are always done on the caller thread,
  * effectively providing a synchronous API.
  * 
+ * Data from network is returned encoded in hexadecimal encoding, use `wilton/hex` for decoding.
+ * 
  * Socket can be closed manually to release system resource, otherwise
  * it will be closed during the shutdown.
  * 
@@ -43,17 +45,11 @@
  *     timeoutMillis: 500
  * });
  * 
- * // read data from seocket, specify 'bytesToRead'
- * // to read the exact number of bytes
- * var received = socket.read({
- *     timeoutMillis: 100
- * });
+ * // read data from socket
+ * var received = socket.read(42);
  * 
  * // write to socket
- * socket.write({
- *     data: "HELO",
- *     timeoutMillis: 100
- * });
+ * socket.writePlain("HELO");
  * 
  * // close socket
  * socket.close();
@@ -93,7 +89,7 @@ define([
      *  - __udpPort__ `Number|Undefined` UDP port number
      *  - __protocol__ `String` networking protocol, supported values: `TCP`, `UDP`
      *  - __role__ `String` socket role, supported values: `client`, `server`
-     *  - __timeoutMillis__ `String` max number of milliseconds allowed
+     *  - __timeoutMillis__ `Number` max number of milliseconds allowed
      *                      to establish the connection
      */
     var Socket = function(options, callback) {
@@ -109,69 +105,96 @@ define([
     };
 
     Socket.prototype = {
+
         /**
-         * @function write
+         * @function read
          * 
-         * Write data to the socket.
+         * Read data from the socket.
          * 
-         * Writes the specified data to this socket. If this call returned
-         * without throwing an exception, that means that the whole
-         * specified data was written to the socket.
+         * Tries to read a specified amount of data from the socket.
+         * Returned result can contain less data than requested.
+         * Returns empty string if no data is available and timeout is exceeded.
          * 
-         * @param options `Object` configuration object, see possible options below
+         * Uses `timeoutMillis` parameter (specified in constructor) as a timeout.
+         * 
+         * @param length `Number` amount of the data to read (in bytes)
          * @param callback `Function|Undefined` callback to receive result or error
-         * @return `Undefined`
-         * 
-         * __Options__
-         *  - __data__ `String` data to write
-         *  - __timeoutMillis__ `Number` max number of milliseconds allowed
-         *                      to write the specified data to this socket
-         *  - __hex__ `Boolean|Undefined` whether the specified `data` is in
-         *            hexadecimal encoding and must be decoded before being
-         *            written to socker; `false` by default.
-         *  
+         * @return `String` device response data in hexadecimal encoding, empty string on timeout
          */
-        write: function(options, callback) {
-            var opts = utils.defaultObject(options);
+        read: function(length, callback) {
             try {
-                opts.socketHandle = this.handle;
-                wiltoncall("net_socket_write", opts);
-                utils.callOrIgnore(callback);
+                var res = wiltoncall("net_socket_read", {
+                    socketHandle: this.handle,
+                    bytesToRead: length
+                });
+                utils.callOrIgnore(callback, res);
+                return res;
             } catch (e) {
                 utils.callOrThrow(callback, e);
             }
         },
 
         /**
-         * @function read
+         * @function writePlain
          * 
-         * Read data to the socket.
+         * Write specifed string to the socket.
          * 
-         * Reads the data from this socket. If `bytesToRead` parameter
-         * specified - then the result, returned from this function without throwing the
-         * exception will always contains specified amount of bytes.
+         * Writes specified string to socket converting the bytes
+         * of input string into hexadecimal encoding as-is without changing the UTF-16 encoding.
+         * Using this method with non-ASCII symbols may lead to unexpected results.
          * 
-         * If `bytesToRead` parameter is not specified - arbitrary number of bytes of data
-         * may be returned and 0 bytes are returned on timeout.
+         * To write UTF-8 bytes to socket use `writeHex()` in conjunction with
+         * `hex.encodeUTF8()`.
          * 
-         * @param options `Object` configuration object, see possible options below
+         * Uses `timeoutMillis` parameter (specified in constructor) as a timeout.
+         * 
+         * @param data `String` string to write to socket
          * @param callback `Function|Undefined` callback to receive result or error
-         * @return `Undefined`
-         * 
-         * __Options__
-         *  - __timeoutMillis__ `Number` max number of milliseconds allowed
-         *                      to read the specified (or unspecified) number of bytes
-         *  - __bytesToRead__ `Number|Undefined` number of bytes to read
-         *  - __hex__ `Boolean|Undefined` whether the specified `data` is in
-         *            hexadecimal encoding and must be decoded before being
-         *            written to socker; `false` by default.
-         *  
+         * @return `Number` number of bytes written to socket
          */
-        read: function(options, callback) {
-            var opts = utils.defaultObject(options);
+        writePlain: function(data, callback) {
             try {
-                opts.socketHandle = this.handle;
-                var res = wiltoncall("net_socket_read", opts);
+                var resStr = wiltoncall("net_socket_write", {
+                    socketHandle: this.handle,
+                    data: data,
+                    hex: false
+                });
+                var resObj = JSON.parse(resStr);
+                utils.checkPropertyType(resObj, "bytesWritten", "number");
+                var res = resObj.bytesWritten;
+                utils.callOrIgnore(callback, res);
+                return res;
+            } catch (e) {
+                utils.callOrThrow(callback, e);
+            }
+        },
+
+        /**
+         * @function writeHex
+         * 
+         * Write specifed string to the socket.
+         * 
+         * Write specifed string in hexadecimal encoding to socket.
+         * 
+         * Writes specified hex-string to socket, unlike `writePlain()` this
+         * function may be used to write abritrary (possibly binary) data.
+         * 
+         * Uses `timeoutMillis` parameter (specified in constructor) as a timeout.
+         * 
+         * @param data `String` string to write to socket
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Number` number of bytes written to socket
+         */
+        writeHex: function(data, callback) {
+            try {
+                var resStr = wiltoncall("net_socket_write", {
+                    socketHandle: this.handle,
+                    data: data,
+                    hex: true
+                });
+                var resObj = JSON.parse(resStr);
+                utils.checkPropertyType(resObj, "bytesWritten", "number");
+                var res = resObj.bytesWritten;
                 utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {

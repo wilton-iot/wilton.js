@@ -17,14 +17,17 @@
 define([
     "assert",
     "wilton/Channel",
+    "wilton/hex",
     "wilton/Socket",
     "wilton/thread"
-], function(assert, Channel, Socket, thread) {
+], function(assert, Channel, hex, Socket, thread) {
     "use strict";
 
     print("test: wilton/Socket");
 
-    var data = "foobarbaz";
+    var dataPlain = "foo";
+    var dataHex = hex.encodeUTF8("barbaz");
+    var dataLen = dataPlain.length + (dataHex.length/2);
 
     //  TCP protocol
 
@@ -32,7 +35,7 @@ define([
         callbackScript: {
             module: "wilton/test/helpers/socketHelper",
             func: "handleTCP",
-            args: [data.length]
+            args: [dataLen]
         }
     });
 
@@ -41,25 +44,28 @@ define([
         tcpPort: 8088,
         protocol: "TCP",
         role: "server",
+        // valgrind is slow
         timeoutMillis: 60000
     });
 
+    var twp = tcpServer.writePlain(dataPlain);
+    assert.equal(twp, 3);
+    var twh = tcpServer.writeHex(dataHex);
+    assert.equal(twh, 6);
+
     // todo: test write large
-    tcpServer.write({
-        data: data,
-        timeoutMillis: 10000
-    });
 
-    var received = tcpServer.read({
-        bytesToRead: data.length - 1,
-        timeoutMillis: 10000
-    });
-    assert.equal(received.length, data.length - 1);
+    var receivedHex = tcpServer.read(dataLen - 1);
+    var received = hex.decodeUTF8(receivedHex);
+    assert.equal(received.length, dataLen - 1);
+    assert.equal(received, "foobarba");
 
-    var tail = tcpServer.read({
-        timeoutMillis: 10000
-    });
+    var tailHex = tcpServer.read(1);
+    var tail = hex.decodeUTF8(tailHex);
     assert.equal(tail.length, 1);
+    assert.equal(tail, "z");
+
+    // todo: test empty read
 
     /*
     var empty = socket.read({
@@ -67,8 +73,6 @@ define([
     });
     assert.equal(empty.length, 0);
     */
-
-    assert.equal(data, received + tail);
 
     tcpServer.close();
 
@@ -79,7 +83,7 @@ define([
         callbackScript: {
             module: "wilton/test/helpers/socketHelper",
             func: "handleUDP",
-            args: [data.length, "SocketTest.udpStarted"]
+            args: [dataPlain.length, "SocketTest.udpStarted"]
         }
     });
 
@@ -102,15 +106,12 @@ define([
     });
     
     // todo: test write large
-    udpClient.write({
-        data: data,
-        timeoutMillis: 10000
-    });
 
-    var received = udpServer.read({
-        timeoutMillis: 10000
-    });
-    assert.equal(received, data);
+    udpClient.writePlain(dataPlain);
+
+    var receivedHex = udpServer.read(dataPlain.length);
+    var received = hex.decodeUTF8(receivedHex);
+    assert.equal(received, dataPlain);
 
     udpClient.close();
     udpServer.close();

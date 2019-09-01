@@ -17,8 +17,9 @@
 define([
     "assert",
     "wilton/Channel",
+    "wilton/hex",
     "wilton/Socket"
-], function(assert, Channel, Socket) {
+], function(assert, Channel, hex, Socket) {
 
     return {
         handleTCP: function(bytesToRead) {
@@ -29,15 +30,12 @@ define([
                 role: "client",
                 timeoutMillis: 60000
             });
-            var received = socket.read({
-                bytesToRead: bytesToRead - 1,
-                timeoutMillis: 10000
-            });
+            var receivedHex = socket.read(bytesToRead - 1);
+            var received = hex.decodeUTF8(receivedHex);
             assert.equal(received.length, bytesToRead - 1);
 
-            var tail = socket.read({
-                timeoutMillis: 10000
-            });
+            var tailHex = socket.read(1);
+            var tail = hex.decodeUTF8(tailHex);
             assert.equal(tail.length, 1);
 
             /*
@@ -47,15 +45,12 @@ define([
             assert.equal(empty.length, 0);
             */
 
-            socket.write({
-                data: received,
-                timeoutMillis: 10000
-            });
+            var written = socket.writePlain(received);
+            assert.equal(written, bytesToRead - 1);
 
-            socket.write({
-                data: tail,
-                timeoutMillis: 10000
-            });
+            var tw = socket.writeHex(tailHex);
+            assert.equal(tw, 1);
+
             socket.close();
         },
 
@@ -77,16 +72,11 @@ define([
                 role: "client",
                 timeoutMillis: 60000
             });
-            var received = server.read({
-                bytesToRead: bytesToRead,
-                timeoutMillis: 10000
-            });
-            assert.equal(received.length, bytesToRead);
+            var urh = server.read(bytesToRead);
+            var ur = hex.decodeUTF8(urh);
+            assert.equal(ur.length, bytesToRead);
 
-            client.write({
-                data: received,
-                timeoutMillis: 10000
-            });
+            client.writeHex(urh);
 
             server.close();
             client.close();
