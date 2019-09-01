@@ -110,7 +110,7 @@ define([
          * Read data from device.
          * 
          * Tries to read a specified amount of data from the device.
-         * Returned result can conntains less data than requested.
+         * Returned result can contain less data than requested.
          * Returns empty result if no data is available and timeout is exceeded.
          * 
          * USB bulk transfer is used to read the data.

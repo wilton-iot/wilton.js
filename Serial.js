@@ -20,7 +20,7 @@
  * __wilton/Serial__ \n
  * Connect to hardware devices using serial protocol.
  * 
- * This module allows to intract with hardware devices using `RS232` protocol.
+ * This module allows to interact with hardware devices using `RS232` protocol.
  * 
  * Responses from device are returned encoded in hexadecimal encoding, use `wilton/hex` for decoding.
  * 
@@ -83,7 +83,7 @@ define([
      * @return `Object` `Serial` instance
      * 
      * __Options__
-     *  - __port__ `String` serial port address (OS-dependent), examples: `/dev/ttyUSB1`, `COM4`
+     *  - __port__ `String` serial port address (OS-dependent), examples: `/dev/ttyUSB1`, `COM4`, `vid:pid`
      *  - __baudRate__ `Number` connection baud rate
      *  - __parity__ `String` enables parity checking, supported values: `NONE`, `EVEN`, `ODD`, `MARK`, `SPACE`
      *  - __byteSize__ `Number` number of data bits
@@ -114,8 +114,8 @@ define([
          * Read data from device.
          * 
          * Tries to read a specified amount of data from the device.
-         * Returned result can conntains less data than requested.
-         * Returns empty result if no data is available and timeout is exceeded.
+         * Returned result can contain less data than requested.
+         * Returns empty string if no data is available and timeout is exceeded.
          * 
          * Uses `timeoutMillis` parameter (specified in constructor) as a timeout.
          * 
@@ -144,7 +144,7 @@ define([
          * Tries to read a data from the device until line ending (`\n` or `\r\n`) will be
          * read or timeout happens. Line ending is not included into result.
          * 
-         * Returned result can conntains less data than requested.
+         * Returned result can contain less data than requested.
          * Returns empty result if no data is available and timeout is exceeded.
          * 
          * Uses `timeoutMillis` parameter (specified in constructor) as a timeout.
