@@ -74,6 +74,10 @@ define([
         });
 */
 
+    // revparseHead
+    var sha1 = git.revparseHead(repo);
+    assert(40 === sha1.length);
+
     // cleanup
     fs.rmdir(dir);
 

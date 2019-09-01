@@ -52,6 +52,9 @@
  *         password: "mypwd",
  *         branch: "master"
  *     });
+ *     
+ * // get current HEAD revision
+ * var sha1 = git.revparseHead("path/to/repo");
  * 
  * @endcode
  */
@@ -157,8 +160,33 @@ define([
         }
     }
 
+    /**
+     * @function revparseHead
+     * 
+     * Read the revision ID of the repo HEAD
+     * 
+     * Reads the revision ID of the repo HEAD
+     * 
+     * @param repo `String` path to the local repository
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `String` 40 symbols revision ID SHA1
+     * 
+     */
+    function revparseHead(repo, callback) {
+        try {
+            var rev = wiltoncall("git_revparse_head", {
+                repo: repo
+            });
+            utils.callOrIgnore(callback, rev);
+            return rev;
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
     return {
         clone: clone,
-        pull: pull
+        pull: pull,
+        revparseHead: revparseHead
     };
 });
