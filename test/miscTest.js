@@ -33,6 +33,10 @@ define([
 
     // systemdNotify
     if (misc.isLinux() && fs.exists("/usr/bin/systemctl")) {
-        systemdNotify("FOO");
+        misc.systemdNotify("FOO", function(e) {
+            assert(null !== e);
+            var expected = "Error notifying systemd, message: [FOO], error code: [0]";
+            assert(e.message.indexOf(expected) >= 0);
+        });
     }
 });
