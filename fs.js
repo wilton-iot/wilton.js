@@ -80,7 +80,7 @@ define([
                     throw new Error("Invalid 'options' object," +
                             " properties: [" + JSON.stringify(utils.listProperties(options)) + "]");
                 }
-                return options.hex;
+                return options.delimiter;
             }
         }
         return "\n";

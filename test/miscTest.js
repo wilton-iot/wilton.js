@@ -16,8 +16,9 @@
 
 define([
     "assert",
+    "wilton/fs",
     "wilton/misc"
-], function(assert, misc) {
+], function(assert, fs, misc) {
     "use strict";
 
     print("test: wilton/misc");
@@ -29,4 +30,9 @@ define([
 
     // compile-time OS
     assert(misc.isAndroid() || misc.isWindows() || misc.isLinux() || misc.isMac());
+
+    // systemdNotify
+    if (misc.isLinux() && fs.exists("/usr/bin/systemctl")) {
+        systemdNotify("FOO");
+    }
 });

@@ -30,7 +30,7 @@ define([
 ], function(dyload, utils, wiltoncall) {
     "use strict";
 
-    if (true === process.env.ANDROID) {
+    if (isAndroid()) {
         dyload({
             name: "wilton_channel"
         });
@@ -206,6 +206,32 @@ define([
         return _isCompileTimeOS("macos", callback);
     }
 
+    /**
+     * @function systemdNotify
+     * 
+     * Notify systemd service manager
+     * 
+     * Sends message to systemd service manager using `sd_notify` API,
+     * see: https://www.freedesktop.org/software/systemd/man/sd_notify.html
+     * 
+     * @param state `String` message to send to systemd
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Undefined`
+     */
+    function systemdNotify(state, callback) {
+        dyload({
+            name: "wilton_systemd"
+        });
+        try {
+            wiltoncall("systemd_notify", {
+                state: state
+            });
+            utils.callOrIgnore(callback);
+        } catch (e) {
+            utils.callOrThrow(callback, e);
+        }
+    }
+
     return {
         wiltonConfig: wiltonConfig,
         stdinReadline: stdinReadline,
@@ -214,6 +240,7 @@ define([
         isAndroid: isAndroid,
         isWindows: isWindows,
         isLinux: isLinux,
-        isMac: isMac
+        isMac: isMac,
+        systemdNotify: systemdNotify
     };
 });
