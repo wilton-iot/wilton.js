@@ -35,7 +35,7 @@ define([
     if (misc.isLinux() && fs.exists("/usr/bin/systemctl")) {
         misc.systemdNotify("FOO", function(e) {
             assert(null !== e);
-            var expected = "Error notifying systemd, message: [FOO], error code: [0]";
+            var expected = "Error notifying systemd, message: [FOO], error code: [";
             assert(e.message.indexOf(expected) >= 0);
         });
     }
