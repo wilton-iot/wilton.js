@@ -103,9 +103,9 @@ define([
     /**
      * @function Channel
      * 
-     * Create `Channel`instance.
+     * Create `Channel` instance.
      * 
-     * Creates channel instance allocating resources for intermediate storage.
+     * Creates a channel instance allocating resources for intermediate storage.
      * If `size` parameter is not specified - created synchronous channel.
      * 
      * Created channel can be accessed in other threads using `lookup()` function.
