@@ -85,10 +85,9 @@ define([
                 sb.push(SYMBOLS[idx]);
             }
             var resp = sb.toString();
-            utils.callOrIgnore(callback, resp);
-            return resp;
+            return utils.callOrIgnore(callback, resp);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
     
@@ -111,10 +110,9 @@ define([
             }
             var ustr = utf8.encode(str);
             var resp = encodeBytes(ustr);
-            utils.callOrIgnore(callback, resp);
-            return resp;
+            return utils.callOrIgnore(callback, resp);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
     
@@ -144,10 +142,9 @@ define([
                     }
                 }
             }
-            utils.callOrIgnore(callback, resp);
-            return resp;
+            return utils.callOrIgnore(callback, resp);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -186,10 +183,9 @@ define([
                 }
                 resp = sb.toString();
             }
-            utils.callOrIgnore(callback, resp);
-            return resp;
+            return utils.callOrIgnore(callback, resp);
         } catch (e) {
-           utils.callOrThrow(callback, e);
+           return utils.callOrThrow(callback, e);
         }
     }
 
@@ -211,10 +207,9 @@ define([
                 throw new Error("Invalid non-string input specified");
             }
             var resp = hexstr.replace(/\s+/g, "");
-            utils.callOrIgnore(callback, resp);
-            return resp;
+            return utils.callOrIgnore(callback, resp);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -250,10 +245,9 @@ define([
                 sb.push(String.fromCharCode(num));
             }
             var resp = sb.toString();
-            utils.callOrIgnore(callback, resp);
-            return resp;
+            return utils.callOrIgnore(callback, resp);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -273,10 +267,9 @@ define([
         try {
             var bytes = decodeBytes(hexstr);
             var resp = utf8.decode(bytes);
-            utils.callOrIgnore(callback, resp);
-            return resp;
+            return utils.callOrIgnore(callback, resp);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -305,10 +298,9 @@ define([
             }
             var target = sb.toString();
             var resp = encodeBytes(target);
-            utils.callOrIgnore(callback, resp);
-            return resp;
+            return utils.callOrIgnore(callback, resp);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -336,10 +328,9 @@ define([
             var plain = decodeBytes(printableHex);
             var plainSingleLine = plain.replace(/\s+/g, " ");
             var resp = prettyHex + " [" + plainSingleLine + "]";
-            utils.callOrIgnore(callback, resp);
-            return resp;
+            return utils.callOrIgnore(callback, resp);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 

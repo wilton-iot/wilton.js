@@ -133,7 +133,7 @@ define([
             }
             utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -163,10 +163,9 @@ define([
             var handleObj = JSON.parse(handleJson);
             utils.checkPropertyType(handleObj, "channelHandle", "number");
             var res = new Channel(handleObj.channelHandle);
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     };
     
@@ -201,15 +200,14 @@ define([
             }
             var resStr = wiltoncall("channel_select", {
                 channels: handles,
-                timeoutMillis: "undefined" != typeof(timeoutMillis) ? timeoutMillis : 0
+                timeoutMillis: "undefined" !== typeof(timeoutMillis) ? timeoutMillis : 0
             });
             var resObj = JSON.parse(resStr);
             utils.checkPropertyType(resObj, "selectedChannelIndex", "number");
             var res = resObj.selectedChannelIndex;
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     };
 
@@ -226,10 +224,9 @@ define([
     Channel.dumpRegistry = function(callback) {
         try {
             var res = wiltoncall("channel_dump_registry");
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     };
 
@@ -255,15 +252,14 @@ define([
                 var resStr = wiltoncall("channel_send", {
                     channelHandle: this.handle,
                     message: message,
-                    timeoutMillis: "undefined" != typeof(timeoutMillis) ? timeoutMillis : 0
+                    timeoutMillis: "undefined" !== typeof(timeoutMillis) ? timeoutMillis : 0
                 });
                 var resObj = JSON.parse(resStr);
                 utils.checkPropertyType(resObj, "success", "boolean");
                 var res = resObj.success;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -284,13 +280,12 @@ define([
             try {
                 var resStr = wiltoncall("channel_receive", {
                     channelHandle: this.handle,
-                    timeoutMillis: "undefined" != typeof(timeoutMillis) ? timeoutMillis : 0
+                    timeoutMillis: "undefined" !== typeof(timeoutMillis) ? timeoutMillis : 0
                 });
                 var res = null !== resStr ? JSON.parse(resStr) : null;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -318,10 +313,9 @@ define([
                 var resObj = JSON.parse(resStr);
                 utils.checkPropertyType(resObj, "success", "boolean");
                 var res = resObj.success;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -345,10 +339,9 @@ define([
                     channelHandle: this.handle
                 });
                 var res = null !== resStr ? JSON.parse(resStr) : null;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         }, 
 
@@ -372,10 +365,9 @@ define([
                     channelHandle: this.handle
                 });
                 var res = null !== resStr ? JSON.parse(resStr) : null;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         }, 
 
@@ -419,10 +411,9 @@ define([
                 } else {
                     // destruction in progress, lets be silent
                 }
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -444,10 +435,9 @@ define([
                 });
                 var obj = JSON.parse(str);
                 var res = obj.maxSize;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -466,10 +456,9 @@ define([
                 var res = wiltoncall("channel_get_name", {
                     channelHandle: this.handle
                 });
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -489,9 +478,9 @@ define([
                 wiltoncall("channel_close", {
                     channelHandle: this.handle
                 });
-                utils.callOrIgnore(callback);
+                return utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         }
     };

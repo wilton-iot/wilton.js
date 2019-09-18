@@ -80,7 +80,7 @@ define([
         assert.deepEqual(msg, {
             data: "foobar"
         });
-        print("test: wilton/httpClient, waiting, count: [" + count + "] of: [" + target + "]");
+        //print("test: wilton/httpClient, waiting, count: [" + count + "] of: [" + target + "]");
     }
     chan.close();
 

@@ -57,10 +57,10 @@ define([
     function isTraceOn(callback){
         try {
             var res = parseInt(wiltoncall("service_is_trace_info_gather_enabled"));
-            utils.callOrIgnore(callback);
-            return parseInt(res) === 1;
+            var res = parseInt(res) === 1;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -76,9 +76,9 @@ define([
     function traceTurnOff(callback){
         try {
             wiltoncall("service_disable_trace_info_gather");
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -94,9 +94,9 @@ define([
     function traceTurnOn(callback){
         try {
             wiltoncall("service_enable_trace_info_gather");
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -112,10 +112,9 @@ define([
     function getCurrentCallStack(callback){
         try {
             var res = wiltoncall("service_get_call_stack");
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -131,10 +130,9 @@ define([
     function getAllCalls(callback){
         try {
             var res = wiltoncall("service_get_all_calls");
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -150,10 +148,9 @@ define([
     function getThreadsCount(callback){
         try {
             var res = parseInt(wiltoncall("service_get_threads_count"));
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
     /**
@@ -168,10 +165,9 @@ define([
         try {
             var res = wiltoncall("service_get_pid");
             var resnum = (res === "") ? 0 : parseInt(res);
-            utils.callOrIgnore(callback, resnum);
-            return resnum;
+            return utils.callOrIgnore(callback, resnum);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -195,10 +191,9 @@ define([
                 var res = wiltoncall("service_get_process_memory_size_bytes"), resnum;
                 resnum = parseInt(res);
             }
-            utils.callOrIgnore(callback, resnum);
-            return resnum;
+            return utils.callOrIgnore(callback, resnum);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 

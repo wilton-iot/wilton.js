@@ -85,7 +85,7 @@ define([
             this.handle = responseWriterHandle;
             utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     };
 
@@ -135,12 +135,12 @@ define([
                     responseWriterHandle: this.handle,
                     data: dt
                 });
-                utils.callOrIgnore(callback);
+                return utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
-        },
-    }
+        }
+    };
 
     return DelayedResponse;
 });

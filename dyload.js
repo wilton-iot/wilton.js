@@ -78,9 +78,9 @@ define([
         }
         try {
             wiltoncall("dyload_shared_library", opts);
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 

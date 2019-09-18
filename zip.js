@@ -107,10 +107,9 @@ define([
                     }
                 }
             }
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -150,10 +149,9 @@ define([
                 var dataBytes = hex.decodeBytes(resHex);
                 res = utf8.decode(dataBytes, /* lenient */ true);
             }
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -176,10 +174,9 @@ define([
                 path: path
             });
             var res = JSON.parse(resstr);
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -239,9 +236,9 @@ define([
             } finally {
                 wiltoncall("zip_close_tl_file_writer");
             }
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 

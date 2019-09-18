@@ -106,10 +106,9 @@ define([
                     });
                     this.metaCached = JSON.parse(json);
                 }
-                utils.callOrIgnore(callback, this.metaCached);
-                return this.metaCached;
+                return utils.callOrIgnore(callback, this.metaCached);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -127,10 +126,9 @@ define([
         headers: function(callback) {
             try {
                 var res = this.meta().headers;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -148,10 +146,9 @@ define([
         queries: function(callback) {
             try {
                 var res = this.meta().queries;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -173,10 +170,9 @@ define([
                 var qrs = this.meta().queries;
                 var dv = "undefined" !== defaultValue ? defaultValue : null;
                 var res = qrs.hasOwnProperty(name) ? qrs[name] : dv;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -206,10 +202,9 @@ define([
                         requestHandle: this.handle
                     });
                 }
-                utils.callOrIgnore(callback, this.dataCached);
-                return this.dataCached;
+                return utils.callOrIgnore(callback, this.dataCached);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -239,10 +234,9 @@ define([
                     });
                     this.formCached = JSON.parse(json);
                 }
-                utils.callOrIgnore(callback, this.formCached);
-                return this.formCached;
+                return utils.callOrIgnore(callback, this.formCached);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -270,10 +264,9 @@ define([
                     var json = this.data();
                     this.jsonCached = JSON.parse(json);
                 }
-                utils.callOrIgnore(callback, this.jsonCached);
-                return this.jsonCached;
+                return utils.callOrIgnore(callback, this.jsonCached);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -306,10 +299,9 @@ define([
                         requestHandle: this.handle
                     });
                 }
-                utils.callOrIgnore(callback, this.dataFilenameCached);
-                return this.dataFilenameCached;
+                return utils.callOrIgnore(callback, this.dataFilenameCached);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -352,9 +344,9 @@ define([
                     requestHandle: this.handle,
                     data: dt
                 });
-                utils.callOrIgnore(callback);
+                return utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -369,7 +361,7 @@ define([
          * File data is sent in streaming mode without reading the whole
          * contents of the file into memory.
          * 
-         * @param data `String` path to file to send
+         * @param filePath `String` path to file to send
          * @param options `Object|Undefined` configuration object, see possible options below
          * @param callback `Function|Undefined` callback to receive result or error
          * @return `Undefined`
@@ -388,9 +380,9 @@ define([
                     requestHandle: this.handle,
                     filePath: filePath
                 });
-                utils.callOrIgnore(callback);
+                return utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -416,9 +408,9 @@ define([
                     requestHandle: this.handle,
                     data: dt
                 });
-                utils.callOrIgnore(callback);
+                return utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -437,11 +429,11 @@ define([
         closeWebSocket: function(callback) {
             try {
                 wiltoncall("request_close_websocket", {
-                    requestHandle: this.handle,
+                    requestHandle: this.handle
                 });
-                utils.callOrIgnore(callback);
+                return utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -466,10 +458,9 @@ define([
                 if ("string" === typeof(key)) {
                     res = key;
                 }
-                utils.callOrIgnore(res, callback);
-                return res;
+                return utils.callOrIgnore(res, callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -523,9 +514,9 @@ define([
                     mustacheFilePath: fpath,
                     values: vals
                 });
-                utils.callOrIgnore(callback);
+                return utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -556,9 +547,9 @@ define([
                     requestHandle: this.handle,
                     data: ""
                 });
-                utils.callOrIgnore(callback);
+                return utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -583,11 +574,11 @@ define([
                 var jsonStr = wiltoncall("request_send_later", {
                     requestHandle: this.handle
                 });
-                utils.callOrIgnore(callback);
                 var json = JSON.parse(jsonStr);
-                return json.responseWriterHandle;
+                var res = json.responseWriterHandle;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
  

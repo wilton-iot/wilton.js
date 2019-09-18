@@ -77,10 +77,9 @@ define([
                 var json = this.data;
                 this.jsonCached = JSON.parse(json);
             }
-            utils.callOrIgnore(callback, this.jsonCached);
-            return this.jsonCached;
+            return utils.callOrIgnore(callback, this.jsonCached);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -210,10 +209,9 @@ define([
             resp.data = utf8.decode(dataBytes, /* lenient */ true);
             resp.jsonCached = null;
             resp.json = _jsonParse;
-            utils.callOrIgnore(callback, resp);
-            return resp;
+            return utils.callOrIgnore(callback, resp);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -250,10 +248,9 @@ define([
             resp.data = utf8.decode(dataBytes, /* lenient */ true);
             resp.jsonCached = null;
             resp.json = _jsonParse;
-            utils.callOrIgnore(callback, resp);
-            return resp;
+            return utils.callOrIgnore(callback, resp);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -304,10 +301,9 @@ define([
                 remove: true === opts.remove
             });
             var resp = JSON.parse(resp_json);
-            utils.callOrIgnore(callback, resp);
-            return resp;
+            return utils.callOrIgnore(callback, resp);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 

@@ -100,7 +100,7 @@ define([
             this.handle = handleParsed.connectionHandle;
             utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     };
 
@@ -126,9 +126,9 @@ define([
                     sql: sqlstr,
                     params: pars
                 });
-                utils.callOrIgnore(callback);
+                return utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -169,10 +169,9 @@ define([
                         count += 1;
                     }
                 }
-                utils.callOrIgnore(callback, count);
-                return count;
+                return utils.callOrIgnore(callback, count);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
         
@@ -198,10 +197,9 @@ define([
                     params: pars
                 });
                 var res = JSON.parse(json);
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -228,10 +226,9 @@ define([
                             " number of records: [" + list.length +  "]");
                 }
                 var res = 1 === list.length ? list[0] : null;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -264,12 +261,11 @@ define([
                         transactionHandle: tran.transactionHandle
                     });
                     logger.warn("Transaction rolled back, error: [" + utils.formatError(e) + "]");
-                    utils.callOrThrow(callback, e);
+                    return utils.callOrThrow(callback, e);
                 }
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -296,10 +292,9 @@ define([
                 var res = lock.synchronize(function() {
                     return self.doInTransaction(operations);
                 });
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -319,9 +314,9 @@ define([
                 wiltoncall("db_connection_close", {
                     connectionHandle: this.handle
                 });
-                utils.callOrIgnore(callback);
+                return utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         }
     };
@@ -362,9 +357,9 @@ define([
                             "Query name not found on start, file: [" + path + "], line: [" + i + "]");
                     name = startedMatch[1];
                     state = "COLLECTING";
-                } else if ("COLLECTING" == state) {
+                } else if ("COLLECTING" === state) {
                     var nameMatch = nameRegex.exec(line);
-                    if (null !== nameMatch && 2 == nameMatch.length) { // next query name found
+                    if (null !== nameMatch && 2 === nameMatch.length) { // next query name found
                         if (0 === sql.length) throw new Error(
                                 "No SQL found for query name: [" + name + "], file: [" + path + "], line: [" + i + "]");
                         if (res.hasOwnProperty(name)) throw new Error(
@@ -385,12 +380,11 @@ define([
             if (res.hasOwnProperty(name)) throw new Error(
                     "Duplicate SQL query name: [" + name + "], file: [" + path + "], line: [" + i + "]");
             res[name] = sql.replace(trimRegex,"");
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
-    }
+    };
 
     return DBConnection;
 });

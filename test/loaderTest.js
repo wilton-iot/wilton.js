@@ -27,11 +27,13 @@ define([
 
     // findModulePath
     assert(utils.endsWith(loader.findModulePath(module.id), "wilton/test/loaderTest"));
+    assert(utils.endsWith(loader.findModulePath(module), "wilton/test/loaderTest"));
     assert(utils.endsWith(loader.findModulePath(module.id + ".js"), "wilton/test/loaderTest.js"));
     assert(utils.endsWith(loader.findModulePath(module.id + ".txt"), "wilton/test/loaderTest.txt"));
 
     // findModuleDirectory
     assert(utils.endsWith(loader.findModuleDirectory(module.id), "wilton/test/"));
+    assert(utils.endsWith(loader.findModuleDirectory(module), "wilton/test/"));
 
     // loadModuleResource
     assert(loader.loadModuleResource("wilton/test/data/foo.txt").trim(), "foo");

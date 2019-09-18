@@ -72,22 +72,22 @@ define([
      * Note, that to get the path to module file in FS input module ID
      * must include the file extension, example: `module.id + ".js"`.
      * 
-     * @param modname `String` module ID
+     * @param module `Object|String` either `module` object or module ID `String`
      * @param callback `Function|Undefined` callback to receive result or error
      * @return `String` full path to the specified module
      */
-    function findModulePath(modname, callback) {
+    function findModulePath(module, callback) {
         try {
+            var modname = "string" === typeof(module.id) ? module.id : module;
             var url = require.toUrl(modname);
             if (utils.startsWith(url, fileProtocolPrefix)) {
                 url = url.substr(fileProtocolPrefix.length);
             } else if (utils.startsWith(url, zipProtocolPrefix)) {
                 url = url.substr(zipProtocolPrefix.length);
             }
-            utils.callOrIgnore(callback, url);
-            return url;
+            return utils.callOrIgnore(callback, url);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -98,19 +98,19 @@ define([
      * 
      * Finds out directory where resides file of the specified module.
      * 
-     * @param modname `String` module ID
+     * @param module `Object|String` either `module` object or module ID `String`
      * @param callback `Function|Undefined` callback to receive result or error
      * @returns `String` path to module directory
      * 
      */
-    function findModuleDirectory(modname, callback) {
+    function findModuleDirectory(module, callback) {
         try {
+            var modname = "string" === typeof(module.id) ? module.id : module;
             var path = findModulePath(modname, callback);
             var dir = path.replace(/\/\w+(.js)?$/g, "/");
-            utils.callOrIgnore(callback, dir);
-            return dir;
+            return utils.callOrIgnore(callback, dir);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -130,10 +130,9 @@ define([
         try {
             var url = require.toUrl(modname);
             var res = wiltoncall("load_module_resource", url);
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -155,10 +154,9 @@ define([
         try {
             var str = loadModuleResource(modname);
             var res = JSON.parse(str);
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -196,10 +194,9 @@ define([
             var confPath = appdir + "conf/config.json";
             var confStr = mustache.renderFile(confPath, values);
             var res = JSON.parse(confStr);
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 

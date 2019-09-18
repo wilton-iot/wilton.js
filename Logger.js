@@ -142,9 +142,9 @@ define([
         var opts = utils.defaultObject(options);
         try {
             wiltoncall("logging_initialize", opts);
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     };
 
@@ -170,9 +170,9 @@ define([
                         thresholdLevel: threshold 
                 }]
             });
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -191,9 +191,9 @@ define([
     Logger.shutdown = function(callback) {
         try {
             wiltoncall("logging_shutdown");
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     };
 
@@ -213,7 +213,7 @@ define([
          * @return `Undefined`
          */
         log: function(message, callback) {
-            this._append("DEBUG", message, callback);
+            return this._append("DEBUG", message, callback);
         },
 
         /**
@@ -231,7 +231,7 @@ define([
          * @return `Undefined`
          */
         debug: function(message, callback) {
-            this._append("DEBUG", message, callback);
+            return this._append("DEBUG", message, callback);
         },
 
         /**
@@ -249,7 +249,7 @@ define([
          * @return `Undefined`
          */
         info: function(message, callback) {
-            this._append("INFO", message, callback);
+            return this._append("INFO", message, callback);
         },
 
         /**
@@ -267,7 +267,7 @@ define([
          * @return `Undefined`
          */
         warn: function(message, callback) {
-            this._append("WARN", message, callback);
+            return this._append("WARN", message, callback);
         },
         
         /**
@@ -285,7 +285,7 @@ define([
          * @return `Undefined`
          */
         error: function(message, callback) {
-            this._append("ERROR", message, callback);
+            return this._append("ERROR", message, callback);
         },
 
         _append: function(level, message, callback) {
@@ -317,11 +317,11 @@ define([
                     logger: this.name,
                     message: msg
                 });
-                utils.callOrIgnore(callback, msg);
+                return utils.callOrIgnore(callback, msg);
             } catch (e) {
                 // do not throw by default
                 if ("function" === typeof(callback)) {
-                    callback(e);
+                    return callback(e);
                 } else {
                     print("===LOGGER ERROR:");
                     print(utils.formatError(e));

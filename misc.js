@@ -59,10 +59,9 @@ define([
         try {
             var resstr = wiltoncall("get_wiltoncall_config");
             var res = JSON.parse(resstr);
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -80,10 +79,9 @@ define([
     function stdinReadline(callback) {
         try {
             var res = wiltoncall("stdin_readline");
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -111,9 +109,9 @@ define([
             } else {
                 wiltoncall("signal_await");
             }
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -133,9 +131,9 @@ define([
         try {
             var callname = "rungc_" + wiltonConfig().defaultScriptEngine;
             wiltoncall(callname);
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -143,10 +141,9 @@ define([
         try {
             var conf = wiltonConfig();
             var res = name === conf.compileTimeOS;
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -226,9 +223,9 @@ define([
             wiltoncall("systemd_notify", {
                 state: state
             });
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 

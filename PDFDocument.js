@@ -103,7 +103,7 @@ define([
             this.handle = handleParsed.pdfDocumentHandle;
             utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     };
 
@@ -133,10 +133,9 @@ define([
                 });
                 var obj = JSON.parse(json);
                 var res = obj.fontName;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -161,7 +160,7 @@ define([
          *  - __height__ `Number|Undefined` Page height.
          */
         addPage: function(options, callback) {
-            this._callWithOpts("pdf_add_page", options, callback);
+            return this._callWithOpts("pdf_add_page", options, callback);
         },
 
         /**
@@ -194,7 +193,7 @@ define([
          *    - __b__ `Number` Blue element as `float`, must be in `[0, 1]`
          */
         writeText: function(options, callback) {
-            this._callWithOpts("pdf_write_text", options, callback);
+            return this._callWithOpts("pdf_write_text", options, callback);
         },
 
         /**
@@ -232,7 +231,7 @@ define([
          *    - __b__ `Number` Blue element as `float`, must be in `[0, 1]`
          */
         writeTextInsideRectangle: function(options, callback) {
-            this._callWithOpts("pdf_write_text_inside_rectangle", options, callback);
+            return this._callWithOpts("pdf_write_text_inside_rectangle", options, callback);
         },
 
         /**
@@ -261,7 +260,7 @@ define([
          *    - __b__ `Number` Blue element as `float`, must be in `[0, 1]`
          */
         drawLine: function(options, callback) {
-            this._callWithOpts("pdf_draw_line", options, callback);
+            return this._callWithOpts("pdf_draw_line", options, callback);
         },
 
         /**
@@ -290,7 +289,7 @@ define([
          *    - __b__ `Number` Blue element as `float`, must be in `[0, 1]`
          */
         drawRectangle: function(options, callback) {
-            this._callWithOpts("pdf_draw_rectangle", options, callback);
+            return this._callWithOpts("pdf_draw_rectangle", options, callback);
         },
 
         /**
@@ -317,7 +316,7 @@ define([
          *  - __height__ `Number` Height of the rectangle in `pt`
          */
         drawImage: function(options, callback) {
-            this._callWithOpts("pdf_draw_image", options, callback);
+            return this._callWithOpts("pdf_draw_image", options, callback);
         },
 
         /**
@@ -337,9 +336,9 @@ define([
                     pdfDocumentHandle: this.handle,
                     path: path
                 });
-                utils.callOrIgnore(callback);
+                return utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -358,9 +357,9 @@ define([
                 wiltoncall("pdf_destroy_document", {
                     pdfDocumentHandle: this.handle
                 });
-                utils.callOrIgnore(callback);
+                return utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -368,10 +367,10 @@ define([
             var opts = utils.defaultObject(options);
             try {
                 opts.pdfDocumentHandle = this.handle;
-                wiltoncall(name, opts);
-                utils.callOrIgnore(callback);
+                var res = wiltoncall(name, opts);
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         }
     };

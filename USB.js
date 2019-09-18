@@ -99,7 +99,7 @@ define([
             }
             utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -127,10 +127,9 @@ define([
                     usbHandle: this.handle,
                     length: length
                 });
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
         
@@ -163,10 +162,9 @@ define([
                 var resObj = JSON.parse(resStr);
                 utils.checkPropertyType(resObj, "bytesWritten", "number");
                 var res = resObj.bytesWritten;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -195,10 +193,9 @@ define([
                 var resObj = JSON.parse(resStr);
                 utils.checkPropertyType(resObj, "bytesWritten", "number");
                 var res = resObj.bytesWritten;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -235,10 +232,9 @@ define([
                     usbHandle: this.handle,
                     options: opts
                 });
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -258,9 +254,9 @@ define([
                 wiltoncall("usb_close", {
                     usbHandle: this.handle
                 });
-                utils.callOrIgnore(callback);
+                return utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         }
     };

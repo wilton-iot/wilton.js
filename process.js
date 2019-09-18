@@ -116,8 +116,7 @@ define([
             if (!misc.isAndroid()) {
                 var res = wiltoncall("process_spawn", opts);
                 var resnum = parseInt(res, 10);
-                utils.callOrIgnore(callback, resnum);
-                return resnum;
+                return utils.callOrIgnore(callback, resnum);
             } else { // spawn wilton process
                 var runOnRhino = WILTON_requiresync("wilton/android/runOnRhino");
                 var repoPath = null;
@@ -135,10 +134,10 @@ define([
                     module: "wilton/android/startDeviceService",
                     args: [repoPath, rootModuleName, startupModule]
                 });
-                return 1;
+                return utils.callOrIgnore(callback, 1);
             }
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -157,10 +156,9 @@ define([
             var json = wiltoncall("process_current_pid");
             var obj = JSON.parse(json);
             var res = obj.pid;
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -181,10 +179,9 @@ define([
             var err = wiltoncall("process_kill_by_pid", {
                 pid: pid
             });
-            utils.callOrIgnore(callback, err);
-            return err;
+            return utils.callOrIgnore(callback, err);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 

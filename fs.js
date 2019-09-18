@@ -109,9 +109,9 @@ define([
             } finally {
                 wiltoncall("fs_close_tl_file_writer");
             }
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -140,7 +140,7 @@ define([
         if ("undefined" === typeof(callback)) {
             callback = options;
         }
-        writeOrAppend(path, data, {
+        return writeOrAppend(path, data, {
             append: true,
             hex: extractHexOption(options),
             delimiter: extractDelimiterOption(options)
@@ -164,10 +164,9 @@ define([
                 path: path
             });
             var res = JSON.parse(resstr).exists;
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -191,9 +190,9 @@ define([
             wiltoncall("fs_mkdir", {
                 path: path
             });
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
  
@@ -218,10 +217,9 @@ define([
                 path: path
             });
             var list = JSON.parse(res);
-            utils.callOrIgnore(callback, list);
-            return list;
+            return utils.callOrIgnore(callback, list);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -257,10 +255,9 @@ define([
                 var dataBytes = hex.decodeBytes(resHex);
                 res = utf8.decode(dataBytes, /* lenient */ true);
             }
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -283,10 +280,9 @@ define([
                 path: path
             });
             var res = JSON.parse(json);
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -310,10 +306,9 @@ define([
             var res = wiltoncall("fs_realpath", {
                 path: path
             });
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
  
@@ -335,9 +330,9 @@ define([
                 oldPath: oldPath,
                 newPath: newPath
             });
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -357,9 +352,9 @@ define([
             wiltoncall("fs_rmdir", {
                 path: path
             });
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
  
@@ -384,10 +379,9 @@ define([
                 path: path
             });
             var res = JSON.parse(resstr);
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -437,9 +431,9 @@ define([
             wiltoncall("fs_unlink", {
                 path: path
             });
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -468,7 +462,7 @@ define([
         if ("undefined" === typeof (callback)) {
             callback = options;
         }
-        writeOrAppend(path, data, {
+        return writeOrAppend(path, data, {
             append: false,
             hex: extractHexOption(options),
             delimiter: extractDelimiterOption(options)
@@ -493,9 +487,9 @@ define([
                 oldPath: oldPath,
                 newPath: newPath
             });
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -530,9 +524,9 @@ define([
                     copyFile(src, target);
                 }
             }
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -554,9 +548,9 @@ define([
                 dest: dest,
                 link: link 
             });
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -580,9 +574,9 @@ define([
                 destPath: destPath,
                 offset: offset 
             });
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -604,9 +598,9 @@ define([
                 path: path,
                 size: size 
             });
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 

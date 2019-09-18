@@ -250,7 +250,7 @@ define([
             }
             utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     };
 
@@ -271,9 +271,9 @@ define([
                 wiltoncall("server_stop", {
                     serverHandle: this.handle
                 });
-                utils.callOrIgnore(callback);
+                return utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -310,9 +310,9 @@ define([
                 opts.message = utils.defaultJson(opts.message);
                 opts.serverHandle = this.handle;
                 wiltoncall("server_broadcast_websocket", opts);
-                utils.callOrIgnore(callback);
+                return utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         }
     };

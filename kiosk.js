@@ -122,9 +122,9 @@ define([
             } else {
                 throw new Error("Unsupported OS");
             }
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 

@@ -77,10 +77,9 @@ define([
                 template: tp,
                 values: vals
             });
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e, "");
+            return utils.callOrThrow(callback, e);
         }
     };
 
@@ -104,10 +103,9 @@ define([
                 file: tpf,
                 values: vals
             });
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e, "");
+            return utils.callOrThrow(callback, e);
         }
     };
 

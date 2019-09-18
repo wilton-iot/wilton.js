@@ -102,10 +102,10 @@ define([
             } else {
                 utils.checkProperties(opts, ["callbackScript"]);
                 wiltoncall("thread_run", opts); 
-                utils.callOrIgnore(callback);
             }
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -125,9 +125,9 @@ define([
             wiltoncall("thread_sleep_millis", {
                 millis: millis
             });
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 

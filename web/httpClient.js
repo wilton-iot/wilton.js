@@ -177,10 +177,7 @@ define([], function() {
 
     function callOrThrow(onFailure, e, res) {
         if ("function" === typeof (onFailure)) {
-            onFailure(e);
-            if ("undefined" !== typeof (res)) {
-                return res;
-            }
+            return onFailure(e);
         } else {
             if (e instanceof Error) {
                 throw e;

@@ -112,9 +112,9 @@ define([
                 repo: repo,
                 options: utils.defaultObject(options)
             });
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -154,9 +154,9 @@ define([
                 repo: repo,
                 options: utils.defaultObject(options)
             });
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -177,10 +177,9 @@ define([
             var rev = wiltoncall("git_revparse_head", {
                 repo: repo
             });
-            utils.callOrIgnore(callback, rev);
-            return rev;
+            return utils.callOrIgnore(callback, rev);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 

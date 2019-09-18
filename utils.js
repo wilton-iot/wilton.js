@@ -170,16 +170,11 @@ define([], function() {
      * 
      * @param onFailure `Function|Undefined` callback to handle the specified `Error`
      * @param e `Error` error to pass to callback or throw
-     * @param res `Any|Undefined` result value to return from this function if callback
-     *            call was successfull
      * @returns `Any` `res` parameter
      */
-    function callOrThrow(onFailure, e, res) {
+    function callOrThrow(onFailure, e) {
         if ("function" === typeof (onFailure)) {
-            onFailure(e);
-            if ("undefined" !== typeof (res)) {
-                return res;
-            }
+            return onFailure(e);
         } else {
             if (e instanceof Error) {
                 throw e;
@@ -204,15 +199,19 @@ define([], function() {
      * 
      * @param onSuccess `Function|Undefined` callback
      * @param params `Any|Undefined` callback argument
-     * @returns `Undefined`
+     * @returns `Any` result of `onSuccess` call (if it is specified);
+     *          `params` (if it is specified, but `onSuccess` - not);
+     *          `undefined` otherwise
      */
     function callOrIgnore(onSuccess, params) {
         if ("function" === typeof (onSuccess)) {
             if ("undefined" !== typeof (params)) {
-                onSuccess(null, params);
+                return onSuccess(null, params);
             } else {
-                onSuccess(null);
+                return onSuccess(null);
             }
+        } else {
+            return params;
         }
     }
 

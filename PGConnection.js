@@ -100,7 +100,7 @@ define([
             this.handle = handleParsed.connectionHandle;
             utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     };
 
@@ -142,10 +142,9 @@ define([
                     }
                 }
 
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -186,10 +185,9 @@ define([
                         count += 1;
                     }
                 }
-                utils.callOrIgnore(callback, count);
-                return count;
+                return utils.callOrIgnore(callback, count);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -208,10 +206,9 @@ define([
         queryList: function(sql, params, callback) {
             try {
                 var res = this.execute(sql, params);
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -239,10 +236,9 @@ define([
                 }
 
                 var res = 1 === list.length ? list[0] : null;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -274,12 +270,11 @@ define([
                         connectionHandle: this.handle
                     });
                     logger.warn("Transaction rolled back, error: [" + utils.formatError(e) + "]");
-                    utils.callOrThrow(callback, e);
+                    return utils.callOrThrow(callback, e);
                 }
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -299,9 +294,9 @@ define([
                 wiltoncall("db_pgsql_connection_close", {
                     connectionHandle: this.handle
                 });
-                utils.callOrIgnore(callback);
+                return utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         }
     };

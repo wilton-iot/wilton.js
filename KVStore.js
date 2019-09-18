@@ -31,7 +31,40 @@
  * 
  * @code
  * 
- * TODO
+ * // create transient (non-persistent store)
+ * var st1 = new KVStore();
+ * 
+ * // create persistent store over a file
+ * var st = new KVStore("path/to/my.json");
+ * 
+ * // put entries into store
+ * st.put("foo", "bar");
+ * st.put("baz": [42, 43]);
+ * 
+ * // append values to existing entry
+ * // existing value must be an array
+ * st.append("baz", [44, 45, 46];
+ * 
+ * // remove entry
+ * st.remove("foo");
+ * 
+ * // share store with other threads
+ * var chan = new Channel("my/channel/name", 1);
+ * chan.send({
+ *     kvstoreHandle: st.handle
+ * });
+ * 
+ * // access store from other thread
+ * var channel = Channel.lookup("my/channel/name");
+ * var handle = channel.peek().kvstoreHandle;
+ * var st = new KVStore(handle);
+ * 
+ * // persist store to file
+ * st.persist();
+ * 
+ * // destroy store, persisting it to file
+ * // and de-allocating native resources
+ * st.destroy()
  * 
  * @endcode
  * 
@@ -86,7 +119,7 @@ define([
             }
             utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -112,10 +145,9 @@ define([
                     key: key
                 });
                 var res = null !== resStr ? JSON.parse(resStr) : null;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -141,10 +173,9 @@ define([
                     keyList: keyList
                 });
                 var res = null !== resStr ? JSON.parse(resStr) : null;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -170,10 +201,9 @@ define([
                     value: value
                 });
                 var res = null !== resStr ? JSON.parse(resStr) : null;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -200,10 +230,9 @@ define([
                     object: obj
                 });
                 var res = JSON.parse(resStr);
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -238,10 +267,9 @@ define([
                 var resObj = JSON.parse(resStr);
                 utils.checkPropertyType(resObj, "keyExisted", "boolean");
                 var res = resObj.keyExisted;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -266,10 +294,9 @@ define([
                 var resObj = JSON.parse(resStr);
                 utils.checkPropertyType(resObj, "keyExisted", "boolean");
                 var res = resObj.keyExisted;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -295,7 +322,7 @@ define([
                 utils.callOrIgnore(callback, res);
                 return res;
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -317,10 +344,9 @@ define([
                 var resObj = JSON.parse(resStr);
                 utils.checkPropertyType(resObj, "size", "number");
                 var res = resObj.size;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -341,10 +367,9 @@ define([
                     kvstoreHandle: this.handle
                 });
                 var res = JSON.parse(resStr);
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -364,10 +389,9 @@ define([
                     kvstoreHandle: this.handle
                 });
                 var res = JSON.parse(resStr);
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -390,10 +414,9 @@ define([
                 var resObj = JSON.parse(resStr);
                 utils.checkPropertyType(resObj, "persistedCount", "number");
                 var res = resObj.persistedCount;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -416,10 +439,9 @@ define([
                 var resObj = JSON.parse(resStr);
                 utils.checkPropertyType(resObj, "removedCount", "number");
                 var res = resObj.removedCount;
-                utils.callOrIgnore(callback, res);
-                return res;
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         },
 
@@ -439,9 +461,9 @@ define([
                 wiltoncall("kvstore_destroy", {
                     kvstoreHandle: this.handle
                 });
-                utils.callOrIgnore(callback);
+                return utils.callOrIgnore(callback);
             } catch (e) {
-                utils.callOrThrow(callback, e);
+                return utils.callOrThrow(callback, e);
             }
         }
 

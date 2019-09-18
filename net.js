@@ -75,10 +75,9 @@ define([
         try {
             var resJson = wiltoncall("net_resolve_hostname", opts);
             var res = JSON.parse(resJson);
-            utils.callOrIgnore(callback, res);
-            return res;
+            return utils.callOrIgnore(callback, res);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
@@ -105,9 +104,9 @@ define([
         var opts = utils.defaultObject(options);
         try {
             wiltoncall("net_wait_for_tcp_connection", opts);
-            utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback);
         } catch (e) {
-            utils.callOrThrow(callback, e);
+            return utils.callOrThrow(callback, e);
         }
     }
 
