@@ -40,6 +40,24 @@
  * 
  * @endcode
  * 
+ * Example of calling JS script in Wilton context (with full access to Wilton API),
+ * `enableWiltonCalls` option must be set:
+ * 
+ * @code
+ * 
+ * var callDesc = JSON.stringify({
+ *     module: "my/mod1",
+ *     func: "mufun1",
+ *     args: ["foo", 42]
+ * });
+ * 
+ * // on Linux, no result available
+ * window.webkit.messageHandlers.wilton.postMessage(callDesc);
+ * 
+ * // on Windows
+ * var res = window.wilton.callWiltonModule(callDesc);
+ * 
+ * @endcode
  */
 define([
     "./dyload",
@@ -55,6 +73,41 @@ define([
         });
     }
 
+    function runFx(opts) {
+        var Runnable = Packages.java.lang.Runnable;
+        var SimpleStringProperty = Packages.javafx.beans.property.SimpleStringProperty;
+        var Image = Packages.javafx.scene.image.Image;
+        var Scene = Packages.javafx.scene.Scene;
+        var Platform = Packages.javafx.application.Platform;
+        var WebView = Packages.javafx.scene.web.WebView;
+        var FxApp = Packages.wilton.support.fx.FxApp;
+        var WiltonWebViewBridge = Packages.wilton.support.webview.WiltonWebViewBridge;
+
+        utils.checkPropertyType(opts, "url", "string");
+
+        FxApp.launchApp(new Runnable({run: function() {
+            var stage = FxApp.STAGE;
+            var wv = new WebView();
+            var engine = wv.getEngine();
+            var bridge = new WiltonWebViewBridge();
+            if (true === opts.enableWiltonCalls) {
+                var window = engine.executeScript("window");
+                window.setMember("wilton", bridge);
+            }
+            engine.load(opts.url);
+            var scene = new Scene(wv);
+            stage.setScene(scene);
+            var titleProp = new SimpleStringProperty("wilton");
+            stage.getIcons().add(new Image("file:" + misc.wiltonConfig().wiltonHome + "conf/logo.png"));
+            stage.titleProperty().bind(titleProp);
+            stage.setFullScreen(true === opts.fullscreen);
+            stage.setWidth("number" === typeof(opts.windowWidth) ? opts.windowWidth : 640);
+            stage.setHeight("number" === typeof(opts.windowHeight) ? opts.windowHeight : 480);
+            stage.show();
+        }}));
+        Platform.exit();
+    }
+
     /**
      * @function run
      * 
@@ -63,10 +116,10 @@ define([
      * Opens a WebView window with a specified URL to load.
      * 
      * Current thread remains blocked until WebView window is closed.
-     *
+     * 
      * Note: on Linux it is better to run kiosk on `duktape` JS engine,
      * on Windows `rhino` or `nashorn` JS engine must be used because
-     * on Windows kiosk relies on OpenJFX. 
+     * on Windows kiosk relies on OpenJFX.
      * 
      * @param options `Object` configuration object, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
@@ -87,6 +140,10 @@ define([
      *  - __windowHeight__ `Number|Undefined` window height in pixels, default value: `480`
      *  - __consoleToStdout__ `Boolean|Undefined` redirect `console.log()` messages to STDOUT,
      *                        default value: `false`; not supported on Windows
+     *  - __inspectorMode__ `Boolean|Undefined` enable WebView code inspector,
+     *                      default value: `false`; not supported on Windows
+     *  - __enableWiltonCalls__ `Boolean|Undefined` allow to call native code through `wiltoncall` API,
+     *                          default value: `false`
      */
     function run(options, callback) {
         var opts = utils.defaultObject(options);
@@ -94,31 +151,7 @@ define([
             if (misc.isLinux()) {
                 wiltoncall("kiosk_run", opts);
             } else if (misc.isWindows()) {
-                var Runnable = Packages.java.lang.Runnable;
-                var SimpleStringProperty = Packages.javafx.beans.property.SimpleStringProperty;
-                var Image = Packages.javafx.scene.image.Image;
-                var Scene = Packages.javafx.scene.Scene;
-                var Platform = Packages.javafx.application.Platform;
-                var WebView = Packages.javafx.scene.web.WebView;
-                var FxApp = Packages.wilton.support.fx.FxApp;
-
-                utils.checkPropertyType(opts, "url", "string");
-
-                FxApp.launchApp(new Runnable({run: function() {
-                    var stage = FxApp.STAGE;
-                    var webView = new WebView();
-                    webView.getEngine().load(opts.url);
-                    var scene = new Scene(webView);
-                    stage.setScene(scene);
-                    var titleProp = new SimpleStringProperty("wilton");
-                    stage.getIcons().add(new Image("file:" + misc.wiltonConfig().wiltonHome + "conf/logo.png"));
-                    stage.titleProperty().bind(titleProp);
-                    stage.setFullScreen(true === opts.fullscreen);
-                    stage.setWidth("number" === typeof(opts.windowWidth) ? opts.windowWidth : 640);
-                    stage.setHeight("number" === typeof(opts.windowHeight) ? opts.windowHeight : 480);
-                    stage.show();
-                }}));
-                Platform.exit();
+                runFx(opts);
             } else {
                 throw new Error("Unsupported OS");
             }
