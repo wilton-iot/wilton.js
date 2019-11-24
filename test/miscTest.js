@@ -39,4 +39,13 @@ define([
             assert(e.message.indexOf(expected) >= 0);
         });
     }
+
+    // winscmStartDispatcher
+    if (misc.isWindows()) {
+        misc.winscmStartDispatcher("foo", function(e) {
+            assert(null !== e);
+            var expected = "Error starting service, name: [foo], error: [code: [1063], message: [";
+            assert(e.message.indexOf(expected) >= 0);
+        });
+    }
 });

@@ -229,6 +229,32 @@ define([
         }
     }
 
+    /**
+     * @function winscmStartDispatcher
+     * 
+     * Connect the main thread of a wilton process to SCM.
+     * 
+     * Connects the main thread of a wilton process to the Windos Service Control Manager.
+     * Call return after the SCM service is stopped.
+     * 
+     * @param name `String` name of the SCM service
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Undefined`
+     */
+    function winscmStartDispatcher(name, callback) {
+        dyload({
+            name: "wilton_winscm"
+        });
+        try {
+            wiltoncall("winscm_start_service_control_dispatcher", {
+                name: name
+            });
+            return utils.callOrIgnore(callback);
+        } catch (e) {
+            return utils.callOrThrow(callback, e);
+        }
+    }
+
     return {
         wiltonConfig: wiltonConfig,
         stdinReadline: stdinReadline,
@@ -238,6 +264,7 @@ define([
         isWindows: isWindows,
         isLinux: isLinux,
         isMac: isMac,
-        systemdNotify: systemdNotify
+        systemdNotify: systemdNotify,
+        winscmStartDispatcher: winscmStartDispatcher
     };
 });
