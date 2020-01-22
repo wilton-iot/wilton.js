@@ -127,8 +127,7 @@ define([
         }
         if (0 === methodEntries.length) {
             throw new Error("Invalid 'views' element: must have one or more" +
-                    " function attrs: GET, POST, PUT, DELETE, OPTIONS, WSOPEN, WSMESSAGE, WSCLOSE," +
-                    " index: [" + i + "]");
+                    " function attrs: GET, POST, PUT, DELETE, OPTIONS, WSOPEN, WSMESSAGE, WSCLOSE");
         }
         return methodEntries;
     }

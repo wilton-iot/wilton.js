@@ -48,7 +48,7 @@
  * // in other thread
  * var obj = chan.receive();
  * var writer = new DelayedResponse(obj.handle);
- * writer.sendResponse({
+ * writer.send({
  *     foo: "bar"
  * });
  * 

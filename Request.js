@@ -52,9 +52,10 @@
  */
 
 define([
+    "./DelayedWebSocket",
     "./utils",
     "./wiltoncall"
-], function(utils, wiltoncall) {
+], function(DelayedWebSocket, utils, wiltoncall) {
     "use strict";
     
     var Request = function(requestHandle) {
@@ -428,9 +429,9 @@ define([
          */
         closeWebSocket: function(callback) {
             try {
-                wiltoncall("request_close_websocket", {
-                    requestHandle: this.handle
-                });
+                var wsHandle = this.retainWebSocket();
+                var dws = new DelayedWebSocket(wsHandle);
+                dws.close();
                 return utils.callOrIgnore(callback);
             } catch (e) {
                 return utils.callOrThrow(callback, e);
@@ -458,7 +459,7 @@ define([
                 if ("string" === typeof(key)) {
                     res = key;
                 }
-                return utils.callOrIgnore(res, callback);
+                return utils.callOrIgnore(callback, res);
             } catch (e) {
                 return utils.callOrThrow(callback, e);
             }
@@ -576,6 +577,38 @@ define([
                 });
                 var json = JSON.parse(jsonStr);
                 var res = json.responseWriterHandle;
+                return utils.callOrIgnore(callback, res);
+            } catch (e) {
+                return utils.callOrThrow(callback, e);
+            }
+        },
+
+        /**
+         * @function retainWebSocket
+         * 
+         * Retain WebSocket connection to use it from another thread
+         * 
+         * Creates a `webSocketHandle`, that can be transfered to other thread
+         * and used here to create `DelayedWebSocket`.
+         * 
+         * While being in `delayed` state, this WebSocket connection does not process
+         * incoming messages (they are buffered meanwhile).
+         * 
+         * `DelayedWebSocket` can be used only for a single operation - 
+         * either sending a message to client or closing the connection.
+         * 
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Number` `webSocketHandle` that can be used to create
+         *         a `DelayedWebSocket` inside another thread
+         * 
+         */
+        retainWebSocket: function(callback) {
+            try {
+                var jsonStr = wiltoncall("request_retain_websocket", {
+                    requestHandle: this.handle
+                });
+                var json = JSON.parse(jsonStr);
+                var res = json.webSocketHandle;
                 return utils.callOrIgnore(callback, res);
             } catch (e) {
                 return utils.callOrThrow(callback, e);
