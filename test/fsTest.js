@@ -139,6 +139,9 @@ define([
     assert.equal(li[1], "boo");
     assert.equal(li[2], "foobar");
 
+    // write: cannot open writer
+    assert.throws(function() { fs.writeFile(null, []); });
+
     // not needed - rmdir is recursive
     //fs.unlink(tflines);
     //assert(!fs.exists(tflines));

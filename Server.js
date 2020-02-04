@@ -313,6 +313,28 @@ define([
             } catch (e) {
                 return utils.callOrThrow(callback, e);
             }
+        },
+
+        /**
+         * @function getTcpPort
+         * 
+         * Find out server TCP port
+         * 
+         * Retuns a TCP port number that this server instance is bound to.
+         * 
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Undefined`
+         */
+        getTcpPort: function(callback) {
+            try {
+                var resJson = wiltoncall("server_get_tcp_port", {
+                    serverHandle: this.handle
+                });
+                var res = JSON.parse(resJson).tcpPort;
+                return utils.callOrIgnore(callback, res);
+            } catch (e) {
+                return utils.callOrThrow(callback, e);
+            }
         }
     };
 

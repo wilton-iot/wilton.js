@@ -26,6 +26,9 @@ define([
     print("test: wilton/zip");
     var dir = scratchDir + "zipTest/";
     fs.mkdir(dir);
+    // prepare fs data
+    fs.writeFile(dir + "foo.txt", "bar");
+    fs.writeFile(dir + "baz.txt", "boo");
 
     // chakra "module->DecrementObjectCount()" segfault on shutdown
     // jscript9.dll!Js::WindowsGlobalizationAdapter::~WindowsGlobalizationAdapter()
@@ -35,6 +38,7 @@ define([
 
     var testZip = dir + "test.zip";
     var testHexZip = dir + "testHex.zip";
+    var testFsZip = dir + "testFs.zip";
 
     // write file
     zip.writeFile(testZip, {
@@ -47,14 +51,26 @@ define([
     }, {
         hex: true
     });
+    zip.writeFile(testFsZip, {
+        foo: dir + "foo.txt",
+        baz: dir + "baz.txt"
+    }, {
+        fsPaths: true
+    });
     assert(fs.exists(testZip));
     assert(fs.stat(testZip).size > 0);
     assert(fs.exists(testHexZip));
     assert(fs.stat(testHexZip).size > 0);
+    assert(fs.exists(testFsZip));
+    assert(fs.stat(testFsZip).size > 0);
+
+    // write fail
+    assert.throws(function() { fs.writeFile(null, {}); });
 
     // list entries (alphabetic order)
     assert.deepEqual(zip.listFileEntries(testZip), ["baz", "foo"]);
     assert.deepEqual(zip.listFileEntries(testHexZip), ["baz", "foo"]);
+    assert.deepEqual(zip.listFileEntries(testFsZip), ["baz", "foo"]);
 
     // read entry
     assert.equal(zip.readFileEntry(testZip, "foo"), "bar");
@@ -65,6 +81,10 @@ define([
     assert.equal(zip.readFileEntry(testHexZip, "foo", {hex: true}), "626172");
     assert.equal(zip.readFileEntry(testHexZip, "baz"), "boo");
     assert.equal(zip.readFileEntry(testHexZip, "baz", {hex: true}), "626f6f");
+    assert.equal(zip.readFileEntry(testFsZip, "foo"), "bar");
+    assert.equal(zip.readFileEntry(testFsZip, "foo", {hex: true}), "626172");
+    assert.equal(zip.readFileEntry(testFsZip, "baz"), "boo");
+    assert.equal(zip.readFileEntry(testFsZip, "baz", {hex: true}), "626f6f");
 
     // read file
     assert.deepEqual(zip.readFile(testZip), {
@@ -75,10 +95,11 @@ define([
         foo: "626172",
         baz: "626f6f"
     });
+    assert.deepEqual(zip.readFile(testFsZip), {
+        foo: "bar",
+        baz: "boo"
+    });
 
     // cleanup
-    fs.unlink(testZip);
-    fs.unlink(testHexZip);
-
     fs.rmdir(dir);
 });

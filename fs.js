@@ -94,12 +94,12 @@ define([
                 delim = hex.encodeUTF8(delim);
             }
             // use thread-local writer
+            wiltoncall("fs_open_tl_file_writer", {
+                path: path,
+                append: opts.append,
+                hex: opts.hex 
+            });
             try {
-                wiltoncall("fs_open_tl_file_writer", {
-                    path: path,
-                    append: opts.append,
-                    hex: opts.hex 
-                });
                 for (var i = 0; i < entries.length; i++) {
                     wiltoncall("fs_append_tl_file_writer", entries[i]);
                     if (i < entries.length - 1 && delim.length > 0) {

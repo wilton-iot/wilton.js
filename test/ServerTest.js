@@ -64,6 +64,7 @@ define([
         },
         rootRedirectLocation: "/wilton/test/views/hi"
     });
+    assert.equal(server.getTcpPort(), 8443);
 
     var meta = {
         sslcertFilename: certdir + "client/testclient.pem",

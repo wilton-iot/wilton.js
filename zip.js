@@ -198,14 +198,18 @@ define([
      * @returns `Undefined`
      * 
      * __Options__
-     *  - __hex__ `Boolean` whether ZIP entry data needs to be converted to
+     *  - __hex__ `Boolean|Undefined` whether ZIP entry data needs to be converted to
      *                      to HEX format before wrting it to ZIP file;
+     *                      `false` by default
+     *  - __fsPaths__ `Boolean|Undefined` whether ZIP entry data represents paths in filesystem
+     *                      that should be read and compressed into ZIP file;
      *                      `false` by default
      */
     function writeFile(path, entries, options, callback) {
         if ("undefined" === typeof (callback)) {
             callback = options;
         }
+        var opts = utils.defaultObject(options);
         try {
             // prepare entries
             if ("object" !== typeof(entries) || null === entries) {
@@ -223,12 +227,13 @@ define([
                 return nameA.localeCompare(nameB);
             });
             // use thread-local writer
+            wiltoncall("zip_open_tl_file_writer", {
+                path: path,
+                entries: entryNames,
+                hex: opts.hex || false,
+                fsPaths: opts.fsPaths || false
+            });
             try {
-                wiltoncall("zip_open_tl_file_writer", {
-                    path: path,
-                    entries: entryNames,
-                    hex: extractHexOption(options)
-                });
                 for (var i = 0; i < entryNames.length; i++) {
                     var key = entryNames[i];
                     wiltoncall("zip_write_tl_entry_content", entries[key]);
