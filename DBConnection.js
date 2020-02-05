@@ -69,16 +69,86 @@ define([
     "module",
     "./dyload",
     "./fs",
+    "./loader",
     "./Logger",
     "./utils",
     "./wiltoncall"
-], function(module, dyload, fs, Logger, utils, wiltoncall) {
+], function(module, dyload, fs, loader, Logger, utils, wiltoncall) {
     "use strict";
-    var logger = new Logger(module.id)
+    var logger = new Logger(module.id);
 
     dyload({
         name: "wilton_db"
     });
+
+    function executeContents(self, contents) {
+        var queries = contents.split(";");
+        var commentRegexp = /^\s*--.*$/;
+        var trimRegex = /^\s+|\s+$/g;
+        var count = 0;
+        for (var i = 0; i < queries.length; i++) {
+            var lines = queries[i].split("\n");
+            var flines = [];
+            for (var j = 0; j < lines.length; j++) {
+                var li = lines[j];
+                var trimmed = li.replace(trimRegex, "");
+                if (trimmed.length > 0 && !commentRegexp.test(li)) {
+                    flines.push(li);
+                }
+            }
+            if (flines.length > 0) {
+                var query = flines.join("\n").replace(trimRegex, "");
+                self.execute(query, {});
+                count += 1;
+            }
+        }
+        return count;
+    }
+
+    // https://github.com/alexkasko/springjdbc-typed-queries/blob/master/typed-queries-common/src/main/java/com/alexkasko/springjdbc/typedqueries/common/PlainSqlQueriesParser.java
+    function loadQueryLines(lines) {
+        var nameRegex = new RegExp("^\\s*/\\*{2}\\s*(.*?)\\s*\\*/\\s*$");
+        var trimRegex = /^\s+|\s+$/g;
+        var res = {};
+        var state = "STARTED";
+        var name = null;
+        var sql = "";
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+            var trimmed = line.replace(trimRegex, "");
+            if (0 === trimmed.length) continue;
+            if ("STARTED" === state) { // search for first query name
+                if (utils.startsWith(trimmed, "--")) continue;
+                var startedMatch = nameRegex.exec(line);
+                if (null === startedMatch || 2 !== startedMatch.length) throw new Error(
+                        "Query name not found on start, file: [" + path + "], line: [" + i + "]");
+                name = startedMatch[1];
+                state = "COLLECTING";
+            } else if ("COLLECTING" === state) {
+                var nameMatch = nameRegex.exec(line);
+                if (null !== nameMatch && 2 === nameMatch.length) { // next query name found
+                    if (0 === sql.length) throw new Error(
+                            "No SQL found for query name: [" + name + "], file: [" + path + "], line: [" + i + "]");
+                    if (res.hasOwnProperty(name)) throw new Error(
+                            "Duplicate SQL query name: [" + name + "], file: [" + path + "], line: [" + i + "]");
+                    // save collected sql string
+                    res[name] = sql.replace(trimRegex,"");
+                    // clean collected sql string
+                    sql = "";
+                    name = nameMatch[1];
+                } else {
+                    sql += line;
+                    sql += "\n";
+                }
+            } else throw new Error("Invalid state: [" + state + "]");
+        }
+        // tail
+        if (null === name) throw new Error("No queries found, file: [" + path + "]");
+        if (res.hasOwnProperty(name)) throw new Error(
+                "Duplicate SQL query name: [" + name + "], file: [" + path + "], line: [" + i + "]");
+        res[name] = sql.replace(trimRegex,"");
+        return res;
+    }
 
     /**
      * @function DBConnection
@@ -149,32 +219,37 @@ define([
         executeFile: function(filePath, callback) {
             try {
                 var contents = fs.readFile(filePath);
-                var queries = contents.split(";");
-                var commentRegexp = /^\s*--.*$/;
-                var trimRegex = /^\s+|\s+$/g;
-                var count = 0;
-                for (var i = 0; i < queries.length; i++) {
-                    var lines = queries[i].split("\n");
-                    var flines = [];
-                    for (var j = 0; j < lines.length; j++) {
-                        var li = lines[j];
-                        var trimmed = li.replace(trimRegex, "");
-                        if (trimmed.length > 0 && !commentRegexp.test(li)) {
-                            flines.push(li);
-                        }
-                    }
-                    if (flines.length > 0) {
-                        var query = flines.join("\n").replace(trimRegex, "");
-                        this.execute(query, {});
-                        count += 1;
-                    }
-                }
+                var count = executeContents(this, contents);
                 return utils.callOrIgnore(callback, count);
             } catch (e) {
                 return utils.callOrThrow(callback, e);
             }
         },
-        
+
+        /**
+         * @function executeModuleResource
+         * 
+         * Execute all queries from RequireJS module.
+         * 
+         * Queries are parsed from module splitting it by `;` symbols
+         * and then executed one by one.
+         * 
+         * Comment-only lines are ignored;
+         * 
+         * @param moduleId `String` module ID that points to SQL file
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Number` number of queries executed
+         */
+        executeModuleResource: function(moduleId, callback) {
+            try {
+                var contents = loader.loadModuleResource(moduleId);
+                var count = executeContents(this, contents);
+                return utils.callOrIgnore(callback, count);
+            } catch (e) {
+                return utils.callOrThrow(callback, e);
+            }
+        },
+
         /**
          * @function queryList
          * 
@@ -324,7 +399,7 @@ define([
     /**
      * @static loadQueryFile
      * 
-     * Load queries froma an SQL file.
+     * Load queries from an SQL file.
      * 
      * Parses a file with SQL queries as `query_name: sql` object.
      * 
@@ -332,54 +407,50 @@ define([
      * 
      * Lines with comments are preserved, empty lines are ignored.
      *
-     * @param path `String` path to file with data
+     * @param path `String` path to file with queries
      * @param callback `Function|Undefined` callback to receive result or error
      * @return `Object` loaded queries.
      */
-    // https://github.com/alexkasko/springjdbc-typed-queries/blob/master/typed-queries-common/src/main/java/com/alexkasko/springjdbc/typedqueries/common/PlainSqlQueriesParser.java
     DBConnection.loadQueryFile = function(path, callback) {
         try {
             var lines = fs.readLines(path);
-            var nameRegex = new RegExp("^\\s*/\\*{2}\\s*(.*?)\\s*\\*/\\s*$");
-            var trimRegex = /^\s+|\s+$/g;
-            var res = {};
-            var state = "STARTED";
-            var name = null;
-            var sql = "";
-            for (var i = 0; i < lines.length; i++) {
-                var line = lines[i];
-                var trimmed = line.replace(trimRegex, "");
-                if (0 === trimmed.length) continue;
-                if ("STARTED" === state) { // search for first query name
-                    if (utils.startsWith(trimmed, "--")) continue;
-                    var startedMatch = nameRegex.exec(line);
-                    if (null === startedMatch || 2 !== startedMatch.length) throw new Error(
-                            "Query name not found on start, file: [" + path + "], line: [" + i + "]");
-                    name = startedMatch[1];
-                    state = "COLLECTING";
-                } else if ("COLLECTING" === state) {
-                    var nameMatch = nameRegex.exec(line);
-                    if (null !== nameMatch && 2 === nameMatch.length) { // next query name found
-                        if (0 === sql.length) throw new Error(
-                                "No SQL found for query name: [" + name + "], file: [" + path + "], line: [" + i + "]");
-                        if (res.hasOwnProperty(name)) throw new Error(
-                                "Duplicate SQL query name: [" + name + "], file: [" + path + "], line: [" + i + "]");
-                        // save collected sql string
-                        res[name] = sql.replace(trimRegex,"");
-                        // clean collected sql string
-                        sql = "";
-                        name = nameMatch[1];
-                    } else {
-                        sql += line;
-                        sql += "\n";
-                    }
-                } else throw new Error("Invalid state: [" + state + "]");
+            var res = loadQueryLines(lines);
+            return utils.callOrIgnore(callback, res);
+        } catch (e) {
+            return utils.callOrThrow(callback, e);
+        }
+    };
+
+    /**
+     * @static loadQueryModuleResource
+     * 
+     * Load queries from an SQL module.
+     * 
+     * Parses a module with SQL queries as `query_name: sql` object.
+     * 
+     * Each query must start with `/** myQuery STAR/` header.
+     * 
+     * Lines with comments are preserved, empty lines are ignored.
+     *
+     * @param moduleId `String` module ID that points to file with queries
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Object` loaded queries.
+     */
+    DBConnection.loadQueryModuleResource = function(moduleId, callback) {
+        try {
+            var contents = loader.loadModuleResource(moduleId);
+            var linesAll = contents.split("\n");
+            var lines = [];
+            for (var i = 0; i < linesAll.length; i++) {
+                var li = linesAll[i];
+                if (utils.endsWith(li, "\r")) {
+                    li = li.substring(0, li.length - 1);
+                }
+                if (li.length > 0) {
+                    lines.push(li);
+                }
             }
-            // tail
-            if (null === name) throw new Error("No queries found, file: [" + path + "]");
-            if (res.hasOwnProperty(name)) throw new Error(
-                    "Duplicate SQL query name: [" + name + "], file: [" + path + "], line: [" + i + "]");
-            res[name] = sql.replace(trimRegex,"");
+            var res = loadQueryLines(lines);
             return utils.callOrIgnore(callback, res);
         } catch (e) {
             return utils.callOrThrow(callback, e);

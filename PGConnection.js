@@ -316,9 +316,24 @@ define([
      * @param callback `Function|Undefined` callback to receive result or error
      * @return `Object` loaded queries.
      */
-    // https://github.com/alexkasko/springjdbc-typed-queries/blob/master/typed-queries-common/src/main/java/com/alexkasko/springjdbc/typedqueries/common/PlainSqlQueriesParser.java
     PGConnection.loadQueryFile = DBConnection.loadQueryFile;
 
+    /**
+     * @static loadQueryModuleResource
+     * 
+     * Load queries from an SQL module.
+     * 
+     * Parses a module with SQL queries as `query_name: sql` object.
+     * 
+     * Each query must start with `/** myQuery STAR/` header.
+     * 
+     * Lines with comments are preserved, empty lines are ignored.
+     *
+     * @param moduleId `String` module ID that points to file with queries
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Object` loaded queries.
+     */
+    PGConnection.loadQueryModuleResource = DBConnection.loadQueryModuleResource;
 
     return PGConnection;
 });

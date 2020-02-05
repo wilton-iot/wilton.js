@@ -74,9 +74,12 @@ define([
 
     // loadQueryFile
     var queries = DBConnection.loadQueryFile(loader.findModulePath("wilton/test/data/test.sql"));
-    assert.equal(queries.myTestSelect, "select foo from bar\n    where baz = 1\n    and 1 > 0 -- stupid condidion\n    limit 42");
-    assert.equal(queries.myTestSelect2, "-- slow query\ndelete from foo\n    where baz = 1");
-    assert.equal(queries.myTestSelect3, "drop table foo");
+    var queriesFromMod = DBConnection.loadQueryModuleResource("wilton/test/data/test.sql");
+    [queries, queriesFromMod].forEach(function(qrs) {
+        assert.equal(qrs.myTestSelect, "select foo from bar\n    where baz = 1\n    and 1 > 0 -- stupid condidion\n    limit 42");
+        assert.equal(qrs.myTestSelect2, "-- slow query\ndelete from foo\n    where baz = 1");
+        assert.equal(qrs.myTestSelect3, "drop table foo");
+    });
 
     conn.close();
     fs.rmdir(dir);

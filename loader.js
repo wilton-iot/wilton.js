@@ -123,13 +123,23 @@ define([
      * module path from file system or from ZIP file.
      * 
      * @param modname `String` logical module path to the resource file
+     * @param options `Object|Undefined` configuration object, can be omitted, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
      * @return `String` contents of the specified file
+     * 
+     * __Options__
+     *  - __hex__ `Boolean` whether data read from specified resources needs
+     *                      to be converted to HEX format before returning it to caller;
+     *                      `false` by default
      */
-    function loadModuleResource(modname, callback) {
+    function loadModuleResource(modname, options, callback) {
+        var opts = utils.defaultObject(options);
         try {
             var url = require.toUrl(modname);
-            var res = wiltoncall("load_module_resource", url);
+            var res = wiltoncall("load_module_resource", {
+                url: url,
+                hex: true === opts.hex
+            });
             return utils.callOrIgnore(callback, res);
         } catch (e) {
             return utils.callOrThrow(callback, e);

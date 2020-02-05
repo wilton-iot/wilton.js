@@ -77,7 +77,7 @@ define([
     // todo: windows binmod path separator
     if (!misc.isWindows()) {
         var binmod = whome + "examples/binmod.wlib";
-        assert.equal(run([dir + "helpers/cliHelperBinmod.js", "-b", binmod]), "binmod/cliHelper");
+        assert.equal(run([dir + "helpers/cliHelperBinmod.js", "-b", binmod]), "helpers/binmod/cliHelper");
     }
 
 });

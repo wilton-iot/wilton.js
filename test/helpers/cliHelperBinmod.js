@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define(["binmod/cliHelper"], function(helper) {
+define(["helpers/binmod/cliHelper"], function(helper) {
     "use strict";
     
     return {
