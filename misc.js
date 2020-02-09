@@ -255,6 +255,29 @@ define([
         }
     }
 
+    /**
+     * @function winComputerName
+     * 
+     * Get Windows "Computer Name".
+     * 
+     * Returs "Computer Name" value from WinAPI call.
+     * Supported only on Windows.
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Undefined`
+     */
+    function winComputerName(callback) {
+        dyload({
+            name: "wilton_winscm"
+        });
+        try {
+            var res = wiltoncall("winscm_misc_get_computer_name");
+            return utils.callOrIgnore(callback, res);
+        } catch (e) {
+            return utils.callOrThrow(callback, e);
+        }
+    }
+
     return {
         wiltonConfig: wiltonConfig,
         stdinReadline: stdinReadline,
@@ -265,6 +288,7 @@ define([
         isLinux: isLinux,
         isMac: isMac,
         systemdNotify: systemdNotify,
-        winscmStartDispatcher: winscmStartDispatcher
+        winscmStartDispatcher: winscmStartDispatcher,
+        winComputerName: winComputerName
     };
 });

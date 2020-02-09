@@ -24,6 +24,7 @@ define([], function() {
                 "wilton/test/ChannelTest",
                 "wilton/test/cliTest",
                 "wilton/test/CronTaskTest",
+                "wilton/test/cryptoTest",
                 "wilton/test/DBConnectionTest",
                 "wilton/test/fsTest",
                 "wilton/test/fsPromiseTest",

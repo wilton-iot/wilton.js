@@ -181,5 +181,6 @@ define([
     // realpath
     assert(fs.realpath(dir + "..").length > 1);
 
+    // cleanup
     fs.rmdir(dir);
 });

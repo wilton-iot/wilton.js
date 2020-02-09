@@ -40,12 +40,17 @@ define([
         });
     }
 
-    // winscmStartDispatcher
     if (misc.isWindows()) {
+        // winscmStartDispatcher
         misc.winscmStartDispatcher("foo", function(e) {
             assert(null !== e);
             var expected = "Error starting service, name: [foo], error: [code: [1063], message: [";
             assert(e.message.indexOf(expected) >= 0);
         });
+
+        // computer name
+        var mname = misc.winComputerName();
+        assert.equal(typeof(mname), "string");
+        assert(mname.length > 0);
     }
 });
