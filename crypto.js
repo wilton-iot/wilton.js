@@ -110,8 +110,8 @@ define([
      * __Options__
      *  - __filePath__ `String` path to the file to encrypt
      *  - __desfilePath__ `String` path to the file to write encryption results into
-     *  - __cryptKey__ `String` encryption key, must be 64 bytes in length
-     *  - __initVec__ `String` encryption key, must be 32 bytes in length
+     *  - __cryptKey__ `String` encryption key in hexadecimal, must be 32 bytes long
+     *  - __initVec__ `String` init vector in hexadecimal, must be 16 bytes long
      */
     function encryptFile(options, callback) {
         var opts = utils.defaultObject(options);
@@ -143,8 +143,8 @@ define([
      * __Options__
      *  - __filePath__ `String` path to the file to decrypt
      *  - __desfilePath__ `String` path to the file to write decryption results into
-     *  - __cryptKey__ `String` encryption key, must be 64 bytes in length
-     *  - __initVec__ `String` encryption key, must be 32 bytes in length
+     *  - __cryptKey__ `String` encryption key in hexadecimal, must be 32 bytes long
+     *  - __initVec__ `String` init vector in hexadecimal, must be 16 bytes long
      */
     function decryptFile(options, callback) {
         var opts = utils.defaultObject(options);
@@ -169,8 +169,8 @@ define([
      * @param callback `Function|Undefined` callback to receive result or error
      * @returns `Object` with the following fields:
      * 
-     *  - __cryptKey__ `String` encryption key
-     *  - __initVec__ `String` initialization vector
+     *  - __cryptKey__ `String` encryption key in hexadecimal
+     *  - __initVec__ `String` initialization vector in hexadecimal
      * 
      */
     function createCryptKey(secret, callback) {
