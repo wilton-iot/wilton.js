@@ -27,7 +27,7 @@ define([
         return;
     }
 
-    var executable = misc.wiltonConfig().applicationDirectory + "/bin/wilton";
+    var executable = misc.wiltonConfig().wiltonHome + "bin/wilton";
     if (misc.isWindows()) { 
         executable += ".exe";
     }

@@ -51,7 +51,7 @@ define([
      * @returns `Object` configuration object with the following fields:
      * 
      * - __defaultScriptEngine__ `String` name of the script engine that is used by default
-     * - __applicationDirectory__ `String` path to the application directory of the current process
+     * - __wiltonHome__ `String` path to the Wilton directory
      * - __environmentVariables__ `Object` system environment variables collected during the startup
      * - __requireJs__ `Object` `RequireJS` configuration
      */

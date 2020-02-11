@@ -49,14 +49,11 @@
  */
 define([
     "require",
-    "./misc",
     "./mustache",
     "./utils",
     "./wiltoncall"
-], function(require, misc, mustache, utils, wiltoncall) {
+], function(require, mustache, utils, wiltoncall) {
     "use strict";
-
-    var conf = misc.wiltonConfig();
 
     var fileProtocolPrefix = "file://";
     var zipProtocolPrefix = "zip://";
@@ -107,7 +104,7 @@ define([
         try {
             var modname = "string" === typeof(module.id) ? module.id : module;
             var path = findModulePath(modname, callback);
-            var dir = path.replace(/\/\w+(.js)?$/g, "/");
+            var dir = path.replace(/\/[^\/]+(.js)?$/g, "/");
             return utils.callOrIgnore(callback, dir);
         } catch (e) {
             return utils.callOrThrow(callback, e);
@@ -188,21 +185,20 @@ define([
      * Loaded file contents are preprocessed replacing references to `{{{appdir}}}`
      * with an actual path to application directory.
      * 
-     * @param startupModule `Object|Undefined` RequireJS startup module
+     * @param startupModule `Object` RequireJS startup module
      * @param callback `Function|Undefined` callback to receive result or error
      * @returns `Object` configuration object parsed from `config.json` file
      */
     function loadAppConfig(startupModule, callback) {
         try {
-            var appdir = conf.applicationDirectory;
-            if("object" === typeof(startupModule) && "string" === typeof(startupModule.id)) {
-                appdir = findModuleDirectory(startupModule.id);
+            if(!("object" === typeof(startupModule) && "string" === typeof(startupModule.id))) {
+                throw new Error("Invalid startup module specified, value: [" + startupModule + "]");
             }
-            var values = {
-                appdir: appdir
-            };
+            var appdir = findModuleDirectory(startupModule.id);
             var confPath = appdir + "conf/config.json";
-            var confStr = mustache.renderFile(confPath, values);
+            var confStr = mustache.renderFile(confPath, {
+                appdir: appdir
+            });
             var res = JSON.parse(confStr);
             return utils.callOrIgnore(callback, res);
         } catch (e) {

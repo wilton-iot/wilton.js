@@ -23,7 +23,7 @@ define([
     "use strict";
 
     var mainActivity = Packages.wilton.android.MainActivity.INSTANCE;
-    var appdir = misc.wiltonConfig().applicationDirectory;
+    var wiltonHome = misc.wiltonConfig().wiltonHome;
 
     function initCloseButton() {
         var button = mainActivity.findViewById(Packages.wilton.android.R.id.close_button);
@@ -110,7 +110,7 @@ define([
         },
 
         version: function() {
-            return fs.readFile(appdir + "wilton.version").replace(/\s+/g, "") ;
+            return fs.readFile(wiltonHome + "wilton.version").replace(/\s+/g, "") ;
         }
     };
 });

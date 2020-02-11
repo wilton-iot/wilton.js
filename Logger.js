@@ -39,13 +39,12 @@
  * @code
  * 
  * // init logging once at app startup
- * var appdir = misc.wiltonConfig().applicationDirectory;
  * Logger.initialize({
  *     appenders: [
  *         {
  *             appenderType: "DAILY_ROLLING_FILE",
  *             thresholdLevel: "DEBUG",
- *             filePath: appdir + "log/myapp_log.txt"
+ *             filePath: "path/to/log/myapp_log.txt"
  *         },
  *         {
  *             appenderType: "CONSOLE",
