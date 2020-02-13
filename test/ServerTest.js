@@ -19,14 +19,17 @@ define([
     "wilton/Channel",
     "wilton/Server",
     "wilton/loader",
+    "wilton/misc",
     "wilton/thread",
     "wilton/test/helpers/httpClientHelper"
-], function(assert, Channel, Server, loader, thread, clientHelper) {
+], function(assert, Channel, Server, loader, misc, thread, clientHelper) {
     "use strict";
 
     print("test: wilton/Server");
 
     var certdir = loader.findModulePath("wilton/test/certificates/");
+    var datadir = loader.findModulePath("wilton/test/data/");
+    var wconf = misc.wiltonConfig();
 
     // worker and channel for delayed reponses
     var delayedChannel = new Channel("ServerTest_delayed");
@@ -62,7 +65,19 @@ define([
             verifyFile: certdir + "server/staticlibs_test_ca.cer",
             verifySubjectSubstr: "CN=testclient"
         },
-        rootRedirectLocation: "/wilton/test/views/hi"
+        rootRedirectLocation: "/wilton/test/views/hi",
+        documentRoots: [{
+            resource: "/filesystem",
+            dirPath: datadir
+        }, {
+            resource: "/zip",
+            zipPath: wconf.wiltonHome + "std.min.wlib",
+            zipInnerPrefix: "wilton/"
+        }, {
+            resource: "/loader",
+            useResourceLoader: true,
+            resourceLoaderPrefix: "file://" + loader.findModulePath("wilton/")
+        }]
     });
     assert.equal(server.getTcpPort(), 8443);
 
@@ -78,7 +93,8 @@ define([
         cainfoFilename: certdir + "client/staticlibs_test_ca.cer"
     };
 
-    var prefix = "https://localhost:8443/wilton/test/views/";
+    var rootPrefix = "https://localhost:8443/";
+    var prefix = rootPrefix + "wilton/test/views/";
     assert.equal(clientHelper.httpGetCode(prefix + "foo", meta), 404);
     assert.equal(clientHelper.httpGet(prefix + "hi", meta), "Hi from wilton_test!");
     assert.equal(clientHelper.httpGet("https://localhost:8443/", meta), "Hi from wilton_test!");
@@ -103,6 +119,10 @@ define([
     assert.equal(clientHelper.httpGet(prefix + "delayed", meta), "delayed OK");
     assert.equal(clientHelper.httpGetHeader(prefix + "delayed", "X-Test-Delayed", meta), "true");
     assert.equal(clientHelper.httpGet(prefix + "metaaftercommit", meta), "metaaftercommit");
+    assert.equal(clientHelper.httpGet(rootPrefix + "filesystem/foo.txt", meta), "foo\n");
+    var wiltonPackageJson = "{\n  \"wilton\": {\n    \"excludes\": [\n      \"test\"\n    ]\n  }\n}\n";
+    assert.equal(clientHelper.httpGet(rootPrefix + "zip/package.json", meta), wiltonPackageJson);
+    assert.equal(clientHelper.httpGet(rootPrefix + "loader/package.json", meta), wiltonPackageJson);
 
     // optional
     server.stop();
