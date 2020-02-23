@@ -97,13 +97,19 @@ define([
             engine.load(opts.url);
             var scene = new Scene(wv);
             stage.setScene(scene);
-            var titleProp = new SimpleStringProperty("wilton");
-            stage.getIcons().add(new Image("file:" + misc.wiltonConfig().wiltonHome + "conf/logo.png"));
+            var titleProp = new SimpleStringProperty("string" === typeof(opts.windowTitle) ? opts.windowTitle: "wilton");
             stage.titleProperty().bind(titleProp);
+            var iconPath = "string" === typeof(opts.windowIconPath) ? opts.windowIconPath:
+                    misc.wiltonConfig().wiltonHome + "conf/logo.png";
+            stage.getIcons().add(new Image("file:" + iconPath));
             stage.setFullScreen(true === opts.fullscreen);
             stage.setWidth("number" === typeof(opts.windowWidth) ? opts.windowWidth : 640);
             stage.setHeight("number" === typeof(opts.windowHeight) ? opts.windowHeight : 480);
-            stage.show();
+            if ("function" === typeof(opts.fxStageCallback)) {
+                opts.fxStageCallback(stage);
+            } else {
+                stage.show();
+            }
         }}));
         Platform.exit();
     }
@@ -144,6 +150,11 @@ define([
      *                      default value: `false`; not supported on Windows
      *  - __enableWiltonCalls__ `Boolean|Undefined` allow to call native code through `wiltoncall` API,
      *                          default value: `false`
+     *  - __windowTitle__ `String|Undefined` title of the WebView window, default value: `wilton`
+     *  - __windowIconPath__ `String|Undefined` path to the `PNG` file to use as a WebView window icon,
+     *                          default value: wilton icon; not supported on Linux
+     *  - __fxStageCallback__ `String|Undefined` path to the `PNG` file to use as a WebView window icon,
+     *                          default value: `function(stage) { stage.show(); }`
      */
     function run(options, callback) {
         var opts = utils.defaultObject(options);
