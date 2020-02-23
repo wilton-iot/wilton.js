@@ -213,6 +213,10 @@ define([
      *    - __dirPath__ `String|Undefined` path to file-system directory to serve files from
      *    - __zipPath__ `String|Undefined` path to ZIP file to server files from
      *    - __zipInnerPrefix__`String|Undefined` prefix to strip from ZIP paths when serving files from ZIP
+     *    - __useResourceLoader__`Boolean|Undefined` whether to load response resources through `wilton_loader`;
+     *                              default value: false
+     *    - __resourceLoaderPrefix__`String|Undefined` prefix (absolute path to WLIB file and optional
+     *                              internal path) to prepend to resources paths
      *    - __cacheMaxAgeSeconds__ `Number|Undefined` value for `Cache-Control`'s `max-age` field
      *                             to use for files server from this `documentRoot`,
      *                             in seconds, default value: `604800`
