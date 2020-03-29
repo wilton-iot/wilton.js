@@ -44,7 +44,10 @@ define([
             outputFile: outFile,
             awaitExit: true
         });
-        if (8 === code) {
+        if (0 !== code) {
+            var output = fs.readFile(outFile);
+            print(code);
+            print(output);
             return "foreign_arch";
         }
         assert.equal(code, 0);
