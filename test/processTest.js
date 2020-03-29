@@ -17,8 +17,9 @@
 define([
     "assert",
     "wilton/misc",
-    "wilton/process"
-], function(assert, misc, process) {
+    "wilton/process",
+    "./_scratchDir"
+], function(assert, misc, process, scratchDir) {
     "use strict";
 
     print("test: wilton/process");
@@ -38,6 +39,7 @@ define([
         executable: executable, 
         args: ["-h"], 
         outputFile: "miscTest_out.txt",
+        directory: scratchDir,
         awaitExit: false
     });
     assert(pid > 0);

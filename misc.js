@@ -86,6 +86,27 @@ define([
     }
 
     /**
+     * @function listRegisteredCalls
+     * 
+     * Return a list of registered Wilton calls
+     * 
+     * Returns a list of call names, that can be used with
+     * `wiltoncall` function.
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Array` list of registered Wilton calls
+     */
+    function listRegisteredCalls(callback) {
+        try {
+            var resJson = wiltoncall("wiltoncall_list_registered");
+            var res = JSON.parse(resJson);
+            return utils.callOrIgnore(callback, res);
+        } catch (e) {
+            return utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
      * @function waitForSignal
      * 
      * Wait for `Ctrl-C`.
@@ -258,6 +279,7 @@ define([
     return {
         wiltonConfig: wiltonConfig,
         stdinReadline: stdinReadline,
+        listRegisteredCalls: listRegisteredCalls,
         waitForSignal: waitForSignal,
         runGC: runGC,
         isAndroid: isAndroid,

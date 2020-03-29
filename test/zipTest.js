@@ -100,6 +100,24 @@ define([
         baz: "boo"
     });
 
+    // unzip file
+    var unzipped1 = dir + "unzipped1/";
+    zip.unzipFile(testZip, unzipped1);
+    assert(fs.exists(unzipped1 + "foo"));
+    assert.equal(fs.readFile(unzipped1 + "foo"), "bar");
+    assert(fs.exists(unzipped1 + "baz"));
+    assert.equal(fs.readFile(unzipped1 + "baz"), "boo");
+
+    // unzip entries
+    var unzipped2 = dir + "unzipped2/";
+    fs.mkdir(unzipped2);
+    zip.unzipFileEntries(testZip, {
+        foo: unzipped2 + "foo"
+    });
+    assert(fs.exists(unzipped2 + "foo"));
+    assert.equal(fs.readFile(unzipped2 + "foo"), "bar");
+    assert(!fs.exists(unzipped2 + "baz"));
+
     // cleanup
     fs.rmdir(dir);
 });

@@ -48,4 +48,17 @@ define([
             assert(e.message.indexOf(expected) >= 0);
         });
     }
+
+    // registered calls
+    var list = misc.listRegisteredCalls();
+    assert(list instanceof Array);
+    assert(list.length > 0);
+    var dyloadFound = false;
+    for (var i = 0; i< list.length; i++) {
+        if ("dyload_shared_library" === list[i]) {
+            dyloadFound = true;
+            break;
+        }
+    }
+    assert(dyloadFound);
 });

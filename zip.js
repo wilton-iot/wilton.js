@@ -114,7 +114,7 @@ define([
     }
 
     /**
-     * @function readFile
+     * @function readFileEntry
      * 
      * Read the contents of a specified entry from a ZIP file.
      * 
@@ -150,6 +150,66 @@ define([
                 res = utf8.decode(dataBytes, /* lenient */ true);
             }
             return utils.callOrIgnore(callback, res);
+        } catch (e) {
+            return utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
+     * @function unzipFileEntries
+     * 
+     * Unzip the specified ZIP entries into FS.
+     * 
+     * Takes the mapping of `src_path_in_zip` -> `dest_path_in_fs`
+     * and decompresses the specified entries to specifieed filesystems
+     * paths.
+     * 
+     * @param path `String` path to file
+     * @param entries `Object` `src_path_in_zip` -> `dest_path_in_fs`
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Undefined`
+     * 
+     */
+    function unzipFileEntries(path, entries, callback) {
+        try {
+            wiltoncall("zip_unzip_file_entries", {
+                path: path,
+                entries: entries
+            });
+            return utils.callOrIgnore(callback);
+        } catch (e) {
+            return utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
+     * @function unzipFile
+     * 
+     * Unzip ZIP file into FS.
+     * 
+     * Unzips all entries from the specified ZIP file into filesystem.
+     * 
+     * @param path `String` path to file
+     * @param destPath `String` path to the directory that will correspond to the
+     *                  root entry of the ZIP file
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Undefined`
+     * 
+     */
+    function unzipFile(path, destPath, callback) {
+        try {
+            var list = listFileEntries(path);
+            var entries = {};
+            for (var i = 0; i < list.length; i++) {
+                var en = list[i];
+                entries[en] = destPath + "/" + en;
+            }
+            wiltoncall("zip_unzip_file_entries", {
+                path: path,
+                destRoot: destPath,
+                entries: entries
+            });
+            return utils.callOrIgnore(callback);
         } catch (e) {
             return utils.callOrThrow(callback, e);
         }
@@ -250,6 +310,8 @@ define([
     return {
         readFile: readFile,
         readFileEntry: readFileEntry,
+        unzipFileEntries: unzipFileEntries,
+        unzipFile: unzipFile,
         listFileEntries: listFileEntries,
         writeFile: writeFile
     };

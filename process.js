@@ -107,6 +107,8 @@ define([
      *  - __args__ `Array` list of the arguments to provide to the executable
      *  - __outputFile__ `String` path to the file for the combined `STDOUT` and
      *                   `STDERR`output
+     *  - __directory__ `String|Undefined` path to the working directory for the process,
+     *                  default value: the same working directory as parent process
      *  - __awaitExit__ `Boolean` whether to wait for the spawned process to exit,
      *                  `false` by default
      */
@@ -136,6 +138,37 @@ define([
                 });
                 return utils.callOrIgnore(callback, 1);
             }
+        } catch (e) {
+            return utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
+     * @function spawnShell
+     * 
+     * Spawn new OS-level shell process.
+     * 
+     * Spawns an OS-level shell process launching OS-specific
+     * shell processor and waits for it to exit.
+     * 
+     * Note: use `spawn` instead of `spawnShell` whether possible.
+     * 
+     * @param commands `Array` list of commands to pass to OS shell processor
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @return `Number` OS-specific output code
+     * 
+     */
+    function spawnShell(commands, callback) {
+        try {
+            if (utils.undefinedOrNull(commands) || !(commands instanceof Array)) {
+                throw new Error("Invalid 'commands' array specified");
+            }
+            var cmd = commands.join(" ");
+            var res = wiltoncall("process_spawn_shell", {
+                command: cmd
+            });
+            var resnum = parseInt(res, 10);
+            return utils.callOrIgnore(callback, resnum);
         } catch (e) {
             return utils.callOrThrow(callback, e);
         }
@@ -187,6 +220,7 @@ define([
 
     return {
         spawn: spawn,
+        spawnShell: spawnShell,
         currentPid: currentPid,
         killByPid: killByPid
     };
