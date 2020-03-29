@@ -44,14 +44,11 @@ define([
             outputFile: outFile,
             awaitExit: true
         });
-        if (0 !== code) {
-            var output = fs.readFile(outFile);
-            print(code);
-            print(output);
+        var output = fs.readFile(outFile);
+        if (-1 !== output.indexOf("Process execv error: [Exec format error]")) {
             return "foreign_arch";
         }
         assert.equal(code, 0);
-        var output = fs.readFile(outFile);
         fs.unlink(outFile);
         return output.trim();
     }
