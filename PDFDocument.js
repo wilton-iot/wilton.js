@@ -309,7 +309,7 @@ define([
          * __Options__
          *  - __imageHex__ `String` image data in hexadecimal
          *  - __imageFormat__ `String` file format of the specified image data,
-         *                    supported formats: `PNG`
+         *                    supported formats: `PNG`, `JPEG`
          *  - __x__ `Number` `x` coordinate of the lower-left corner of the rectangle
          *  - __y__ `Number` `y` coordinate of the lower-left corner of the rectangle
          *  - __width__ `Number` Width of the rectangle in `pt`
