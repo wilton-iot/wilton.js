@@ -31,7 +31,7 @@ define([
 
     //  TCP protocol
 
-    thread.run({
+    var tcpThreadChan = thread.run({
         callbackScript: {
             module: "wilton/test/helpers/socketHelper",
             func: "handleTCP",
@@ -75,11 +75,12 @@ define([
     */
 
     tcpServer.close();
+    tcpThreadChan.receiveAndClose();
 
     // UDP protocol
 
     var udpStarted = new Channel("SocketTest.udpStarted");
-    thread.run({
+    var udpThreadChan = thread.run({
         callbackScript: {
             module: "wilton/test/helpers/socketHelper",
             func: "handleUDP",
@@ -116,5 +117,6 @@ define([
     udpClient.close();
     udpServer.close();
     udpStarted.close();
+    udpThreadChan.receiveAndClose();
 
 });

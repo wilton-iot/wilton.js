@@ -300,6 +300,8 @@ define([
          * Draws the specified image scaling it to the specified `width` and `higth`
          * at the current (last added) page of the document.
          * 
+         * Either `imageHex` or `imagePath` must be specified.
+         * 
          * See `libharu` documentation for the information about the [coordinate system](https://github.com/libharu/libharu/wiki/Graphics#coordinate-system).
          * 
          * @param options `Object` configuration object, see possible options below
@@ -307,7 +309,8 @@ define([
          * @return `Undefined`
          * 
          * __Options__
-         *  - __imageHex__ `String` image data in hexadecimal
+         *  - __imageHex__ `String|Undefined` image data in hexadecimal
+         *  - __imagePath__ `StringUndefined` path to image file
          *  - __imageFormat__ `String` file format of the specified image data,
          *                    supported formats: `PNG`, `JPEG`
          *  - __x__ `Number` `x` coordinate of the lower-left corner of the rectangle

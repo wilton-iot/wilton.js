@@ -29,7 +29,7 @@ define([
 
     var engine = misc.wiltonConfig().defaultScriptEngine;
 
-    thread.run({
+    var threadExitChan = thread.run({
         callbackScript: {
             module: "wilton/test/helpers/threadHelper",
             func: "increment1"
@@ -40,6 +40,7 @@ define([
             "load_module_resource", // required by require.js on duktape
             "dyload_shared_library", // required by wilton/Channels
             "channel_lookup",
+            "channel_offer",
             "channel_receive",
             "channel_send"
         ]
@@ -47,9 +48,9 @@ define([
 
     chanOut.send(42);
     assert.equal(chanIn.receive(), 43);
-    
+
     // wait for thread to die
-    thread.sleepMillis(100);
+    threadExitChan.receiveAndClose();
 
     chanOut.close();
     chanIn.close();

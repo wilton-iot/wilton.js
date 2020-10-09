@@ -65,14 +65,17 @@ define([
     
     var num_workers = 2;
     var target = num_workers * 10;
-    
+
+    var threadChans = [];
     for (var i = 0; i < num_workers; i++) {
-        thread.run({
+        var tc = thread.run({
             callbackScript: {
-                "module": "wilton/test/helpers/httpClientHelper",
-                "func": "postAndIncrement"
-            }
+                module: "wilton/test/helpers/httpClientHelper",
+                func: "postAndIncrement"
+            },
+            shutdownChannelName: "clientTest/" + i
         });
+        threadChans.push(tc);
     }
 
     for(var count = 0; count < target; count++) {
@@ -83,6 +86,9 @@ define([
         //print("test: wilton/httpClient, waiting, count: [" + count + "] of: [" + target + "]");
     }
     chan.close();
+    for (var i = 0; i < threadChans.length; i++) {
+        threadChans[i].receiveAndClose();
+    }
 
     // response data to file
     var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/views/postmirror", {
@@ -117,7 +123,7 @@ define([
     }
     fs.mkdir(tmp_dir);
     fs.writeFile(tmp_dir + "test_part_send.txt", "foobar");
-    var respFileSend = "none"
+    var respFileSend = "none";
     respFileSend = http.sendFileByParts("http://127.0.0.1:8080/wilton/test/views/savefile", {
         filePath: tmp_dir + "test_part_send.txt",
         meta: {

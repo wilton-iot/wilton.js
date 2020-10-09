@@ -38,7 +38,7 @@ define([
     assert.equal(chan.name(), "ChannelTest.buffered.in");
     var retChan = new Channel("ChannelTest.buffered.out", 2);
 
-    thread.run({
+    var bufThreadExitChan = thread.run({
         callbackScript: {
             module: "wilton/test/helpers/ChannelHelper",
             func: "conduit",
@@ -110,6 +110,7 @@ define([
         traceBuffered.push(envelope.msg);
     }
     // print(JSON.stringify(traceBuffered));
+    bufThreadExitChan.receiveAndClose();
 
 
     // sync
@@ -120,7 +121,7 @@ define([
     assert.equal(chan.maxSize(), 0);
     var retChan = new Channel("ChannelTest.sync.out");
 
-    thread.run({
+    var syncThreadExitChan = thread.run({
         callbackScript: {
             module: "wilton/test/helpers/ChannelHelper",
             func: "conduit",
@@ -185,6 +186,7 @@ define([
     // print(JSON.stringify(traceSync));
     // all channels must be empty
     // print(Channel.dumpRegistry());
+    syncThreadExitChan.receiveAndClose();
 
 
     // select
@@ -196,7 +198,7 @@ define([
     var dummyChan1 = new Channel("ChannelTest.selector.dummy1", 1);
     var dummyChan2 = new Channel("ChannelTest.selector.dummy2");
 
-    thread.run({
+    var selThreadExitChan = thread.run({
         callbackScript: {
             module: "wilton/test/helpers/ChannelHelper",
             func: "conduit",
@@ -237,6 +239,8 @@ define([
     retChan.close();
     dummyChan1.close();
     dummyChan2.close();
+    selThreadExitChan.receiveAndClose();
+
     lockChan.close();
     traceChan.close();
 

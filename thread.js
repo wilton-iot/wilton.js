@@ -49,11 +49,12 @@
  * 
  */
 define([
+    "./Channel",
     "./dyload",
     "./misc",
     "./wiltoncall",
     "./utils"
-], function(dyload, misc, wiltoncall, utils) {
+], function(Channel, dyload, misc, wiltoncall, utils) {
     "use strict";
 
     dyload({
@@ -72,7 +73,7 @@ define([
      * 
      * @param options `Object` configuration object, see possible options below
      * @param callback `Function|Undefined` callback to receive result or error
-     * @return `Undefined`
+     * @return `Object` `Channel` object where thread will send a message on its exit
      * 
      * __Options__
      *  - __callbackScript__ `Object` module path and function name to run from background thread
@@ -81,6 +82,9 @@ define([
      *               if function is not specified, only module will be loaded
      *               (its top-level code will be executed)
      *    - __args__ `Array|Undefined` optional list of arguments, that will be passed to specified function
+     *  - __shutdownChannelName__ `String|Undefined` the name of the `Channel`, that will be
+     *                            created for this thread; thread will send the message to 
+     *                            this channel on exit; default value: `callbackScript.module`
      *  - __capabilities__ `Array|Undefined` list of the `wiltoncall` calls names allowed to
      *                     be used from the spawned thread; if this parameter is not specified,
      *                     then capabilities checks are not performed for the spawned thread
@@ -88,6 +92,15 @@ define([
     function run(options, callback) {
         var opts = utils.defaultObject(options);
         try {
+            utils.checkProperties(opts, ["callbackScript"]);
+            // prepare shutdown channel
+            var chanName = opts.callbackScript.module;
+            if (utils.hasPropertyWithType(opts, "shutdownChannelName", "string")) {
+                chanName = opts.shutdownChannelName;
+                delete opts.shutdownChannelName;
+            }
+            var chan = new Channel(chanName, 1);
+            // start thread
             if (misc.isAndroid() &&
                     ("rhino" === misc.wiltonConfig().defaultScriptEngine &&
                     "undefined" === typeof(opts.callbackScript.engine)) ||
@@ -98,12 +111,16 @@ define([
                 var ThreadGroup = Packages.java.lang.ThreadGroup;
                 new Thread(new ThreadGroup("rhino"), new Runnable(function() {
                     wiltoncall("runscript_rhino", opts.callbackScript);
+                    chan.offer("{}");
                 }), "rhino-thread", 1024 * 1024 * 16).start();
             } else {
-                utils.checkProperties(opts, ["callbackScript"]);
+                opts.shutdownChannelOffer = {
+                    channelHandle: chan.handle,
+                    message: "{}"
+                };
                 wiltoncall("thread_run", opts); 
             }
-            return utils.callOrIgnore(callback);
+            return utils.callOrIgnore(callback, chan);
         } catch (e) {
             return utils.callOrThrow(callback, e);
         }

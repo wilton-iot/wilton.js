@@ -482,6 +482,29 @@ define([
             } catch (e) {
                 return utils.callOrThrow(callback, e);
             }
+        },
+
+        /**
+         * @function receiveAndClose
+         * 
+         * Receive a message and close the channel after that.
+         * 
+         * Shortcut method to perform `receive()` and `close()` in
+         * one go. Received message is discarded. Equivalent to:
+         * 
+         * @code
+         * 
+         * chan.receive();
+         * chan.close();
+         * 
+         * @endcode
+         * 
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Undefined`
+         */
+        receiveAndClose: function(callback) {
+            this.receive(callback);
+            this.close(callback);
         }
     };
 

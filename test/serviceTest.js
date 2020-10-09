@@ -17,26 +17,20 @@
 define([
     "assert",
     "wilton/fs",
-    "wilton/loader",
     "wilton/service",
     "wilton/thread"
-], function(assert, fs, loader, service, thread) {
+], function(assert, fs, service, thread) {
     "use strict";
 
     print("test: wilton/service");
 
-    var executable = loader.findModulePath("") + "/../build/bin/wilton_cli";
-    if (!fs.exists(executable)) {
-        executable += ".exe";
-    }
-    
     var pid = service.getPid();
     assert(pid >= 0);
 
     var memory = service.getMemorySize();
     assert(memory > 0);
 
-    thread.run({
+    var threadExitChan = thread.run({
         callbackScript: {
             module: "wilton/test/helpers/threadHelper",
             func: "increment1"
@@ -51,11 +45,13 @@ define([
     assert(service.isTraceOn());
 
     var callStack = service.getCurrentCallStack();
-    assert(callStack == "root/");
+    assert(callStack === "root/");
 
     var calls = service.getAllCalls();
-    assert(calls == "");
+    assert(calls === "");
 
     service.traceTurnOff();
     assert(!service.isTraceOn());
+    threadExitChan.receiveAndClose();
+
 });

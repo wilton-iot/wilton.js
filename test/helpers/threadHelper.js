@@ -16,7 +16,7 @@
 
 define(["wilton/Channel"], function(Channel) {
     "use strict";
-    
+
     return {
         increment1: function() {
             var chanIn = Channel.lookup("threadTestOut");

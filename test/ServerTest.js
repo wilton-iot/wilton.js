@@ -33,7 +33,7 @@ define([
 
     // worker and channel for delayed reponses
     var delayedChannel = new Channel("ServerTest_delayed");
-    thread.run({
+    var threadExitChan = thread.run({
         callbackScript: {
             module: "wilton/test/helpers/delayedRequestsWorker",
             args: ["ServerTest_delayed"]
@@ -127,5 +127,6 @@ define([
     // optional
     server.stop();
     delayedChannel.close();
+    threadExitChan.receiveAndClose();
 
 });
