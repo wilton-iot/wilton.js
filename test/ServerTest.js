@@ -71,7 +71,7 @@ define([
             dirPath: datadir
         }, {
             resource: "/zip",
-            zipPath: wconf.wiltonHome + "std.min.wlib",
+            zipPath: wconf.wiltonHome + "std.wlib",
             zipInnerPrefix: "wilton/"
         }, {
             resource: "/loader",
