@@ -72,6 +72,22 @@ define([
     assert.throws(function() { st.append("foo", {foo: "bar"}); });
     assert.throws(function() { st.append("foo", null); });
 
+    // dequeue
+    st.dequeue("boo", 2);
+    assert.equal(st.get("boo").length, 2);
+    assert.equal(st.get("boo")[0], null);
+    assert.equal(st.get("boo")[1], "bee4");
+    st.dequeue("boo");
+    assert.equal(st.get("boo").length, 1);
+    assert.equal(st.get("boo")[0], "bee4");
+    st.dequeue("boo", 42);
+    assert.equal(st.get("boo").length, 0);
+    // restore "boo"
+    st.append("boo", ["bee1", "bee2", null, "bee4"]);
+    // invalid input
+    st.dequeue("fail");
+    assert.throws(function() { st.dequeue("foo");});
+
     // getBatch
     var getBatchRes = st.getBatch(["foo", "bar", "fail"]);
     assert("object" === typeof(getBatchRes));

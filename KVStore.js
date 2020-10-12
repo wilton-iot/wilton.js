@@ -45,6 +45,10 @@
  * // existing value must be an array
  * st.append("baz", [44, 45, 46];
  * 
+ * // removes values from the head of the existing entry
+ * // existing value must be an array
+ * st.dequeue("baz", 1); // "baz" value now is [45, 46]
+ * 
  * // remove entry
  * st.remove("foo");
  * 
@@ -267,6 +271,44 @@ define([
                 var resObj = JSON.parse(resStr);
                 utils.checkPropertyType(resObj, "keyExisted", "boolean");
                 var res = resObj.keyExisted;
+                return utils.callOrIgnore(callback, res);
+            } catch (e) {
+                return utils.callOrThrow(callback, e);
+            }
+        },
+
+        /**
+         * @function dequeue
+         * 
+         * Dequeues the number of values from the list for the specified key.
+         * 
+         * Removes the specified number of values from the head of the array,
+         * stored as a value for the specified key.
+         * 
+         * If the specified count is larger than a size of an `Array` - all elements
+         * from `Array` are removed.
+         * 
+         * If key exists in the store, its value must be an `Array`.
+         * 
+         * If key doesn't exist in the store or if `Array` is empty - does nothing.
+         * 
+         * 
+         * @param key `String` key of the entry to to deque from, its already inserted
+         *            value must be a JSON `Array`
+         * @param count `Integer|Undefined` number of elements to dequeue, default value: `1`
+         * @param callback `Function|Undefined` callback to receive result or error
+         * @return `Number` number of elements dequeued
+         */
+        dequeue: function(key, count, callback) {
+            try {
+                var resStr = wiltoncall("kvstore_dequeue", {
+                    kvstoreHandle: this.handle,
+                    key: key,
+                    count: count || 1
+                });
+                var resObj = JSON.parse(resStr);
+                utils.checkPropertyType(resObj, "dequeuedCount", "number");
+                var res = resObj.dequeuedCount;
                 return utils.callOrIgnore(callback, res);
             } catch (e) {
                 return utils.callOrThrow(callback, e);
