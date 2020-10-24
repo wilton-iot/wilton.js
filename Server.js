@@ -116,7 +116,7 @@ define([
                         module: "wilton/Server",
                         func: "dispatch",
                         args: [{
-                            // actual handled module to be called by dispatcher
+                            // actual handler module to be called by dispatcher
                             module: vi,
                             func: me,
                             args: []

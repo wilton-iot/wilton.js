@@ -288,8 +288,9 @@ define([], function() {
                     responseCode: xhr.status
                 };
                 var err = null;
-                if (0 === xhr.status && meta.timeoutMillis > 0) {
-                    err = "Request timeout exceeded, value: [" + meta.timeoutMillis + "]";
+                if (0 === xhr.status) {
+                    var stm = meta.timeoutMillis > 0 ? String(meta.timeoutMillis) : "default";
+                    err = "Request timeout exceeded, value: [" + stm + "]";
                 } else if (meta.abortOnResponseError && xhr.status >= 400) {
                     err = xhr.statusText;
                 }
