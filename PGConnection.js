@@ -308,7 +308,7 @@ define([
      *
      * Parses a file with SQL queries as `query_name: sql` object.
      *
-     * Each query must start with `/** myQuery STAR/` header.
+     * Each query must start with `/(STAR)(STAR) myQuery (STAR)/` header.
      *
      * Lines with comments are preserved, empty lines are ignored.
      *
@@ -325,7 +325,7 @@ define([
      * 
      * Parses a module with SQL queries as `query_name: sql` object.
      * 
-     * Each query must start with `/** myQuery STAR/` header.
+     * Each query must start with `/(STAR)(STAR) myQuery (STAR)/` header.
      * 
      * Lines with comments are preserved, empty lines are ignored.
      *

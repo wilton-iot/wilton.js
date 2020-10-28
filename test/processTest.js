@@ -16,10 +16,11 @@
 
 define([
     "assert",
+    "wilton/fs",
     "wilton/misc",
     "wilton/process",
     "./_scratchDir"
-], function(assert, misc, process, scratchDir) {
+], function(assert, fs, misc, process, scratchDir) {
     "use strict";
 
     print("test: wilton/process");
@@ -35,10 +36,11 @@ define([
 
     // spawn
 
+    var out = scratchDir + "processTest_out.txt";
     var pid = process.spawn({
         executable: executable, 
         args: ["-h"], 
-        outputFile: "miscTest_out.txt",
+        outputFile: out,
         directory: scratchDir,
         awaitExit: false
     });
@@ -51,4 +53,6 @@ define([
     // current pid
     var cpid = process.currentPid();
     assert(cpid > 0);
+
+    fs.unlink(out);
 });
