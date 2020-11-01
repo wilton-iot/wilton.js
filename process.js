@@ -105,7 +105,7 @@ define([
      * __Options__
      *  - __executable__ `String` path to the executable file
      *  - __args__ `Array` list of the arguments to provide to the executable
-     *  - __outputFile__ `String` path to the file for the combined `STDOUT` and
+     *  - __outputFile__ `String|Undefined` path to the file for the combined `STDOUT` and
      *                   `STDERR`output
      *  - __directory__ `String|Undefined` path to the working directory for the process,
      *                  default value: the same working directory as parent process

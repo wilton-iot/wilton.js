@@ -36,11 +36,9 @@ define([
 
     // spawn
 
-    var out = scratchDir + "processTest_out.txt";
     var pid = process.spawn({
         executable: executable, 
         args: ["-h"], 
-        outputFile: out,
         directory: scratchDir,
         awaitExit: false
     });
@@ -53,6 +51,4 @@ define([
     // current pid
     var cpid = process.currentPid();
     assert(cpid > 0);
-
-    fs.unlink(out);
 });
