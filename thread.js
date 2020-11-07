@@ -94,7 +94,7 @@ define([
         try {
             utils.checkProperties(opts, ["callbackScript"]);
             // prepare shutdown channel
-            var chanName = opts.callbackScript.module;
+            var chanName = opts.callbackScript.module || opts.callbackScript.esmodule;
             if (utils.hasPropertyWithType(opts, "shutdownChannelName", "string")) {
                 chanName = opts.shutdownChannelName;
                 delete opts.shutdownChannelName;

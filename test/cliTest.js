@@ -63,6 +63,7 @@ define([
 
     // run script
     assert.equal(run([dir + "helpers/cliHelper.js"]), "helpers/cliHelper");
+    assert.equal(run([dir + "helpers/cliHelperFun.js"]), "helpers/cliHelperFun");
 
     // run script specifying mod
     assert.equal(run([dir + "helpers/cliHelper.js", "-s", "foo/bar"]), "foo/bar/cliHelper");
