@@ -132,6 +132,17 @@ define([
         return methodEntries;
     }
 
+    function createEsmView(vi) {
+        return {
+            method: vi.method,
+            path: utils.startsWith(vi.path, "/") ? vi.path : "/" + vi.path,
+            callbackScript: {
+                esmodule: vi.esmodule,
+                args: []
+            }
+        };
+    }
+
     function prepareViews(filters, views) {
         if(utils.undefinedOrNull(views)) {
             throw new Error("Invalid null 'views'attribute specified");
@@ -149,6 +160,8 @@ define([
                 for (var j = 0; j < methodEntries.length; j++) {
                     res.push(methodEntries[j]);
                 }
+            } else if (utils.hasProperties(vi, ["method", "path", "esmodule"])) {
+                res.push(createEsmView(vi));
             } else {
                 utils.checkProperties(vi, ["method", "path", "callbackScript"]);
                 res.push(vi);

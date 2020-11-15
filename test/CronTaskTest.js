@@ -22,7 +22,7 @@ define([
     "use strict";
 
     print("test: wilton/CronTask");
-    
+
     var chanOut = new Channel("cronTestOut");
     var chanIn = new Channel("cronTestIn");
 
