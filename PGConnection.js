@@ -219,12 +219,12 @@ define([
          * 
          * Executes `select` query and returns its single row result as an object or null on empty query.
          * 
-         * Query must return only one row or be empty, otherwise `Error` will be thrown.
+         * Query must return no more than one row, `Error` will be thrown, if more rows returned.
          * 
          * @param sql `String` SQL query
          * @param params `Object|Undefined` query parameters object
          * @param callback `Function|Undefined` callback to receive result or error
-         * @return `Object|null` object converted from the single row or null returned
+         * @return `Object` object converted from the single row returned, or `null` if no rows returned
          */
         queryObject: function(sql, params, callback) {
             try {

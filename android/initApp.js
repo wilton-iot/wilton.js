@@ -20,11 +20,15 @@ define([
 ], function(callJsModule, initSignals) {
     "use strict";
 
-    return function(startupModule) {
+    return function() {
         initSignals();
+        var args = [];
+        for (var i = 1; i < arguments.length; i++) {
+            args.push(arguments[i]);
+        }
         callJsModule({
-            module: startupModule,
-            func: "main"
+            module: arguments[0],
+            args: args
         });
     };
 

@@ -227,7 +227,7 @@ define([], function() {
             try {
                 onMessage(socket, event);
             } catch(e) {
-                socket.opts.onError(event);
+                //socket.opts.onError(event);
                 socket.opts.onError(e);
             }
         };

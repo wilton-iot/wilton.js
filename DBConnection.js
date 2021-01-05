@@ -106,7 +106,7 @@ define([
     }
 
     // https://github.com/alexkasko/springjdbc-typed-queries/blob/master/typed-queries-common/src/main/java/com/alexkasko/springjdbc/typedqueries/common/PlainSqlQueriesParser.java
-    function loadQueryLines(lines) {
+    function loadQueryLines(lines, path) {
         var nameRegex = new RegExp("^\\s*/\\*{2}\\s*(.*?)\\s*\\*/\\s*$");
         var trimRegex = /^\s+|\s+$/g;
         var res = {};
@@ -285,12 +285,12 @@ define([
          * 
          * Executes `select` query and returns its result as an object.
          * 
-         * Query must return exactly one row, otherwise `Error` will be thrown.
+         * Query must return no more than one row, `Error` will be thrown, if more rows returned.
          * 
          * @param sql `String` SQL query
          * @param params `Object|Undefined` query parameters object
          * @param callback `Function|Undefined` callback to receive result or error
-         * @return `Object` object converted from the single row returned
+         * @return `Object` object converted from the single row returned, or `null` if no rows returned
          */
         queryObject: function(sql, params, callback) {
             try {
@@ -414,7 +414,7 @@ define([
     DBConnection.loadQueryFile = function(path, callback) {
         try {
             var lines = fs.readLines(path);
-            var res = loadQueryLines(lines);
+            var res = loadQueryLines(lines, path);
             return utils.callOrIgnore(callback, res);
         } catch (e) {
             return utils.callOrThrow(callback, e);
@@ -450,7 +450,7 @@ define([
                     lines.push(li);
                 }
             }
-            var res = loadQueryLines(lines);
+            var res = loadQueryLines(lines, moduleId);
             return utils.callOrIgnore(callback, res);
         } catch (e) {
             return utils.callOrThrow(callback, e);

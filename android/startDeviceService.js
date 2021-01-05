@@ -23,15 +23,20 @@ define([
 
     var mainActivity = Packages.wilton.android.MainActivity.INSTANCE;
 
-    return function(repoPath, rootModuleName, startupModule) {
+    return function(application, rootModuleName, startupCallDesc) {
         // stop possible leftover
         mainActivity.stopService(new Intent(mainActivity, DeviceService));
 
         // start device service
         var intent = new Intent(mainActivity, DeviceService);
-        intent.putExtra("wilton_repoPath", repoPath);
+        intent.putExtra("wilton_application", application);
         intent.putExtra("wilton_rootModuleName", rootModuleName);
-        intent.putExtra("wilton_startupModule", startupModule);
+        intent.putExtra("wilton_startupModule", startupCallDesc.module);
+        // todo: structured args
+        for (var i = 0; i < startupCallDesc.args.length; i++) {
+            var arg = startupCallDesc.args[i];
+            intent.putExtra("wilton_startupArg" + i, arg);
+        }
         mainActivity.startService(intent);
     };
 });

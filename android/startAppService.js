@@ -24,14 +24,14 @@ define([
 
     var mainActivity = Packages.wilton.android.MainActivity.INSTANCE;
 
-    return function(repoPath, launchOpts, runOnRhinoUrl) {
+    return function(application, launchOpts, runOnRhinoUrl) {
         // stop possible leftovers
         mainActivity.stopService(new Intent(mainActivity, AppService));
         mainActivity.stopService(new Intent(mainActivity, DeviceService));
 
         // start app service
         var intent = new Intent(mainActivity, AppService);
-        intent.putExtra("wilton_repoPath", repoPath);
+        intent.putExtra("wilton_application", application);
         intent.putExtra("wilton_rootModuleName", launchOpts.rootModuleName);
         intent.putExtra("wilton_startupModule", launchOpts.startupModule);
         intent.putExtra("wilton_runOnRhinoUrl", runOnRhinoUrl);

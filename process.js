@@ -81,6 +81,19 @@ define([
         throw new Error("Startup script not found, args: [" + JSON.stringify(args, null, 4) + "]");
     }
 
+    function startupModuleArgs(args) {
+        var res = [];
+        var skip = true;
+        for (var i = 0; i < args.length; i++) {
+            if (!skip) {
+                res.push(args[i]);
+            } else if ("--" === args[i]) {
+                skip = false;
+            }
+        }
+        return res;
+    }
+
     /**
      * @function spawn
      * 
@@ -121,20 +134,23 @@ define([
                 return utils.callOrIgnore(callback, resnum);
             } else { // spawn wilton process
                 var runOnRhino = WILTON_requiresync("wilton/android/runOnRhino");
-                var repoPath = null;
+                var application = null;
                 var rootModuleName = null;
                 var startupModule = null;
                 // only single element in paths is expected
                 var paths = misc.wiltonConfig().requireJs.paths;
                 for (var key in paths) {
-                    repoPath = paths[key].replace(/^file:\/\//, "");
+                    application = paths[key].replace(/^.*\//, "");
                     rootModuleName = key;
                     startupModule = rootModuleName + "/" + findStartupModule(opts.args);
                     break;
                 }
                 runOnRhino({
                     module: "wilton/android/startDeviceService",
-                    args: [repoPath, rootModuleName, startupModule]
+                    args: [application, rootModuleName, {
+                        module: startupModule,
+                        args: startupModuleArgs(opts.args)
+                    }]
                 });
                 return utils.callOrIgnore(callback, 1);
             }

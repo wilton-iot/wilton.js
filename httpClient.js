@@ -226,9 +226,15 @@ define([
      * file into memory.
      * 
      * @param url `String` URL of the HTTP server
-     * @param options `Object` configuration object, see details in `sendRequest()` function
+     * @param options `Object` configuration object, see file-specific options below;
+     *                  see other supported options in `sendRequest()` function doc
      * @param callback `Function|Undefined` callback to receive result or error
      * @returns `Object` response object, see details in `sendRequest()` function
+     * 
+     * __Options__
+     * 
+     *  - __filePath__ `String` path to file to send
+     *  - __remove__ `Boolean|Undefined` whether to delete the file after sending, default value: `false`
      */
     function sendFile(url, options, callback) {
         var opts = utils.defaultObject(options);
