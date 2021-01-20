@@ -243,13 +243,13 @@ define([
             var urlstr = utils.defaultString(url);
             var fp = utils.defaultString(opts.filePath);
             var meta = utils.defaultObject(opts.meta);
-            var resp_json = wiltoncall("httpclient_send_file", {
+            var respJson = wiltoncall("httpclient_send_file", {
                 url: urlstr,
                 filePath: fp,
                 metadata: meta,
                 remove: true === opts.remove
             });
-            var resp = JSON.parse(resp_json);
+            var resp = JSON.parse(respJson);
             var dataBytes = hex.decodeBytes(resp.dataHex);
             resp.data = utf8.decode(dataBytes, /* lenient */ true);
             resp.jsonCached = null;
@@ -298,16 +298,143 @@ define([
             var urlstr = utils.defaultString(url);
             var fp = utils.defaultString(opts.filePath);
             var meta = utils.defaultObject(opts.meta);
-            var send_options = utils.defaultObject(opts.sendOptions);
-            var resp_json = wiltoncall("httpclient_send_file_by_parts", {
+            var sendOptions = utils.defaultObject(opts.sendOptions);
+            var respJson = wiltoncall("httpclient_send_file_by_parts", {
                 url: urlstr,
                 filePath: fp,
-                sendOptions: send_options,
+                sendOptions: sendOptions,
                 metadata: meta,
                 remove: true === opts.remove
             });
-            var resp = JSON.parse(resp_json);
+            var resp = JSON.parse(respJson);
             return utils.callOrIgnore(callback, resp);
+        } catch (e) {
+            return utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
+     * @function initQueue
+     * 
+     * Initialize requests queue for this thread.
+     * 
+     * Initializes HTTP requests queue allowing to use `enqueueRequest` and
+     * `pollQueue` operations. Queue is bound to the thread it is initialized from
+     * and can be used only from it.
+     * 
+     * `closeQueue` must be called from the same thread to de-allocate resources,
+     * alternatively resources cleanup will be done automatically on shutdown.
+     * 
+     * @param options `Object` configuration object, see possible options below.
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Undefined`
+     *
+     * __options__
+     * 
+     *  - __fdsetTimeoutMillis__ `Number` max allowed number of milliseconds
+     *                           to wait for activity on one of running requests,
+     *                           default value: `100`
+     *  - __maxHostConnections__ `Number` max number of connections to a single host,
+     *                           default value: `0 (unlimited)`
+     *  - __maxTotalConnections__ `Number` max number of simultaneously open connections,
+     *                            default value: `0 (unlimited)`
+     *  - __maxconnects__ `Number` max number of simultaneously open connections  may be kept
+     *                           in connection cache after completed use, default value:
+     *                           4 times the number of simultaneously run requests
+     */
+    function initQueue(options, callback) {
+        var opts = utils.defaultObject(options);
+        try {
+            wiltoncall("httpclient_queue_init", opts);
+            return utils.callOrIgnore(callback);
+        } catch (e) {
+            return utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
+     * @function closeQueue
+     * 
+     * Close requests queue for this thread.
+     * 
+     * Closes requests queue and de-allocates system resources used.
+     * If not called - resources cleanup will be done automatically on shutdown.
+     * 
+     * Must be called from the same thread queue was initialized from.
+     * 
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Undefined`
+     */
+    function closeQueue(callback) {
+        try {
+            wiltoncall("httpclient_queue_close");
+            return utils.callOrIgnore(callback);
+        } catch (e) {
+            return utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
+     * @function enqueueRequest
+     * 
+     * Submit request to queue.
+     * 
+     * Submits specified request to the queue for execution. `initQueue` must
+     * be called in the same thread before using this function.
+     * 
+     * @param url `String` URL of the HTTP server
+     * @param options `Object` configuration object, see supported options in
+     *                `sendRequest()` function doc
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Undefined`
+     */
+    function enqueueRequest(url, options, callback) {
+        var opts = utils.defaultObject(options);
+        try {
+            _checkStrayOpts(opts);
+            var urlstr = utils.defaultString(url);
+            var dt = "";
+            if (!utils.undefinedOrNull(opts.data)) {
+                dt = utils.defaultJson(opts.data);
+            }
+            var meta = utils.defaultObject(opts.meta);
+            var resp_json = wiltoncall("httpclient_queue_submit", {
+                url: urlstr,
+                data: dt,
+                metadata: meta
+            });
+            return utils.callOrIgnore(callback);
+        } catch (e) {
+            return utils.callOrThrow(callback, e);
+        }
+    }
+
+    /**
+     * @function pollQueue
+     * 
+     * Poll requests queue.
+     * 
+     * Polls requests queue allowing enqued requests to perform the work.
+     * `initQueue` must be called in the same thread before using this function.
+     * 
+     * @param options `Object` currently not supported
+     * @param callback `Function|Undefined` callback to receive result or error
+     * @returns `Array` list of the responses for requests, that finished execution,
+     *          see details on the structure of each response in `sendRequest()` function
+     */
+    function pollQueue(options, callback) {
+        var opts = utils.defaultObject(options);
+        try {
+            var respJson = wiltoncall("httpclient_queue_poll", opts);
+            var respList = JSON.parse(respJson);
+            for (var i = 0; i < respList.length; i++) {
+                var resp = respList[i];
+                var dataBytes = hex.decodeBytes(resp.dataHex);
+                resp.data = utf8.decode(dataBytes, /* lenient */ true);
+                resp.jsonCached = null;
+                resp.json = _jsonParse;
+            };
+            return utils.callOrIgnore(callback, respList);
         } catch (e) {
             return utils.callOrThrow(callback, e);
         }
@@ -316,6 +443,10 @@ define([
     return {
         sendRequest: sendRequest,
         sendFile: sendFile,
-        sendFileByParts: sendFileByParts
+        sendFileByParts: sendFileByParts,
+        initQueue: initQueue,
+        closeQueue: closeQueue,
+        enqueueRequest: enqueueRequest,
+        pollQueue: pollQueue
     };
 });

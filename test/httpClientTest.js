@@ -146,6 +146,37 @@ define([
     assert.equal(fs.readFile(saved_file), "foobar");
     fs.rmdir(tmp_dir);
 
+    // queue
+    // check no throw
+    http.closeQueue();
+    http.initQueue();
+    assert.throws(function() { http.initQueue(); });
+    for (var i = 0; i < 8; i++) {
+        http.enqueueRequest("http://127.0.0.1:8080/wilton/test/views/postmirror", {
+            data: "foo",
+            meta: {
+                timeoutMillis: 60000
+            }
+        });
+    }
+    var list = [];
+    for (var i = 0; i < 1024; i++) {
+        var polled = http.pollQueue();
+        assert(polled instanceof Array);
+        for (var j = 0; j < polled.length; j++) {
+            list.push(polled[j]);
+        }
+        if (list.length >= 8) {
+            break;
+        }
+    }
+    assert.equal(list.length, 8);
+    for (var i = 0; i < list.length; i++) {
+        var resp = list[i];
+        assert.equal(resp.responseCode, 200);
+        assert.equal(resp.data, "foo");
+    }
+
     server.stop();
 
     fs.rmdir(dir);

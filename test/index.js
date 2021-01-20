@@ -18,34 +18,34 @@ define([], function() {
 
     return {
         main: function() {
-            require([
-                "wilton/test/_scratchDir",
-                "wilton/test/LoggerTest",
-                "wilton/test/ChannelTest",
-                "wilton/test/cliTest",
-                "wilton/test/CronTaskTest",
-                "wilton/test/cryptoTest",
-                "wilton/test/DBConnectionTest",
-                "wilton/test/fsTest",
-                "wilton/test/fsPromiseTest",
-                "wilton/test/gitTest",
-                "wilton/test/hexTest",
-                "wilton/test/httpClientTest",
-                "wilton/test/KVStoreTest",
-                "wilton/test/loaderTest",
-                "wilton/test/miscTest",
-                "wilton/test/mustacheTest",
-                "wilton/test/netTest",
-                "wilton/test/PDFDocumentTest",
-//                "wilton/test/PGConnectionTest",
-                "wilton/test/processTest",
-                "wilton/test/ServerTest",
-                "wilton/test/SocketTest",
-                "wilton/test/threadTest",
-                "wilton/test/utilsTest",
-                "wilton/test/zipTest"
-            ], function() {});
-        }
+                require([
+                    "wilton/test/_scratchDir",
+                    "wilton/test/LoggerTest",
+                    "wilton/test/ChannelTest",
+                    "wilton/test/cliTest",
+                    "wilton/test/CronTaskTest",
+                    "wilton/test/cryptoTest",
+                    "wilton/test/DBConnectionTest",
+                    "wilton/test/fsTest",
+                    "wilton/test/fsPromiseTest",
+                    "wilton/test/gitTest",
+                    "wilton/test/hexTest",
+                    "wilton/test/httpClientTest",
+                    "wilton/test/KVStoreTest",
+                    "wilton/test/loaderTest",
+                    "wilton/test/miscTest",
+                    "wilton/test/mustacheTest",
+                    "wilton/test/netTest",
+                    "wilton/test/PDFDocumentTest",
+    //                "wilton/test/PGConnectionTest",
+                    "wilton/test/processTest",
+                    "wilton/test/ServerTest",
+                    "wilton/test/SocketTest",
+                    "wilton/test/threadTest",
+                    "wilton/test/utilsTest",
+                    "wilton/test/zipTest"
+                ], function() {});
+            }
     };
 });
 
