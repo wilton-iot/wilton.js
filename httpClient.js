@@ -83,6 +83,26 @@ define([
         }
     }
 
+    function _defaultMeta(opts) {
+        var meta = utils.defaultObject(opts.meta);
+        var headers = utils.defaultObject(meta.headers);
+        meta.headers = headers;
+        for (var key in headers) {
+            if (headers.hasOwnProperty(key)) {
+                var val = utils.defaultString(headers[key]);
+                if ("content-type" === val.toLowerCase()) {
+                    return meta;
+                }
+            }
+        }
+        if ("object" === typeof(opts.data) && null !== opts.data) {
+            headers["Content-Type"] = "application/json";
+        } else {
+            headers["Content-Type"] = "text/plain";
+        }
+        return meta;
+    }
+
     /**
      * @function sendRequest
      * 
@@ -198,7 +218,7 @@ define([
             if (!utils.undefinedOrNull(opts.data)) {
                 dt = utils.defaultJson(opts.data);
             }
-            var meta = utils.defaultObject(opts.meta);
+            var meta = _defaultMeta(opts);
             var resp_json = wiltoncall("httpclient_send_request", {
                 url: urlstr,
                 data: dt,
@@ -242,7 +262,7 @@ define([
             _checkStrayOpts(opts);
             var urlstr = utils.defaultString(url);
             var fp = utils.defaultString(opts.filePath);
-            var meta = utils.defaultObject(opts.meta);
+            var meta = _defaultMeta(opts);
             var respJson = wiltoncall("httpclient_send_file", {
                 url: urlstr,
                 filePath: fp,
@@ -297,7 +317,7 @@ define([
             _checkStrayOpts(opts);
             var urlstr = utils.defaultString(url);
             var fp = utils.defaultString(opts.filePath);
-            var meta = utils.defaultObject(opts.meta);
+            var meta = _defaultMeta(opts);
             var sendOptions = utils.defaultObject(opts.sendOptions);
             var respJson = wiltoncall("httpclient_send_file_by_parts", {
                 url: urlstr,
@@ -397,7 +417,7 @@ define([
             if (!utils.undefinedOrNull(opts.data)) {
                 dt = utils.defaultJson(opts.data);
             }
-            var meta = utils.defaultObject(opts.meta);
+            var meta = _defaultMeta(opts);
             var resp_json = wiltoncall("httpclient_queue_submit", {
                 url: urlstr,
                 data: dt,
