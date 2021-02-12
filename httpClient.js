@@ -85,6 +85,9 @@ define([
 
     function _defaultMeta(opts) {
         var meta = utils.defaultObject(opts.meta);
+        if (utils.undefinedOrNull(opts.data)) {
+            return meta;
+        }
         var headers = utils.defaultObject(meta.headers);
         meta.headers = headers;
         for (var key in headers) {
