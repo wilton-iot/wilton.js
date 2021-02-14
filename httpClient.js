@@ -51,12 +51,10 @@
  * @endcode
  */
 define([
-    "utf8",
     "./dyload",
-    "./hex",
     "./utils",
     "./wiltoncall"
-], function(utf8, dyload, hex, utils, wiltoncall) {
+], function(dyload, utils, wiltoncall) {
     "use strict";
 
     dyload({
@@ -122,9 +120,6 @@ define([
      * 
      *  - __connectionSuccess__ `Boolean` `true` if the connection to server was successful,
      *                          `false` otherwise
-     *  - __dataHex__ `String` response data in hexadecimal encoding, use `wilton/hex`to
-     *                decode it; response may contain code sequences that are not valid for
-     *                `UTF-8` encoding
      *  - __data__ `String` data decoded as a `String` with invalid `UTF-8` code sequences
      *             replaced with `0xFFFD`
      *  - __json__ `Function` parses the contents of `data` field as a JSON, resulting
@@ -211,6 +206,7 @@ define([
      *    - __cainfoFilename__ `String|Undefined` path to Certificate Authority (CA) bundle
      *    - __crlfileFilename__ `String|Undefined` path to CRL file
      *    - __sslCipherList__ `String|Undefined` ciphers to use for TLS
+     *  - - __responseDataHex__ `Boolean|Undefined` whether to encode response data into hexadecimal format
      */
     function sendRequest(url, options, callback) {
         var opts = utils.defaultObject(options);
@@ -228,8 +224,6 @@ define([
                 metadata: meta
             });
             var resp = JSON.parse(resp_json);
-            var dataBytes = hex.decodeBytes(resp.dataHex);
-            resp.data = utf8.decode(dataBytes, /* lenient */ true);
             resp.jsonCached = null;
             resp.json = _jsonParse;
             return utils.callOrIgnore(callback, resp);
@@ -273,8 +267,6 @@ define([
                 remove: true === opts.remove
             });
             var resp = JSON.parse(respJson);
-            var dataBytes = hex.decodeBytes(resp.dataHex);
-            resp.data = utf8.decode(dataBytes, /* lenient */ true);
             resp.jsonCached = null;
             resp.json = _jsonParse;
             return utils.callOrIgnore(callback, resp);
@@ -452,8 +444,6 @@ define([
             var respList = JSON.parse(respJson);
             for (var i = 0; i < respList.length; i++) {
                 var resp = respList[i];
-                var dataBytes = hex.decodeBytes(resp.dataHex);
-                resp.data = utf8.decode(dataBytes, /* lenient */ true);
                 resp.jsonCached = null;
                 resp.json = _jsonParse;
             };

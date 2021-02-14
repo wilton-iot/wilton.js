@@ -46,12 +46,10 @@
  */
 
 define([
-    "utf8",
     "./dyload",
-    "./hex",
     "./utils",
     "./wiltoncall"
-], function(utf8, dyload, hex, utils, wiltoncall) {
+], function(dyload, utils, wiltoncall) {
     "use strict";
 
     dyload({
@@ -93,20 +91,11 @@ define([
             callback = options;
         }
         try {
-            var hexRequested = extractHexOption(options);
             var resstr = wiltoncall("zip_read_file", {
                 path: path,
-                hex: true
+                hex: extractHexOption(options)
             });
             var res = JSON.parse(resstr);
-            if (!hexRequested) {
-                for (var key in res) {
-                    if (res.hasOwnProperty(key)) {
-                        var dataBytes = hex.decodeBytes(res[key]);
-                        res[key] = utf8.decode(dataBytes, /* lenient */ true);
-                    }
-                }
-            }
             return utils.callOrIgnore(callback, res);
         } catch (e) {
             return utils.callOrThrow(callback, e);
@@ -138,17 +127,11 @@ define([
             callback = options;
         }
         try {
-            var hexRequested = extractHexOption(options);
-            var resHex = wiltoncall("zip_read_file_entry", {
+            var res = wiltoncall("zip_read_file_entry", {
                 path: path,
                 entry: entry,
-                hex: true
+                hex: extractHexOption(options)
             });
-            var res = resHex;
-            if (!hexRequested) {
-                var dataBytes = hex.decodeBytes(resHex);
-                res = utf8.decode(dataBytes, /* lenient */ true);
-            }
             return utils.callOrIgnore(callback, res);
         } catch (e) {
             return utils.callOrThrow(callback, e);

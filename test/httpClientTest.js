@@ -59,6 +59,16 @@ define([
     });
     assert.equal(resp.data, "foobar");
 
+    // hex
+    var respHex = http.sendRequest("http://127.0.0.1:8080/wilton/test/views/postmirror", {
+        data: "foobar",
+        meta: {
+            timeoutMillis: 60000,
+            responseDataHex: true
+        }
+    });
+    assert.equal(respHex.data, "666f6f626172");
+
     // threads
 
     var chan = new Channel("clientTest", 64);
