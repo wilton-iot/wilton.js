@@ -23,7 +23,8 @@ define([
 
     print("test: wilton/misc");
 
-    assert("object" === typeof(misc.wiltonConfig()));
+    var wconf = misc.wiltonConfig();
+    assert("object" === typeof(wconf));
 
     // GC call present
     misc.runGC();
@@ -61,4 +62,9 @@ define([
         }
     }
     assert(dyloadFound);
+
+    // signals in JVM mode
+    if ("rhino" === wconf.defaultScriptEngine || "nashorn" === wconf.defaultScriptEngine) {
+        assert.throws(function() { misc.waitForSignal(); });
+    }
 });
