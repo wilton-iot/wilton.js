@@ -74,8 +74,8 @@ define([
         logger.debug("Connecting to device, vid: [" + vid.toString(16) + "]," +
                 " pid: [" + pid.toString(16) + "]");
         for (; idx < vpa.length; idx++) {
-            var dvid = vpa[i][0];
-            var dpid = vpa[i][1];
+            var dvid = vpa[idx][0];
+            var dpid = vpa[idx][1];
             if (vid === dvid && pid === dpid) {
                 success = true;
                 break;
