@@ -162,6 +162,7 @@ define([
      *                                     subsequent headers will be ignored, default value: `128`
      *    - __consumerThreadWakeupTimeoutMillis__ `Number|Undefined` consumer threads wakeup timeout,
      *                                            in milliseconds, default value: `100`
+     *    - __requestDataFilePath__ `String|Undefined` path to file to send, only supported with `enqueueRequest`
      *    - __responseDataFilePath__ `String|Undefined` path to file where to write the response body
      *    - __forceHttp10__ `Boolean|Undefined` whether to use HTTP `1.0` protocol closing the connection
      *                      after the request, default value: `false`
@@ -401,7 +402,7 @@ define([
      * @param options `Object` configuration object, see supported options in
      *                `sendRequest()` function doc
      * @param callback `Function|Undefined` callback to receive result or error
-     * @returns `Undefined`
+     * @returns `Object` enqueued request, `requestId` is unique for the given queue
      */
     function enqueueRequest(url, options, callback) {
         var opts = utils.defaultObject(options);
@@ -413,12 +414,13 @@ define([
                 dt = utils.defaultJson(opts.data);
             }
             var meta = _defaultMeta(opts);
-            var resp_json = wiltoncall("httpclient_queue_submit", {
+            var respJson = wiltoncall("httpclient_queue_submit", {
                 url: urlstr,
                 data: dt,
                 metadata: meta
             });
-            return utils.callOrIgnore(callback);
+            var resp = JSON.parse(respJson);
+            return utils.callOrIgnore(callback, resp);
         } catch (e) {
             return utils.callOrThrow(callback, e);
         }

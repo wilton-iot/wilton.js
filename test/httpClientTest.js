@@ -21,8 +21,9 @@ define([
     "wilton/httpClient",
     "wilton/Server",
     "wilton/thread",
+    "wilton/utils",
     "./_scratchDir"
-], function(assert, Channel, fs, http, Server, thread, scratchDir) {
+], function(assert, Channel, fs, http, Server, thread, utils, scratchDir) {
     "use strict";
 
     print("test: wilton/httpClient");
@@ -50,6 +51,7 @@ define([
     });
     assert.equal(resp.data, "Hi from wilton_test!");
     assert.equal(resp.headers.Connection, "close");
+    assert(resp.requestId > 0);
     
     var resp = http.sendRequest("http://127.0.0.1:8080/wilton/test/views/postmirror", {
         data: "foobar",
@@ -160,14 +162,17 @@ define([
     // check no throw
     http.closeQueue();
     http.initQueue();
+    var idObj = {};
     assert.throws(function() { http.initQueue(); });
     for (var i = 0; i < 8; i++) {
-        http.enqueueRequest("http://127.0.0.1:8080/wilton/test/views/postmirror", {
+        var enqueued = http.enqueueRequest("http://127.0.0.1:8080/wilton/test/views/postmirror", {
             data: "foo",
             meta: {
                 timeoutMillis: 60000
             }
         });
+        assert(enqueued.requestId > 0);
+        idObj[enqueued.requestId] = true;
     }
     var list = [];
     for (var i = 0; i < 1024; i++) {
@@ -185,6 +190,51 @@ define([
         var resp = list[i];
         assert.equal(resp.responseCode, 200);
         assert.equal(resp.data, "foo");
+        assert(resp.requestId > 0);
+        assert.equal(idObj[resp.requestId], true);
+        delete idObj[resp.requestId];
+    }
+    assert.equal(utils.listProperties(idObj).length, 0);
+
+    // send file
+    fs.writeFile(dir + "queueTestSend.txt", "foobaf");
+    var enqueuedSend = http.enqueueRequest("http://127.0.0.1:8080/wilton/test/views/postmirror", {
+        meta: {
+            timeoutMillis: 60000,
+            requestDataFilePath: dir + "queueTestSend.txt"
+        }
+    });
+    assert(enqueuedSend.requestId > 0);
+    for (var i = 0; i < 1024; i++) {
+        var polled = http.pollQueue();
+        if (polled.length > 0) {
+            assert.equal(polled.length, 1);
+            assert(polled[0].requestId > 0);
+            assert.equal(polled[0].requestId, enqueuedSend.requestId);
+            assert.equal(polled[0].data, "foobaf");
+            break;
+        }
+    }
+
+    // receive file
+    var enqueuedReceive = http.enqueueRequest("http://127.0.0.1:8080/wilton/test/views/postmirror", {
+        data: "foobaz",
+        meta: {
+            timeoutMillis: 60000,
+            responseDataFilePath: dir + "queueTestReceive.txt"
+        }
+    });
+    assert(enqueuedReceive.requestId > 0);
+    for (var i = 0; i < 1024; i++) {
+        var polled = http.pollQueue();
+        if (polled.length > 0) {
+            assert.equal(polled.length, 1);
+            assert(polled[0].requestId > 0);
+            assert.equal(polled[0].requestId, enqueuedReceive.requestId);
+            assert(fs.exists(dir + "queueTestReceive.txt"));
+            assert.equal(fs.readFile(dir + "queueTestReceive.txt"), "foobaz");
+            break;
+        }
     }
 
     server.stop();
