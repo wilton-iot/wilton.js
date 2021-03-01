@@ -100,7 +100,9 @@ define([
             });
             try {
                 for (var i = 0; i < entries.length; i++) {
-                    wiltoncall("fs_append_tl_file_writer", entries[i]);
+                    if (entries[i].length > 0) {
+                        wiltoncall("fs_append_tl_file_writer", entries[i]);
+                    }
                     if (i < entries.length - 1 && delim.length > 0) {
                         wiltoncall("fs_append_tl_file_writer", delim);
                     }

@@ -17,13 +17,14 @@
 define([
     "assert",
     "wilton/Channel",
+    "wilton/crypto",
     "wilton/fs",
     "wilton/httpClient",
     "wilton/Server",
     "wilton/thread",
     "wilton/utils",
     "./_scratchDir"
-], function(assert, Channel, fs, http, Server, thread, utils, scratchDir) {
+], function(assert, Channel, crypto, fs, http, Server, thread, utils, scratchDir) {
     "use strict";
 
     print("test: wilton/httpClient");
@@ -35,7 +36,8 @@ define([
         views: [
             "wilton/test/views/hi",
             "wilton/test/views/savefile",
-            "wilton/test/views/postmirror"
+            "wilton/test/views/postmirror",
+            "wilton/test/views/bigfile"
         ],
         requestPayload: {
             tmpDirPath: dir,
@@ -237,7 +239,86 @@ define([
         }
     }
 
+    // size limit
+    var enqueuedLimit = http.enqueueRequest("http://127.0.0.1:8080/wilton/test/views/postmirror", {
+        data: "foobar",
+        meta: {
+            timeoutMillis: 60000,
+            queueResponseMaxSizeBytes: 5
+        }
+    });
+    for (var i = 0; i < 1024; i++) {
+        var polled = http.pollQueue();
+        if (polled.length > 0) {
+            assert.equal(polled.length, 1);
+            assert.equal(polled[0].requestId, enqueuedLimit.requestId);
+            assert.equal(polled[0].responseCode, 0);
+            assert(polled[0].error.length > 0);
+            break;
+        }
+    }
+
+    // big file
+    var bigFile = dir + "bigfile.txt";
+    var bigSt = "";
+    var bigLen = 0;
+    fs.writeFile(bigFile, "");
+    for (var i = 0; ; i++) {
+        bigSt += String(i) + "_";
+        if (bigSt.length > (1 << 12)) {
+            bigSt += "\n";
+            fs.appendFile(bigFile, bigSt);
+            bigLen += bigSt.length;
+            bigSt = "";
+        }
+        if (bigLen > (1<<15)) {
+            break;
+        }
+    }
+    var bigHash = crypto.hashFile({
+        filePath: bigFile
+    });
+    var enqueuedBig = http.enqueueRequest("http://127.0.0.1:8080/wilton/test/views/bigfile", {
+        meta: {
+            timeoutMillis: 60000,
+            headers: {
+                "X-httpClientTest-bigfile": bigFile
+            }
+        }
+    });
+    for (var i = 0; i < 1024; i++) {
+        var polled = http.pollQueue();
+        if (polled.length > 0) {
+            assert.equal(polled[0].requestId, enqueuedBig.requestId);
+            var bigFileReceived = dir + "bigReceived.txt";
+            fs.writeFile(bigFileReceived, polled[0].data);
+            var hashReceived = crypto.hashFile({
+                filePath: bigFileReceived
+            });
+            assert.equal(fs.stat(bigFileReceived).size, bigLen);
+            assert.equal(hashReceived, bigHash);
+            break;
+        }
+    }
+
     server.stop();
+
+    // connection invalid
+    var enqueuedInvalid = http.enqueueRequest("http://127.0.0.1:8080/wilton/test/views/hi", {
+        meta: {
+            connecttimeoutMillis: 500
+        }
+    });
+    for (var i = 0; i < 1024; i++) {
+        var polled = http.pollQueue();
+        if (polled.length > 0) {
+            assert.equal(polled[0].requestId, enqueuedInvalid.requestId);
+            assert.equal(polled[0].responseCode, 0);
+            assert.equal(polled[0].connectionSuccess, false);
+            assert.equal(polled[0].error, "Connection error");
+            break;
+        }
+    }
 
     fs.rmdir(dir);
 });

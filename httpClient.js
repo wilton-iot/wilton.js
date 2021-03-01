@@ -122,6 +122,7 @@ define([
      *                          `false` otherwise
      *  - __data__ `String` data decoded as a `String` with invalid `UTF-8` code sequences
      *             replaced with `0xFFFD`
+     *  - __error__ `String` error message, empty string if no error happened
      *  - __json__ `Function` parses the contents of `data` field as a JSON, resulting
      *             JSON object is cached for this response instance - the same object is
      *             returned for the following `json()` invocations
@@ -208,6 +209,8 @@ define([
      *    - __crlfileFilename__ `String|Undefined` path to CRL file
      *    - __sslCipherList__ `String|Undefined` ciphers to use for TLS
      *  - - __responseDataHex__ `Boolean|Undefined` whether to encode response data into hexadecimal format
+     *  - - __queueResponseMaxSizeBytes__ `Number|Undefined` max size of the in-memory response body,
+     *                                    only applicable to HTTP queue, default value: `0` (unlimited)
      */
     function sendRequest(url, options, callback) {
         var opts = utils.defaultObject(options);
