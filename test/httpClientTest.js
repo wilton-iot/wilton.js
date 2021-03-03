@@ -176,20 +176,12 @@ define([
         assert(enqueued.requestId > 0);
         idObj[enqueued.requestId] = true;
     }
-    var list = [];
-    for (var i = 0; i < 1024; i++) {
-        var polled = http.pollQueue();
-        assert(polled instanceof Array);
-        for (var j = 0; j < polled.length; j++) {
-            list.push(polled[j]);
-        }
-        if (list.length >= 8) {
-            break;
-        }
-    }
-    assert.equal(list.length, 8);
-    for (var i = 0; i < list.length; i++) {
-        var resp = list[i];
+    var listFromQueue = http.pollQueue({
+        minResponsesCount: 8
+    });
+    assert.equal(listFromQueue.length, 8);
+    for (var i = 0; i < listFromQueue.length; i++) {
+        var resp = listFromQueue[i];
         assert.equal(resp.responseCode, 200);
         assert.equal(resp.data, "foo");
         assert(resp.requestId > 0);
@@ -207,16 +199,13 @@ define([
         }
     });
     assert(enqueuedSend.requestId > 0);
-    for (var i = 0; i < 1024; i++) {
-        var polled = http.pollQueue();
-        if (polled.length > 0) {
-            assert.equal(polled.length, 1);
-            assert(polled[0].requestId > 0);
-            assert.equal(polled[0].requestId, enqueuedSend.requestId);
-            assert.equal(polled[0].data, "foobaf");
-            break;
-        }
-    }
+    var polledSendFile = http.pollQueue({
+        minResponsesCount: 1
+    });
+    assert.equal(polledSendFile.length, 1);
+    assert(polledSendFile[0].requestId > 0);
+    assert.equal(polledSendFile[0].requestId, enqueuedSend.requestId);
+    assert.equal(polledSendFile[0].data, "foobaf");
 
     // receive file
     var enqueuedReceive = http.enqueueRequest("http://127.0.0.1:8080/wilton/test/views/postmirror", {
@@ -227,17 +216,15 @@ define([
         }
     });
     assert(enqueuedReceive.requestId > 0);
-    for (var i = 0; i < 1024; i++) {
-        var polled = http.pollQueue();
-        if (polled.length > 0) {
-            assert.equal(polled.length, 1);
-            assert(polled[0].requestId > 0);
-            assert.equal(polled[0].requestId, enqueuedReceive.requestId);
-            assert(fs.exists(dir + "queueTestReceive.txt"));
-            assert.equal(fs.readFile(dir + "queueTestReceive.txt"), "foobaz");
-            break;
-        }
-    }
+    var polledReceiveFile = http.pollQueue({
+        minResponsesCount: 1
+    });
+    assert.equal(polledReceiveFile.length, 1);
+    assert(polledReceiveFile[0].requestId > 0);
+    assert.equal(polledReceiveFile[0].requestId, enqueuedReceive.requestId);
+    assert.equal(polledReceiveFile[0].json().responseDataFilePath, dir + "queueTestReceive.txt");
+    assert(fs.exists(dir + "queueTestReceive.txt"));
+    assert.equal(fs.readFile(dir + "queueTestReceive.txt"), "foobaz");
 
     // size limit
     var enqueuedLimit = http.enqueueRequest("http://127.0.0.1:8080/wilton/test/views/postmirror", {
@@ -247,16 +234,13 @@ define([
             queueResponseMaxSizeBytes: 5
         }
     });
-    for (var i = 0; i < 1024; i++) {
-        var polled = http.pollQueue();
-        if (polled.length > 0) {
-            assert.equal(polled.length, 1);
-            assert.equal(polled[0].requestId, enqueuedLimit.requestId);
-            assert.equal(polled[0].responseCode, 0);
-            assert(polled[0].error.length > 0);
-            break;
-        }
-    }
+    var polledSizeLimit = http.pollQueue({
+        minResponsesCount: 1
+    });
+    assert.equal(polledSizeLimit.length, 1);
+    assert.equal(polledSizeLimit[0].requestId, enqueuedLimit.requestId);
+    assert.equal(polledSizeLimit[0].responseCode, 0);
+    assert(polledSizeLimit[0].error.length > 0);
 
     // big file
     var bigFile = dir + "bigfile.txt";
@@ -286,20 +270,17 @@ define([
             }
         }
     });
-    for (var i = 0; i < 1024; i++) {
-        var polled = http.pollQueue();
-        if (polled.length > 0) {
-            assert.equal(polled[0].requestId, enqueuedBig.requestId);
-            var bigFileReceived = dir + "bigReceived.txt";
-            fs.writeFile(bigFileReceived, polled[0].data);
-            var hashReceived = crypto.hashFile({
-                filePath: bigFileReceived
-            });
-            assert.equal(fs.stat(bigFileReceived).size, bigLen);
-            assert.equal(hashReceived, bigHash);
-            break;
-        }
-    }
+    var polledBig = http.pollQueue({
+        minResponsesCount: 1
+    });
+    assert.equal(polledBig[0].requestId, enqueuedBig.requestId);
+    var bigFileReceived = dir + "bigReceived.txt";
+    fs.writeFile(bigFileReceived, polledBig[0].data);
+    var hashReceived = crypto.hashFile({
+        filePath: bigFileReceived
+    });
+    assert.equal(fs.stat(bigFileReceived).size, bigLen);
+    assert.equal(hashReceived, bigHash);
 
     server.stop();
 
@@ -309,16 +290,13 @@ define([
             connecttimeoutMillis: 500
         }
     });
-    for (var i = 0; i < 1024; i++) {
-        var polled = http.pollQueue();
-        if (polled.length > 0) {
-            assert.equal(polled[0].requestId, enqueuedInvalid.requestId);
-            assert.equal(polled[0].responseCode, 0);
-            assert.equal(polled[0].connectionSuccess, false);
-            assert.equal(polled[0].error, "Connection error");
-            break;
-        }
-    }
+    var polledNoConnection = http.pollQueue({
+        minResponsesCount: 1
+    });
+    assert.equal(polledNoConnection[0].requestId, enqueuedInvalid.requestId);
+    assert.equal(polledNoConnection[0].responseCode, 0);
+    assert.equal(polledNoConnection[0].connectionSuccess, false);
+    assert.equal(polledNoConnection[0].error, "Connection error");
 
     fs.rmdir(dir);
 });

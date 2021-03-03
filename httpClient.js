@@ -350,9 +350,11 @@ define([
      *
      * __options__
      * 
-     *  - __fdsetTimeoutMillis__ `Number` max allowed number of milliseconds
-     *                           to wait for activity on one of running requests,
-     *                           default value: `100`
+     *  - __requestsQueueMaxSize__ `Number` Max number of simultaneous requests
+     *  - __fdsetTimeoutMillis__ `Number` Timeout to wait for after 'fdset' call failure
+     *                                  (in milliseconds), default value: `100`
+     *  - __socketSelectTimeoutMillis__ `Number` max timeout for socket 'select' call (in milliseconds),
+     *                                          default value: `100`
      *  - __maxHostConnections__ `Number` max number of connections to a single host,
      *                           default value: `0 (unlimited)`
      *  - __maxTotalConnections__ `Number` max number of simultaneously open connections,
@@ -437,10 +439,20 @@ define([
      * Polls requests queue allowing enqued requests to perform the work.
      * `initQueue` must be called in the same thread before using this function.
      * 
-     * @param options `Object` currently not supported
+     * @param options `Object` configuration object, see possible options below.
      * @param callback `Function|Undefined` callback to receive result or error
      * @returns `Array` list of the responses for requests, that finished execution,
      *          see details on the structure of each response in `sendRequest()` function
+     *
+     * __options__
+     * 
+     *  - __minResponsesCount__ `Number|Undefined` minimum number of responses to obtain,
+     *                          queue will be polled repeatedly until the specified number of
+     *                          responses is received; if this number is bigger than a number of
+     *                          currently running requests - poll exists when all running requests
+     *                          are finished; default value: `0`
+     *  - __pollPeriodMillis__ `Number|Undefined` the number of millisecods to pass between poll
+     *                          invocations; default value: `0`
      */
     function pollQueue(options, callback) {
         var opts = utils.defaultObject(options);
