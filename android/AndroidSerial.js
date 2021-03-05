@@ -58,50 +58,44 @@ define([
                 " available: [" + JSON.stringify(found, null, 4) + "]");
     }
 
-    function openFTDI(options, device) {
+    function openFTDI(options, serial) {
+        logger.debug("Looking for FTDI device, serial: [" + serial + "]");
         var man = D2xxManager.getInstance(deviceService);
         var count = man.createDeviceInfoList(deviceService);
         logger.debug("FTDI devices count: [" + count + "]");
         if (0 === count) {
             throw new Error("FTDI USB device is not connected");
         }
-        var vpa = man.getVIDPID();
         var idx = 0;
-        var success = false;
-        var found = [];
-        var vid = device.getVendorId();
-        var pid = device.getProductId();
-        logger.debug("Connecting to device, vid: [" + vid.toString(16) + "]," +
-                " pid: [" + pid.toString(16) + "]");
-        for (; idx < vpa.length; idx++) {
-            var dvid = vpa[idx][0];
-            var dpid = vpa[idx][1];
-            if (vid === dvid && pid === dpid) {
-                success = true;
-                break;
+        for (var i = 0; i < count; i++) {
+            var info = man.getDeviceInfoListDetail(i);
+            if (null !== info) {
+                var ser = String(info.serialNumber);
+                logger.debug("FTDI device found, serial: [" + ser + "]");
+                if (0 === idx && serial === ser) {
+                    idx = i;
+                }
             } else {
-                found.push(dvid.toString(16) + ":" + dpid.toString(16));
+                logger.warn("Cannot access FTDI device info, idx: [" + i + "]");
             }
         }
-        if (!success) {
-            throw new Error("FTDI USB device not found," +
-                    " vid: [" + vid.toString(16) + "]" +
-                    " pid: [" + pid.toString(16) + "]" +
-                    " available: [" + JSON.stringify(found, null, 4) + "]");
-        }
+        logger.debug("Is due to open FTDI device, index: [" + idx + "]");
         var dev = man.openByIndex(deviceService, idx);
         dev.setBaudRate(options.baudRate);
         dev.setDataCharacteristics(options.byteSize, options.stopBitsCount, D2xxManager.FT_PARITY_NONE);
         dev.setFlowControl(D2xxManager.FT_FLOW_NONE, 0, 0);
-        dev.syncRead = function(buf, timeout) {
-            return dev.read(buf, buf.length, timeout);
-        };
-        dev.syncWrite = function(buf/*, timeout */) {
-            return dev.write(buf);
-        };
-        dev.syncClose = dev.close;
 
-        this.port = dev;
+        return {
+            syncRead: function(buf, timeout) {
+                return dev.read(buf, buf.length, timeout);
+            },
+            syncWrite: function(buf/*, timeout */) {
+                return dev.write(buf);
+            },
+            syncClose: function() {
+                dev.close();
+            }
+        };
     }
 
     function openSerial(options, device) {
@@ -126,25 +120,23 @@ define([
         dev.setParity(UsbSerialInterface.PARITY_NONE);
         dev.setFlowControl(UsbSerialInterface.FLOW_CONTROL_OFF);
 
-        this.port = dev;
+        return dev;
     }
 
     var AndroidSerial = function(options) {
         utils.checkProperties(options, ["port", "baudRate", "byteSize", "stopBitsCount", "timeoutMillis"]);
         logger.debug("Opening serial connection, timeout: [" + options.timeoutMillis + "] ...");
-        
-        // list devices
-        var uman = deviceService.getSystemService(Context.USB_SERVICE);
-        var devices = uman.getDeviceList().values().toArray();
-        if (0 === devices.length) {
-            throw new Error("No USB devices found");
-        }
 
-        var device = findDeviceByVidPid(devices, options.port);
-
-        if (0x403 === device.getVendorId()) { // ftdi
-            this.port = openFTDI(options, device);
+        if (utils.startsWith(options.port, "ftdi:")) { // ftdi
+            this.port = openFTDI(options, options.port.substring(5));
         } else { // other devices
+            // list devices
+            var uman = deviceService.getSystemService(Context.USB_SERVICE);
+            var devices = uman.getDeviceList().values().toArray();
+            if (0 === devices.length) {
+                throw new Error("No USB devices found");
+            }
+	    var device = findDeviceByVidPid(devices, options.port);
             this.port = openSerial(options, device);
         }
         this.timeoutMillis = options.timeoutMillis;
@@ -232,10 +224,11 @@ define([
                 var wbuf = Array.newInstance(Byte.TYPE, bytes.length - written);
                 System.arraycopy(bytes, written, wbuf, 0, wbuf.length);
                 var wr = this.port.syncWrite(bytes, tm);
-                // serial may report wrong write size
-                var cwr = wr < wbuf.length ? wr : wbuf.length;
-                written += cwr;
-
+                if (wr > 0) {
+                    // serial may report wrong write size
+                    var cwr = wr < wbuf.length ? wr : wbuf.length;
+                    written += cwr;
+                }
                 now = Date.now();
                 elapsed = now - start;
             }
