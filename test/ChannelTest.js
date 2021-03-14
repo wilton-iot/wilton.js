@@ -197,6 +197,18 @@ define([
     var retChan = new Channel("ChannelTest.selector.out", 2);
     var dummyChan1 = new Channel("ChannelTest.selector.dummy1", 1);
     var dummyChan2 = new Channel("ChannelTest.selector.dummy2");
+    var enqueuedChan = new Channel("ChannelTest.selector.enqueued", 42);
+    enqueuedChan.send({
+        foo: 42
+    });
+
+    // immediate return enqueued
+    var idx_enqueued = Channel.select([dummyChan1, enqueuedChan]);
+    assert.equal(1, idx_enqueued);
+    assert.deepEqual(enqueuedChan.receive(), {
+        foo: 42
+    });
+    enqueuedChan.close();
 
     var selThreadExitChan = thread.run({
         callbackScript: {
