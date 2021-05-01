@@ -30,6 +30,7 @@ define([
         // Force links and redirects to open in the WebView instead of in a browser
         webView.setWebViewClient(new WebViewClient());
         webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
         webView.loadUrl("http://127.0.0.1:26100/");
     }
 
